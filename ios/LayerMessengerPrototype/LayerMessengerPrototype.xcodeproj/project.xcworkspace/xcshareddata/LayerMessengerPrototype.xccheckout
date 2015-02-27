@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>28D8D15C-4553-4CD4-B7F1-9ABDCEFA9814</string>
+	<key>IDESourceControlProjectName</key>
+	<string>LayerMessengerPrototype</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>204983544B18183BC878D046A1FBDC4BEE16CA2D</key>
+		<string>https://bitbucket.org/vk_arcadia/layermessengerprototype.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ios/LayerMessengerPrototype/LayerMessengerPrototype.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>204983544B18183BC878D046A1FBDC4BEE16CA2D</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://bitbucket.org/vk_arcadia/layermessengerprototype.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>204983544B18183BC878D046A1FBDC4BEE16CA2D</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>204983544B18183BC878D046A1FBDC4BEE16CA2D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>LayerMessengerPrototype</string>
+		</dict>
+	</array>
+</dict>
+</plist>

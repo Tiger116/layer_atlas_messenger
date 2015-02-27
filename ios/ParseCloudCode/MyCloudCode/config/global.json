@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "LayerMessengerPrototype": {
+            "applicationId": "hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8", 
+            "masterKey": "k1eUhMAxp1Mmw8rLh84ByJLCYqmRQ7AdPMs4ooKR"
+        }, 
+        "_default": {
+            "link": "LayerMessengerPrototype"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.5"
+    }
+}
