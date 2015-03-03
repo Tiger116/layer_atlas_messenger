@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3545AFC61AA0826200B6AF91 /* libPods-Atlas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */; };
+		3545AFC81AA0826D00B6AF91 /* libPods-LayerKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */; };
 		359FFB301A9C8A8D00F51353 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB2E1A9C8A8D00F51353 /* Bolts.framework */; };
 		359FFB311A9C8A8D00F51353 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB2F1A9C8A8D00F51353 /* Parse.framework */; };
 		359FFB331A9C8AFB00F51353 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB321A9C8AFB00F51353 /* AudioToolbox.framework */; };
@@ -21,15 +23,15 @@
 		359FFB451A9C8B6300F51353 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB441A9C8B6300F51353 /* libz.dylib */; };
 		359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB461A9C8B6D00F51353 /* libsqlite3.dylib */; };
 		35BB42651A975AF2006248F8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42641A975AF2006248F8 /* main.m */; };
-		35BB426E1A975AF2006248F8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 35BB426C1A975AF2006248F8 /* Main.storyboard */; };
 		35BB42701A975AF2006248F8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 35BB426F1A975AF2006248F8 /* Images.xcassets */; };
 		35BB42731A975AF2006248F8 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35BB42711A975AF2006248F8 /* LaunchScreen.xib */; };
 		35BB427F1A975AF2006248F8 /* LayerMessengerPrototypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB427E1A975AF2006248F8 /* LayerMessengerPrototypeTests.m */; };
 		35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB428B1A975BBB006248F8 /* AppDelegate.m */; };
 		35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42911A975BD1006248F8 /* ConversationsViewController.m */; };
 		35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42971A975D78006248F8 /* MessagesViewController.m */; };
-		35BB429E1A975DE0006248F8 /* ConversationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB429D1A975DE0006248F8 /* ConversationCell.m */; };
-		35BB42A11A975DF2006248F8 /* MessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42A01A975DF2006248F8 /* MessageCell.m */; };
+		35BF373D1AA5F1490014ED96 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF37391AA5F1490014ED96 /* User.m */; };
+		35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF373C1AA5F1490014ED96 /* UsersDataSource.m */; };
+		35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35FA565A1AA4AC640090148B /* ParticipantsViewController.m */; };
 		CF08B644ABFB518202E04EB5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F25916D77E0F48C3F8A768 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +47,8 @@
 
 /* Begin PBXFileReference section */
 		24F25916D77E0F48C3F8A768 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-Atlas.a"; path = "Pods/build/Debug-iphoneos/libPods-Atlas.a"; sourceTree = "<group>"; };
+		3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-LayerKit.a"; path = "Pods/build/Debug-iphoneos/libPods-LayerKit.a"; sourceTree = "<group>"; };
 		359FFB2E1A9C8A8D00F51353 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		359FFB2F1A9C8A8D00F51353 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		359FFB321A9C8AFB00F51353 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -61,7 +65,6 @@
 		35BB425F1A975AF2006248F8 /* LayerMessengerPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LayerMessengerPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		35BB42631A975AF2006248F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		35BB42641A975AF2006248F8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		35BB426D1A975AF2006248F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		35BB426F1A975AF2006248F8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		35BB42721A975AF2006248F8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		35BB42781A975AF2006248F8 /* LayerMessengerPrototypeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LayerMessengerPrototypeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,10 +76,12 @@
 		35BB42911A975BD1006248F8 /* ConversationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversationsViewController.m; sourceTree = "<group>"; };
 		35BB42961A975D78006248F8 /* MessagesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessagesViewController.h; sourceTree = "<group>"; };
 		35BB42971A975D78006248F8 /* MessagesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessagesViewController.m; sourceTree = "<group>"; };
-		35BB429C1A975DE0006248F8 /* ConversationCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversationCell.h; sourceTree = "<group>"; };
-		35BB429D1A975DE0006248F8 /* ConversationCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversationCell.m; sourceTree = "<group>"; };
-		35BB429F1A975DF2006248F8 /* MessageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageCell.h; sourceTree = "<group>"; };
-		35BB42A01A975DF2006248F8 /* MessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageCell.m; sourceTree = "<group>"; };
+		35BF37381AA5F1490014ED96 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		35BF37391AA5F1490014ED96 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		35BF373B1AA5F1490014ED96 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
+		35BF373C1AA5F1490014ED96 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
+		35FA56591AA4AC640090148B /* ParticipantsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticipantsViewController.h; sourceTree = "<group>"; };
+		35FA565A1AA4AC640090148B /* ParticipantsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParticipantsViewController.m; sourceTree = "<group>"; };
 		5EFA945ED357962BF6694591 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		DA93C32A9A428F64F594C3A6 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -86,6 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3545AFC81AA0826D00B6AF91 /* libPods-LayerKit.a in Frameworks */,
+				3545AFC61AA0826200B6AF91 /* libPods-Atlas.a in Frameworks */,
 				359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */,
 				359FFB451A9C8B6300F51353 /* libz.dylib in Frameworks */,
 				359FFB431A9C8B4900F51353 /* SystemConfiguration.framework in Frameworks */,
@@ -137,7 +144,6 @@
 			isa = PBXGroup;
 			children = (
 				35BB42881A975BBB006248F8 /* Classes */,
-				35BB426C1A975AF2006248F8 /* Main.storyboard */,
 				35BB426F1A975AF2006248F8 /* Images.xcassets */,
 				35BB42711A975AF2006248F8 /* LaunchScreen.xib */,
 				35BB42621A975AF2006248F8 /* Supporting Files */,
@@ -176,6 +182,7 @@
 			children = (
 				35BB42891A975BBB006248F8 /* AppDelegate */,
 				35BB428C1A975BBB006248F8 /* ViewControllers */,
+				35BF37361AA5F1490014ED96 /* DataRelated */,
 				35BB42991A975D8A006248F8 /* Views */,
 			);
 			path = Classes;
@@ -194,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				35BB428D1A975BBB006248F8 /* ConversationsViewController */,
+				35FA56581AA4AC2F0090148B /* ParticipantsController */,
 				35BB428E1A975BBB006248F8 /* MessagesViewController */,
 			);
 			path = ViewControllers;
@@ -220,28 +228,44 @@
 		35BB42991A975D8A006248F8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				35BB429A1A975DB0006248F8 /* ConversationCell */,
-				35BB429B1A975DB0006248F8 /* MessageCell */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		35BB429A1A975DB0006248F8 /* ConversationCell */ = {
+		35BF37361AA5F1490014ED96 /* DataRelated */ = {
 			isa = PBXGroup;
 			children = (
-				35BB429C1A975DE0006248F8 /* ConversationCell.h */,
-				35BB429D1A975DE0006248F8 /* ConversationCell.m */,
+				35BF37371AA5F1490014ED96 /* User */,
+				35BF373A1AA5F1490014ED96 /* UsersDataSource */,
 			);
-			path = ConversationCell;
+			path = DataRelated;
 			sourceTree = "<group>";
 		};
-		35BB429B1A975DB0006248F8 /* MessageCell */ = {
+		35BF37371AA5F1490014ED96 /* User */ = {
 			isa = PBXGroup;
 			children = (
-				35BB429F1A975DF2006248F8 /* MessageCell.h */,
-				35BB42A01A975DF2006248F8 /* MessageCell.m */,
+				35BF37381AA5F1490014ED96 /* User.h */,
+				35BF37391AA5F1490014ED96 /* User.m */,
 			);
-			path = MessageCell;
+			path = User;
+			sourceTree = "<group>";
+		};
+		35BF373A1AA5F1490014ED96 /* UsersDataSource */ = {
+			isa = PBXGroup;
+			children = (
+				35BF373B1AA5F1490014ED96 /* UsersDataSource.h */,
+				35BF373C1AA5F1490014ED96 /* UsersDataSource.m */,
+			);
+			path = UsersDataSource;
+			sourceTree = "<group>";
+		};
+		35FA56581AA4AC2F0090148B /* ParticipantsController */ = {
+			isa = PBXGroup;
+			children = (
+				35FA56591AA4AC640090148B /* ParticipantsViewController.h */,
+				35FA565A1AA4AC640090148B /* ParticipantsViewController.m */,
+			);
+			path = ParticipantsController;
 			sourceTree = "<group>";
 		};
 		D4D486EA7E83C5075D416C2C /* Pods */ = {
@@ -256,6 +280,8 @@
 		EAC00861624EB0724FA19C72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */,
+				3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */,
 				359FFB461A9C8B6D00F51353 /* libsqlite3.dylib */,
 				359FFB441A9C8B6300F51353 /* libz.dylib */,
 				359FFB421A9C8B4900F51353 /* SystemConfiguration.framework */,
@@ -356,7 +382,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35BB426E1A975AF2006248F8 /* Main.storyboard in Resources */,
 				35BB42731A975AF2006248F8 /* LaunchScreen.xib in Resources */,
 				35BB42701A975AF2006248F8 /* Images.xcassets in Resources */,
 			);
@@ -410,10 +435,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
+				35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */,
 				35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */,
+				35BF373D1AA5F1490014ED96 /* User.m in Sources */,
 				35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */,
-				35BB42A11A975DF2006248F8 /* MessageCell.m in Sources */,
-				35BB429E1A975DE0006248F8 /* ConversationCell.m in Sources */,
+				35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */,
 				35BB42651A975AF2006248F8 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,14 +463,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		35BB426C1A975AF2006248F8 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				35BB426D1A975AF2006248F8 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		35BB42711A975AF2006248F8 /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -545,11 +563,17 @@
 				);
 				INFOPLIST_FILE = LayerMessengerPrototype/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/build/Debug-iphoneos",
+				);
 				OTHER_LDFLAGS = (
 					"-force_load",
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
+					"-force_load",
+					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
 					"-l\"Pods-LayerKit\"",
-					"-l\"z\"",
+					"-lz",
 					"-framework",
 					"\"CFNetwork\"",
 					"-framework",
@@ -576,11 +600,17 @@
 				);
 				INFOPLIST_FILE = LayerMessengerPrototype/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/build/Debug-iphoneos",
+				);
 				OTHER_LDFLAGS = (
 					"-force_load",
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
+					"-force_load",
+					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
 					"-l\"Pods-LayerKit\"",
-					"-l\"z\"",
+					"-lz",
 					"-framework",
 					"\"CFNetwork\"",
 					"-framework",

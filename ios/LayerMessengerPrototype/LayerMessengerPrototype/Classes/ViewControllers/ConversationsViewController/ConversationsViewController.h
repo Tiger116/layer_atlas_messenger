@@ -8,11 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import <LayerKit/LayerKit.h>
+#import <Atlas.h>
 
-@interface ConversationsViewController : UITableViewController
-
-@property (nonatomic) LYRClient *layerClient;
-
-- (void)appDidConnectedToLayer;
+@interface ConversationsViewController : ATLConversationListViewController
 
 @end

@@ -32,6 +32,9 @@ NSString *const LQSCurrentUserID = @"iOS_Device";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Initialize window.
+    
+    
     // Initialize Parse.
     [Parse setApplicationId:@"hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8"
                   clientKey:@"XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx"];
@@ -51,9 +54,12 @@ NSString *const LQSCurrentUserID = @"iOS_Device";
                     NSLog(@"Failed Authenticating Layer Client with error:%@", error);
                 }else
                 {
-                    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-                    [(ConversationsViewController*)navigationController.topViewController setLayerClient:self.layerClient];
-                    [(ConversationsViewController*)navigationController.topViewController appDidConnectedToLayer];
+                    self.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.layerClient];
+                    self.navController = [[UINavigationController alloc] initWithRootViewController:self.conversationsViewController];
+                    
+                    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+                    [self.window setRootViewController:self.navController];
+                    [self.window makeKeyAndVisible];
                 }
             }];
         }

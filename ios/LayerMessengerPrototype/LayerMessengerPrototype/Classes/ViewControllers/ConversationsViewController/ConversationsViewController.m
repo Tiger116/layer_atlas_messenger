@@ -8,9 +8,8 @@
 
 #import "ConversationsViewController.h"
 #import "MessagesViewController.h"
-#import "ConversationCell.h"
 
-@interface ConversationsViewController ()
+@interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
 @property (strong,nonatomic) NSOrderedSet* conversations;
 
@@ -21,8 +20,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    self.delegate = self;
+    self.dataSource = self;
+    self.allowsEditing = YES;
+    
+    // Right navigation item
+    UIBarButtonItem *composeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeButtonTapped)];
+    [self.navigationItem setRightBarButtonItem:composeButton];
     
 }
 
@@ -32,112 +37,52 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)appDidConnectedToLayer
+- (void)composeButtonTapped
 {
-    self.conversations = [self getAllConversations];
-    [self.tableView reloadData];
+    [self presentControllerWithConversation:nil];
 }
 
-- (NSOrderedSet*) getAllConversations
+#pragma mark - Conversation Selection
+
+- (void)presentControllerWithConversation:(LYRConversation *)conversation
 {
-    // Fetches all LYRConversation objects
-    LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+    BOOL shouldShowAddressBar = (conversation.participants.count > 2 || !conversation.participants.count);
+    MessagesViewController *messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient];
+    messagesViewController.displaysAddressBar = shouldShowAddressBar;
+    messagesViewController.conversation = conversation;
     
-    NSError *error;
-    NSOrderedSet *conversations = [self.layerClient executeQuery:query error:&error];
-    if (!error) {
-        NSLog(@"%tu conversations", conversations.count);
-        if (conversations.count > 0)
-        {
-            return conversations;
-        } else {
-            NSString* otherUser = @"otherUser";
-            LYRConversation* conversation = [self.layerClient newConversationWithParticipants:[NSSet setWithArray:@[otherUser]] options:nil error:&error];
-            [conversation setValue:otherUser forMetadataAtKeyPath:@"title"];
-            return [NSOrderedSet orderedSetWithArray:@[conversation]];
-        }
-        
+    if (self.navigationController.topViewController == self) {
+        [self.navigationController pushViewController:messagesViewController animated:YES];
     } else {
-        NSLog(@"Query failed with error %@", error);
-        return nil;
+        NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
+        NSUInteger listViewControllerIndex = [self.navigationController.viewControllers indexOfObject:self];
+        NSRange replacementRange = NSMakeRange(listViewControllerIndex + 1, viewControllers.count - listViewControllerIndex - 1);
+        [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[messagesViewController]];
+        [self.navigationController setViewControllers:viewControllers animated:YES];
     }
 }
 
-#pragma mark - Table view data source
+#pragma mark - ATLConversationListViewControllerDelegate
 
-//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-//#warning Potentially incomplete method implementation.
-//    // Return the number of sections.
-//    return 0;
-//}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didSelectConversation:(LYRConversation *)conversation
 {
-    return 44;
+    [self presentControllerWithConversation:conversation];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+#pragma mark - ATLConversationListViewControllerDataSource
+
+/**
+ Atlas - Returns a label that is used to represent the conversation. Atlas Messenger puts the name representing the `lastMessage.sentByUserID` property first in the string.
+ */
+- (NSString *)conversationListViewController:(ATLConversationListViewController *)conversationListViewController titleForConversation:(LYRConversation *)conversation
 {
-    return [self.conversations count];
-}
-
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-     ConversationCell *cell = (ConversationCell*)[tableView dequeueReusableCellWithIdentifier:@"ConversationCell" forIndexPath:indexPath];
-    cell.conversationTitle.text = ((LYRConversation*)self.conversations[indexPath.row]).metadata[@"title"];
     
-    return cell;
+    NSMutableSet *participantIdentifiers = [conversation.participants mutableCopy];
+    [participantIdentifiers minusSet:[NSSet setWithObject:self.layerClient.authenticatedUserID]];
+    
+    if (participantIdentifiers.count == 0) return @"Personal Conversation";
+    
+    return @"Other";
 }
-
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([segue.identifier isEqualToString:@"messagesSegue"])
-    {
-        MessagesViewController* destinationVievController = (MessagesViewController*)[segue destinationViewController];
-        [destinationVievController setLayerClient:self.layerClient];
-        ConversationCell* cell = ((ConversationCell*)sender);
-        [destinationVievController setConversation:[self.conversations objectAtIndex:[self.tableView indexPathForCell:cell].row]];
-    }
-}
-
 
 @end

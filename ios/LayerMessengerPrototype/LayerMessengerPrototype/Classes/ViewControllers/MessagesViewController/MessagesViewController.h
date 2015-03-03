@@ -8,12 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <LayerKit/LayerKit.h>
+#import <Atlas.h>
 
-@interface MessagesViewController : UIViewController
+@interface MessagesViewController : ATLConversationViewController
 
-@property (nonatomic) LYRClient *layerClient;
-@property (nonatomic, strong) LYRConversation* conversation;
-@property (strong, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) IBOutlet UITextView *textView;
+
 
 @end

@@ -4,7 +4,12 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>Pods-LayerKit.xcscheme</key>
+		<key>Pods-Atlas-AtlasResource.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-Atlas.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -17,12 +22,17 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>251872A6F825B3505FBC9FD8</key>
+		<key>4A9DC82D95F552662BB7D97A</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7EA25D2A0425C20BF76775D6</key>
+		<key>7252A7B0D7FF8208B6868F4C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>81C3A2A4DDD90545F32A2AA5</key>
 		<dict>
 			<key>primary</key>
 			<true/>
