@@ -69,6 +69,33 @@
     [self presentControllerWithConversation:conversation];
 }
 
+/**
+ Atlas - Informs the delegate a conversation was deleted. Atlas Messenger does not need to react as the superclass will handle removing the conversation in response to a deletion.
+ */
+- (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didDeleteConversation:(LYRConversation *)conversation deletionMode:(LYRDeletionMode)deletionMode
+{
+    NSLog(@"Conversation Successsfully Deleted");
+}
+
+/**
+ Atlas - Informs the delegate that a conversation deletion attempt failed. Atlas Messenger does not do anything in response.
+ */
+- (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didFailDeletingConversation:(LYRConversation *)conversation deletionMode:(LYRDeletionMode)deletionMode error:(NSError *)error
+{
+    NSLog(@"Conversation Deletion Failed with Error: %@", error);
+}
+
+/**
+ Atlas - Informs the delegate that a search has been performed. Atlas messenger queries for, and returns objects conforming to the `ATLParticipant` protocol whose `fullName` property contains the search text.
+ */
+- (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didSearchForText:(NSString *)searchText completion:(void (^)(NSSet *))completion
+{
+#warning Not implemented method
+//    [self.participantDataSource participantsMatchingSearchText:searchText completion:^(NSSet *participants) {
+//        completion(participants);
+//    }];
+}
+
 #pragma mark - ATLConversationListViewControllerDataSource
 
 /**

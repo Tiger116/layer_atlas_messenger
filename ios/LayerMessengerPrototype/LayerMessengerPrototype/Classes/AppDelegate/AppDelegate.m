@@ -14,14 +14,6 @@
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
 
-#if TARGET_IPHONE_SIMULATOR
-// If on simulator set the user ID to Simulator and participant to Device
-NSString *const LQSCurrentUserID = @"iOS_Simulator";
-#else
-// If on device set the user ID to Device and participant to Simulator
-NSString *const LQSCurrentUserID = @"iOS_Device";
-#endif
-
 @interface AppDelegate () <LYRClientDelegate>
 
 @property (nonatomic) LYRClient *layerClient;
@@ -49,7 +41,7 @@ NSString *const LQSCurrentUserID = @"iOS_Device";
         if (!success) {
             NSLog(@"Failed to connect to Layer: %@", error);
         } else {
-            [self authenticateLayerWithUserID:LQSCurrentUserID completion:^(BOOL success, NSError *error) {
+            [self authenticateLayerWithUserID:nil completion:^(BOOL success, NSError *error) {
                 if (!success) {
                     NSLog(@"Failed Authenticating Layer Client with error:%@", error);
                 }else
@@ -144,10 +136,10 @@ NSString *const LQSCurrentUserID = @"iOS_Device";
     }];
 }
 
-- (void)requestIdentityTokenForUserID:(NSString *)userID nonce:(NSString *)nonce completion:(void(^)(NSString *identityToken, NSError *error))completion
-{
-    
-}
+//- (void)requestIdentityTokenForUserID:(NSString *)userID nonce:(NSString *)nonce completion:(void(^)(NSString *identityToken, NSError *error))completion
+//{
+//    
+//}
 
 #pragma - mark LYRClientDelegate Delegate Methods
 

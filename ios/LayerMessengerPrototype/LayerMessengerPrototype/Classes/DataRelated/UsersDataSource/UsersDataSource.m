@@ -53,9 +53,16 @@
     }];
 }
 
+-(User*) getUserForId:(NSString*)userId
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"_User"];
+    PFObject* object = [query getObjectWithId:userId];
+    return [self userFromPFObject:object];
+}
+
 -(User*) userFromPFObject:(PFObject*) object
 {
-    User* user = [[User alloc] initWithFirstName:object[@"firstName"] lastName:object[@"lastName"] userId:object[@"objectId"]];
+    User* user = [[User alloc] initWithFirstName:object[@"firstName"] lastName:object[@"lastName"] userId:object.objectId];
     user.username = object[@"username"];
     return user;
 }

@@ -14,6 +14,7 @@
 //+(instancetype) sharedUsersDataSource;
 -(void) getAllUsersInBackgroundWithCompletion:(void(^)(NSMutableSet* users, NSError* error))block;
 -(void) getUserInBackgroundForId:(NSString*)userId withCompletion:(void(^)(User* user, NSError* error))block;
+-(User*) getUserForId:(NSString*)userId;
 
 
 @end

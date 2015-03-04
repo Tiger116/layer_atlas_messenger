@@ -10,7 +10,7 @@
 #import <LayerKit/LayerKit.h>
 #import <Atlas.h>
 
-@interface MessagesViewController : ATLConversationViewController
+@interface MessagesViewController : ATLConversationViewController <ATLConversationViewControllerDataSource, ATLConversationViewControllerDelegate, ATLParticipantTableViewControllerDelegate>
 
 
 
