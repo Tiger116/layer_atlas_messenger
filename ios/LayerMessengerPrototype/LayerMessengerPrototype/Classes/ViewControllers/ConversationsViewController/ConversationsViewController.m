@@ -9,6 +9,7 @@
 #import "ConversationsViewController.h"
 #import "MessagesViewController.h"
 #import <LayerKit/LayerKit.h>
+#import "UsersDataSource.h"
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
@@ -132,7 +133,25 @@
     
     if (participantIdentifiers.count == 0) return @"Personal Conversation";
     
-    return @"Other";
+    NSMutableSet* participants = [[UsersDataSource sharedUsersDataSource] getUsersForIds:participantIdentifiers];
+    if (participants.count == 0) return @"No Matching Participants";
+    if (participants.count == 1) return [[participants allObjects][0] fullName];
+    
+    NSMutableArray *firstNames = [NSMutableArray new];
+    [participants enumerateObjectsUsingBlock:^(id obj, BOOL *stop) {
+        id<ATLParticipant> participant = obj;
+        if (participant.firstName) {
+            // Put the last message sender's name first
+            if ([conversation.lastMessage.sentByUserID isEqualToString:participant.participantIdentifier]) {
+                [firstNames insertObject:participant.firstName atIndex:0];
+            } else {
+                [firstNames addObject:participant.firstName];
+            }
+        }
+    }];
+    NSString *firstNamesString = [firstNames componentsJoinedByString:@", "];
+    return firstNamesString;
+
 }
 
 @end

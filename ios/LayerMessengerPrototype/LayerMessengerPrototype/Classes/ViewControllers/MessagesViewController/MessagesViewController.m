@@ -46,7 +46,7 @@
 - (id<ATLParticipant>)conversationViewController:(ATLConversationViewController *)conversationViewController participantForIdentifier:(NSString *)participantIdentifier
 {
     if (participantIdentifier) {
-        UsersDataSource* userDataSource = [UsersDataSource new];
+        UsersDataSource* userDataSource = [UsersDataSource sharedUsersDataSource];
         return [userDataSource getUserForId:participantIdentifier];
     }
     return nil;
@@ -162,7 +162,7 @@
  */
 - (void)addressBarViewController:(ATLAddressBarViewController *)addressBarViewController didTapAddContactsButton:(UIButton *)addContactsButton
 {
-    UsersDataSource *usersDataSource = [[UsersDataSource alloc] init];
+    UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
         ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:users sortType:ATLParticipantPickerSortTypeFirstName];
         controller.delegate = self;

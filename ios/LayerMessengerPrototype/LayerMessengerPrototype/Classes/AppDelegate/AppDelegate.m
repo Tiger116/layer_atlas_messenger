@@ -10,6 +10,7 @@
 #import <LayerKit/LayerKit.h>
 #import "ConversationsViewController.h"
 #import <Parse/Parse.h>
+#import "UsersDataSource.h"
 
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
@@ -21,10 +22,13 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{    
+{
     // Initialize Parse.
     [Parse setApplicationId:@"hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8"
                   clientKey:@"XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx"];
+    
+    //Initialize UsersDataSourse
+    [UsersDataSource sharedUsersDataSource];
     
     // Initializes a LYRClient object
     NSUUID *appID = [[NSUUID alloc] initWithUUIDString:LayerAppIDString];
