@@ -30,6 +30,62 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self configureTitle];
+}
+
+- (void)configureTitle
+{
+    if ([self.conversation.metadata valueForKey:@"title"])
+    {
+        NSString *conversationTitle = [self.conversation.metadata valueForKey:@"title"];
+        if (conversationTitle.length)
+        {
+            self.title = conversationTitle;
+        } else {
+            self.title = [self defaultTitle];
+        }
+    } else {
+            self.title = [self defaultTitle];
+    }
+}
+
+- (NSString *)defaultTitle
+{
+    if (!self.conversation) {
+        return @"New Message";
+    }
+    
+    NSMutableSet *otherParticipantIDs = [self.conversation.participants mutableCopy];
+    if (self.layerClient.authenticatedUserID) [otherParticipantIDs removeObject:self.layerClient.authenticatedUserID];
+    
+    if (otherParticipantIDs.count == 0) {
+        return @"Personal";
+    } else if (otherParticipantIDs.count == 1) {
+        NSString *otherParticipantID = [otherParticipantIDs anyObject];
+        id<ATLParticipant> participant = [self conversationViewController:self participantForIdentifier:otherParticipantID];
+        return participant ? participant.firstName : @"Message";
+    } else if (otherParticipantIDs.count > 1) {
+        NSUInteger participantCount = 0;
+        id<ATLParticipant> knownParticipant;
+        for (NSString *participantIdentifier in otherParticipantIDs) {
+            id<ATLParticipant> participant = [self conversationViewController:self participantForIdentifier:participantIdentifier];
+            if (participant) {
+                participantCount += 1;
+                knownParticipant = participant;
+            }
+        }
+        if (participantCount == 1) {
+            return knownParticipant.firstName;
+        } else if (participantCount > 1) {
+            return @"Group";
+        }
+    }
+    return @"Message";
+}
+
 - (void)configureUserInterfaceAttributes
 {
     [[ATLIncomingMessageCollectionViewCell appearance] setBubbleViewColor:ATLLightGrayColor()];
@@ -164,7 +220,22 @@
 {
     UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:users sortType:ATLParticipantPickerSortTypeFirstName];
+        NSMutableSet* otherUsers = [NSMutableSet new];
+        for (User* user in users)
+        {
+            BOOL userWasSelected = NO;
+            for (User* participant in addressBarViewController.selectedParticipants)
+            {
+                if ([participant.participantIdentifier isEqualToString:user.participantIdentifier]) {
+                    userWasSelected = YES;
+                }
+            }
+            if (!userWasSelected) {
+                [otherUsers addObject:user];
+            }
+        }
+        
+        ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
         controller.delegate = self;
         controller.allowsMultipleSelection = NO;
         [self.navigationController pushViewController:controller animated:YES];
