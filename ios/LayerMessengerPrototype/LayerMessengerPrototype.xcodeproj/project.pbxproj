@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3545AFC61AA0826200B6AF91 /* libPods-Atlas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */; };
-		3545AFC81AA0826D00B6AF91 /* libPods-LayerKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */; };
+		359427EB1AA728690027ADE7 /* AuthenticationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 359427E91AA728690027ADE7 /* AuthenticationViewController.m */; };
+		359427EC1AA728690027ADE7 /* AuthenticationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 359427EA1AA728690027ADE7 /* AuthenticationViewController.xib */; };
 		359FFB301A9C8A8D00F51353 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB2E1A9C8A8D00F51353 /* Bolts.framework */; };
 		359FFB311A9C8A8D00F51353 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB2F1A9C8A8D00F51353 /* Parse.framework */; };
 		359FFB331A9C8AFB00F51353 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FFB321A9C8AFB00F51353 /* AudioToolbox.framework */; };
@@ -49,6 +49,9 @@
 		24F25916D77E0F48C3F8A768 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-Atlas.a"; path = "Pods/build/Debug-iphoneos/libPods-Atlas.a"; sourceTree = "<group>"; };
 		3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-LayerKit.a"; path = "Pods/build/Debug-iphoneos/libPods-LayerKit.a"; sourceTree = "<group>"; };
+		359427E81AA728690027ADE7 /* AuthenticationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthenticationViewController.h; sourceTree = "<group>"; };
+		359427E91AA728690027ADE7 /* AuthenticationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticationViewController.m; sourceTree = "<group>"; };
+		359427EA1AA728690027ADE7 /* AuthenticationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AuthenticationViewController.xib; sourceTree = "<group>"; };
 		359FFB2E1A9C8A8D00F51353 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		359FFB2F1A9C8A8D00F51353 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		359FFB321A9C8AFB00F51353 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -91,8 +94,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3545AFC81AA0826D00B6AF91 /* libPods-LayerKit.a in Frameworks */,
-				3545AFC61AA0826200B6AF91 /* libPods-Atlas.a in Frameworks */,
 				359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */,
 				359FFB451A9C8B6300F51353 /* libz.dylib in Frameworks */,
 				359FFB431A9C8B4900F51353 /* SystemConfiguration.framework in Frameworks */,
@@ -120,6 +121,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		359427E71AA728410027ADE7 /* AuthenticationViewController */ = {
+			isa = PBXGroup;
+			children = (
+				359427E81AA728690027ADE7 /* AuthenticationViewController.h */,
+				359427E91AA728690027ADE7 /* AuthenticationViewController.m */,
+				359427EA1AA728690027ADE7 /* AuthenticationViewController.xib */,
+			);
+			path = AuthenticationViewController;
+			sourceTree = "<group>";
+		};
 		35BB42561A975AF2006248F8 = {
 			isa = PBXGroup;
 			children = (
@@ -200,6 +211,7 @@
 		35BB428C1A975BBB006248F8 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				359427E71AA728410027ADE7 /* AuthenticationViewController */,
 				35BB428D1A975BBB006248F8 /* ConversationsViewController */,
 				35FA56581AA4AC2F0090148B /* ParticipantsController */,
 				35BB428E1A975BBB006248F8 /* MessagesViewController */,
@@ -382,6 +394,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359427EC1AA728690027ADE7 /* AuthenticationViewController.xib in Resources */,
 				35BB42731A975AF2006248F8 /* LaunchScreen.xib in Resources */,
 				35BB42701A975AF2006248F8 /* Images.xcassets in Resources */,
 			);
@@ -434,6 +447,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359427EB1AA728690027ADE7 /* AuthenticationViewController.m in Sources */,
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
 				35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */,
 				35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */,

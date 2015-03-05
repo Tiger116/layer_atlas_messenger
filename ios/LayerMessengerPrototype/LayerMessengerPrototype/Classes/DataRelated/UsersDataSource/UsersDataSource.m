@@ -9,6 +9,12 @@
 #import "UsersDataSource.h"
 #import <Parse/Parse.h>
 
+@interface UsersDataSource ()
+
+
+
+@end
+
 @implementation UsersDataSource
 
 //+(instancetype) sharedUsersDataSource
@@ -55,6 +61,7 @@
 
 -(User*) getUserForId:(NSString*)userId
 {
+#warning Blocking operation on main thread
     PFQuery *query = [PFQuery queryWithClassName:@"_User"];
     PFObject* object = [query getObjectWithId:userId];
     return [self userFromPFObject:object];

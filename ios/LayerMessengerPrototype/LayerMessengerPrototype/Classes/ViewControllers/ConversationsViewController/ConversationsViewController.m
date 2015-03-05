@@ -8,6 +8,7 @@
 
 #import "ConversationsViewController.h"
 #import "MessagesViewController.h"
+#import <LayerKit/LayerKit.h>
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
@@ -25,9 +26,15 @@
     self.dataSource = self;
     self.allowsEditing = YES;
     
+    // Left navigation item
+    UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sing out" style:UIBarButtonItemStylePlain target:self action:@selector(singOutButtonTapped)];
+    [self.navigationItem setLeftBarButtonItem:singOutButton];
+    
     // Right navigation item
     UIBarButtonItem *composeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeButtonTapped)];
     [self.navigationItem setRightBarButtonItem:composeButton];
+    
+    [self.navigationController setNavigationBarHidden:NO];
     
 }
 
@@ -40,6 +47,17 @@
 - (void)composeButtonTapped
 {
     [self presentControllerWithConversation:nil];
+}
+
+- (void)singOutButtonTapped
+{
+    [self.layerClient deauthenticateWithCompletion:^(BOOL success, NSError *error) {
+        if (!success) {
+            NSLog(@"Failed to deauthenticate with error: %@",error);
+        } else {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+    }];
 }
 
 #pragma mark - Conversation Selection
@@ -103,6 +121,11 @@
  */
 - (NSString *)conversationListViewController:(ATLConversationListViewController *)conversationListViewController titleForConversation:(LYRConversation *)conversation
 {
+    // If we have a Conversation name in metadata, return it.
+//    NSString *conversationTitle = conversation.metadata[@"title"];
+//    if (conversationTitle.length) {
+//        return conversationTitle;
+//    }
     
     NSMutableSet *participantIdentifiers = [conversation.participants mutableCopy];
     [participantIdentifiers minusSet:[NSSet setWithObject:self.layerClient.authenticatedUserID]];

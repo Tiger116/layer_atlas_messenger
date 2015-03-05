@@ -16,17 +16,12 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 
 @interface AppDelegate () <LYRClientDelegate>
 
-@property (nonatomic) LYRClient *layerClient;
-
 @end
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    // Initialize window.
-    
-    
+{    
     // Initialize Parse.
     [Parse setApplicationId:@"hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8"
                   clientKey:@"XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx"];
@@ -41,19 +36,17 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
         if (!success) {
             NSLog(@"Failed to connect to Layer: %@", error);
         } else {
-            [self authenticateLayerWithUserID:nil completion:^(BOOL success, NSError *error) {
-                if (!success) {
-                    NSLog(@"Failed Authenticating Layer Client with error:%@", error);
-                }else
-                {
-                    self.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.layerClient];
-                    self.navController = [[UINavigationController alloc] initWithRootViewController:self.conversationsViewController];
-                    
-                    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-                    [self.window setRootViewController:self.navController];
-                    [self.window makeKeyAndVisible];
-                }
-            }];
+            self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
+            self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];
+            if(self.layerClient.authenticatedUserID)
+            {
+                self.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.layerClient];
+                [self.navController pushViewController:self.conversationsViewController animated:NO];
+            }
+            self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+            [self.window setRootViewController:self.navController];
+            [self.window makeKeyAndVisible];
+            
         }
     }];
     
@@ -85,7 +78,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 
 #pragma mark - Layer Authentication Methods
 
-- (void)authenticateLayerWithUserID:(NSString *)userID completion:(void (^)(BOOL success, NSError * error))completion
+- (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion
 {
     if (self.layerClient.authenticatedUserID) {
         NSLog(@"Layer Authenticated as User %@", self.layerClient.authenticatedUserID);
@@ -100,7 +93,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
         // Upon reciept of nonce, post to your backend and acquire a Layer identityToken
         if (nonce) {
             
-            [PFUser logInWithUsernameInBackground:@"iOS_Simulator" password:@"86903" block:^(PFUser *user, NSError *error) {
+            [PFUser logInWithUsernameInBackground:username password:password block:^(PFUser *user, NSError *error) {
                 if (user)
                 {
                     NSString *userID  = user.objectId;
