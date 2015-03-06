@@ -109,10 +109,11 @@
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didSearchForText:(NSString *)searchText completion:(void (^)(NSSet *))completion
 {
-#warning Not implemented method
-//    [self.participantDataSource participantsMatchingSearchText:searchText completion:^(NSSet *participants) {
-//        completion(participants);
-//    }];
+    //TODO: Add search for conversation titles
+    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet *participants) {
+        completion(participants);
+    }];
 }
 
 #pragma mark - ATLConversationListViewControllerDataSource

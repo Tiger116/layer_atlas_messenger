@@ -124,4 +124,14 @@
     return nil;
 }
 
+-(void) getUsersMatchingSearchText:(NSString*)searchText completion:(void(^)(NSSet *participants))block
+{
+    NSString *escapedSearchString = [NSRegularExpression escapedPatternForString:searchText];
+    NSString *searchPattern = [NSString stringWithFormat:@".*\\b%@.*", escapedSearchString];
+    NSPredicate *searchPredicate = [NSPredicate predicateWithFormat:@"fullName MATCHES[cd] %@", searchPattern];
+    
+    NSSet* matchedUsers = [self.users filteredSetUsingPredicate:searchPredicate];
+    block(matchedUsers);
+}
+
 @end

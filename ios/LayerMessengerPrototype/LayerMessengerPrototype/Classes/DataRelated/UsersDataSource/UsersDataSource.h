@@ -16,6 +16,7 @@
 -(void) getUserInBackgroundForId:(NSString*)userId withCompletion:(void(^)(User* user, NSError* error))block;
 -(User*) getUserForId:(NSString*)userId;
 -(NSMutableSet*) getUsersForIds:(NSMutableSet*)ids;
+-(void) getUsersMatchingSearchText:(NSString*)searchText completion:(void(^)(NSSet *participants))block;
 
 
 @end

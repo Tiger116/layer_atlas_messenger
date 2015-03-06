@@ -205,10 +205,21 @@
  */
 - (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSearchWithString:(NSString *)searchText completion:(void (^)(NSSet *))completion
 {
-#warning Not implemented method
-//    [self.participantDataSource participantsMatchingSearchText:searchText completion:^(NSSet *participants) {
-//        completion(participants);
-//    }];
+    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet* matchedUsers)
+     {
+         NSMutableSet* usersToDisplay = [NSMutableSet new];
+         for (User* participant in participantTableViewController.participants)
+         {
+             for (User* matchedUser in matchedUsers)
+             {
+                 if ([participant.participantIdentifier isEqualToString:matchedUser.participantIdentifier]) {
+                     [usersToDisplay addObject:matchedUser];
+                 }
+             }
+         }
+         completion(usersToDisplay);
+     }];
 }
 
 #pragma mark - ATLAddressBarControllerDelegate
@@ -248,10 +259,10 @@
  */
 - (void)addressBarViewController:(ATLAddressBarViewController *)addressBarViewController searchForParticipantsMatchingText:(NSString *)searchText completion:(void (^)(NSArray *participants))completion
 {
-#warning Not implemented method
-//    [self.participantDataSource participantsMatchingSearchText:searchText completion:^(NSSet *participants) {
-//        completion([participants allObjects]);
-//    }];
+    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet *participants) {
+        completion([participants allObjects]);
+    }];
 }
 
 /**
@@ -261,6 +272,14 @@
 {
 #warning Not implemented method
 //    [self detailsButtonTapped];
+}
+
+#pragma mark - Accessors
+
+- (void)setConversation:(LYRConversation *)conversation
+{
+    [super setConversation:conversation];
+    [self configureTitle];
 }
 
 
