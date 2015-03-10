@@ -1,6 +1,7 @@
 package com.layer.quick_start_android;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -94,7 +95,8 @@ public class MainActivity extends ActionBarActivity {
 
 
             if (!layerClient.isAuthenticated()) {
-
+                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(intent);
                 //First we try to authenticate the user. if the LayerClient is not connected, "connect()"
                 //will be called automatically by the Layer SDK.
                 layerClient.authenticate();
