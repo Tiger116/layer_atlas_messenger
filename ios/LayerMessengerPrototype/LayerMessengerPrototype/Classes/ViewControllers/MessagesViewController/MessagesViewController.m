@@ -9,8 +9,9 @@
 #import "MessagesViewController.h"
 #import "UsersDataSource.h"
 #import "ParticipantsViewController.h"
+#import "DetailsViewController.h"
 
-@interface MessagesViewController () 
+@interface MessagesViewController () <DetailsViewControllerDelegate>
 
 @end
 
@@ -20,6 +21,9 @@
     [super viewDidLoad];
     self.dataSource = self;
     self.delegate = self;
+    
+    UIBarButtonItem *detailsButton = [[UIBarButtonItem alloc] initWithTitle:@"Details" style:UIBarButtonItemStylePlain target:self action:@selector(detailsButtonTapped)];
+    [self.navigationItem setRightBarButtonItem:detailsButton];
     
     [self configureUserInterfaceAttributes];
     //[self setupLayerNotificationObservers];
@@ -95,6 +99,14 @@
     [[ATLOutgoingMessageCollectionViewCell appearance] setBubbleViewColor:ATLBlueColor()];
     [[ATLOutgoingMessageCollectionViewCell appearance] setMessageTextColor:[UIColor whiteColor]];
     [[ATLOutgoingMessageCollectionViewCell appearance] setMessageLinkTextColor:[UIColor whiteColor]];
+}
+
+-(void) detailsButtonTapped
+{
+    DetailsViewController* detailsViewController = [[DetailsViewController alloc] initWithNibName:@"DetailsViewController" bundle:nil];
+    [detailsViewController setConversation:self.conversation];
+    [detailsViewController setDelegate:self];
+    [self.navigationController pushViewController:detailsViewController animated:YES];
 }
 
 #pragma mark - ATLConversationViewControllerDataSource
@@ -270,8 +282,14 @@
  */
 - (void)addressBarViewControllerDidSelectWhileDisabled:(ATLAddressBarViewController *)addressBarViewController
 {
-#warning Not implemented method
-//    [self detailsButtonTapped];
+    [self detailsButtonTapped];
+}
+
+#pragma mark - DetailsViewControllerDelegate
+
+-(void) conversationTitleDidChange:(NSString*) newTitle
+{
+    [self configureTitle];
 }
 
 #pragma mark - Accessors

@@ -124,10 +124,10 @@
 - (NSString *)conversationListViewController:(ATLConversationListViewController *)conversationListViewController titleForConversation:(LYRConversation *)conversation
 {
     // If we have a Conversation name in metadata, return it.
-//    NSString *conversationTitle = conversation.metadata[@"title"];
-//    if (conversationTitle.length) {
-//        return conversationTitle;
-//    }
+    NSString *conversationTitle = conversation.metadata[@"title"];
+    if (conversationTitle.length) {
+        return conversationTitle;
+    }
     
     NSMutableSet *participantIdentifiers = [conversation.participants mutableCopy];
     [participantIdentifiers minusSet:[NSSet setWithObject:self.layerClient.authenticatedUserID]];

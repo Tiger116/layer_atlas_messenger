@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "13880894713E0DD783CE9157"
-               BuildableName = "AtlasResource.bundle"
-               BlueprintName = "Pods-Atlas-AtlasResource"
+               BlueprintIdentifier = "A2FE9BCA22F4B08F1A786F32"
+               BuildableName = "libPods-MBProgressHUD.a"
+               BlueprintName = "Pods-MBProgressHUD"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

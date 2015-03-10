@@ -30,8 +30,16 @@
 		35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42971A975D78006248F8 /* MessagesViewController.m */; };
 		35BF373D1AA5F1490014ED96 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF37391AA5F1490014ED96 /* User.m */; };
 		35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF373C1AA5F1490014ED96 /* UsersDataSource.m */; };
+		35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */; };
+		35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */; };
+		35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */; };
+		35D5B6E91AA9D1A70039AF46 /* DetailsConversationMemberCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6E71AA9D1A70039AF46 /* DetailsConversationMemberCell.xib */; };
+		35D5B6EE1AA9D1D50039AF46 /* DetailsConversationTitleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6EC1AA9D1D50039AF46 /* DetailsConversationTitleCell.m */; };
+		35D5B6EF1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6ED1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib */; };
+		35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6F11AA9D1F70039AF46 /* DetailsLeaveConversationCell.m */; };
+		35D5B6F41AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */; };
+		35DFFABE1AAEE981009DA14B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35DFFABD1AAEE981009DA14B /* libPods.a */; };
 		35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35FA565A1AA4AC640090148B /* ParticipantsViewController.m */; };
-		CF08B644ABFB518202E04EB5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24F25916D77E0F48C3F8A768 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +89,19 @@
 		35BF37391AA5F1490014ED96 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		35BF373B1AA5F1490014ED96 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
 		35BF373C1AA5F1490014ED96 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
+		35D5B6D21AA9BAF80039AF46 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsViewController.h; sourceTree = "<group>"; };
+		35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsViewController.m; sourceTree = "<group>"; };
+		35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsViewController.xib; sourceTree = "<group>"; };
+		35D5B6E51AA9D1A70039AF46 /* DetailsConversationMemberCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsConversationMemberCell.h; sourceTree = "<group>"; };
+		35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsConversationMemberCell.m; sourceTree = "<group>"; };
+		35D5B6E71AA9D1A70039AF46 /* DetailsConversationMemberCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsConversationMemberCell.xib; sourceTree = "<group>"; };
+		35D5B6EB1AA9D1D50039AF46 /* DetailsConversationTitleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsConversationTitleCell.h; sourceTree = "<group>"; };
+		35D5B6EC1AA9D1D50039AF46 /* DetailsConversationTitleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsConversationTitleCell.m; sourceTree = "<group>"; };
+		35D5B6ED1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsConversationTitleCell.xib; sourceTree = "<group>"; };
+		35D5B6F01AA9D1F70039AF46 /* DetailsLeaveConversationCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsLeaveConversationCell.h; sourceTree = "<group>"; };
+		35D5B6F11AA9D1F70039AF46 /* DetailsLeaveConversationCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsLeaveConversationCell.m; sourceTree = "<group>"; };
+		35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsLeaveConversationCell.xib; sourceTree = "<group>"; };
+		35DFFABD1AAEE981009DA14B /* libPods.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPods.a; path = "Pods/../build/Debug-iphoneos/libPods.a"; sourceTree = "<group>"; };
 		35FA56591AA4AC640090148B /* ParticipantsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticipantsViewController.h; sourceTree = "<group>"; };
 		35FA565A1AA4AC640090148B /* ParticipantsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParticipantsViewController.m; sourceTree = "<group>"; };
 		5EFA945ED357962BF6694591 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -92,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35DFFABE1AAEE981009DA14B /* libPods.a in Frameworks */,
 				359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */,
 				359FFB451A9C8B6300F51353 /* libz.dylib in Frameworks */,
 				359FFB431A9C8B4900F51353 /* SystemConfiguration.framework in Frameworks */,
@@ -102,7 +124,6 @@
 				359FFB391A9C8B1100F51353 /* CoreLocation.framework in Frameworks */,
 				359FFB351A9C8B0500F51353 /* CFNetwork.framework in Frameworks */,
 				359FFB331A9C8AFB00F51353 /* AudioToolbox.framework in Frameworks */,
-				CF08B644ABFB518202E04EB5 /* libPods.a in Frameworks */,
 				359FFB311A9C8A8D00F51353 /* Parse.framework in Frameworks */,
 				359FFB301A9C8A8D00F51353 /* Bolts.framework in Frameworks */,
 			);
@@ -212,6 +233,7 @@
 				35BB428D1A975BBB006248F8 /* ConversationsViewController */,
 				35FA56581AA4AC2F0090148B /* ParticipantsController */,
 				35BB428E1A975BBB006248F8 /* MessagesViewController */,
+				35D5B6D11AA9BAC50039AF46 /* DetailsViewController */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -237,6 +259,9 @@
 		35BB42991A975D8A006248F8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				35D5B6E31AA9D1880039AF46 /* DetailsConversationTitleCell */,
+				35D5B6E21AA9D1880039AF46 /* DetailsConversationMemberCell */,
+				35D5B6E41AA9D1880039AF46 /* DetailsLeaveConversationCell */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -268,6 +293,46 @@
 			path = UsersDataSource;
 			sourceTree = "<group>";
 		};
+		35D5B6D11AA9BAC50039AF46 /* DetailsViewController */ = {
+			isa = PBXGroup;
+			children = (
+				35D5B6D21AA9BAF80039AF46 /* DetailsViewController.h */,
+				35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */,
+				35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */,
+			);
+			path = DetailsViewController;
+			sourceTree = "<group>";
+		};
+		35D5B6E21AA9D1880039AF46 /* DetailsConversationMemberCell */ = {
+			isa = PBXGroup;
+			children = (
+				35D5B6E51AA9D1A70039AF46 /* DetailsConversationMemberCell.h */,
+				35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */,
+				35D5B6E71AA9D1A70039AF46 /* DetailsConversationMemberCell.xib */,
+			);
+			path = DetailsConversationMemberCell;
+			sourceTree = "<group>";
+		};
+		35D5B6E31AA9D1880039AF46 /* DetailsConversationTitleCell */ = {
+			isa = PBXGroup;
+			children = (
+				35D5B6EB1AA9D1D50039AF46 /* DetailsConversationTitleCell.h */,
+				35D5B6EC1AA9D1D50039AF46 /* DetailsConversationTitleCell.m */,
+				35D5B6ED1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib */,
+			);
+			path = DetailsConversationTitleCell;
+			sourceTree = "<group>";
+		};
+		35D5B6E41AA9D1880039AF46 /* DetailsLeaveConversationCell */ = {
+			isa = PBXGroup;
+			children = (
+				35D5B6F01AA9D1F70039AF46 /* DetailsLeaveConversationCell.h */,
+				35D5B6F11AA9D1F70039AF46 /* DetailsLeaveConversationCell.m */,
+				35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */,
+			);
+			path = DetailsLeaveConversationCell;
+			sourceTree = "<group>";
+		};
 		35FA56581AA4AC2F0090148B /* ParticipantsController */ = {
 			isa = PBXGroup;
 			children = (
@@ -289,6 +354,7 @@
 		EAC00861624EB0724FA19C72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				35DFFABD1AAEE981009DA14B /* libPods.a */,
 				3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */,
 				3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */,
 				359FFB461A9C8B6D00F51353 /* libsqlite3.dylib */,
@@ -396,9 +462,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D5B6EF1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib in Resources */,
 				359427EC1AA728690027ADE7 /* AuthenticationViewController.xib in Resources */,
+				35D5B6F41AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib in Resources */,
 				35BB42731A975AF2006248F8 /* LaunchScreen.xib in Resources */,
+				35D5B6E91AA9D1A70039AF46 /* DetailsConversationMemberCell.xib in Resources */,
 				35BB42701A975AF2006248F8 /* Images.xcassets in Resources */,
+				35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -449,14 +519,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D5B6EE1AA9D1D50039AF46 /* DetailsConversationTitleCell.m in Sources */,
 				359427EB1AA728690027ADE7 /* AuthenticationViewController.m in Sources */,
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
 				35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */,
 				35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */,
 				35BF373D1AA5F1490014ED96 /* User.m in Sources */,
 				35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */,
+				35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */,
+				35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */,
 				35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */,
 				35BB42651A975AF2006248F8 /* main.m in Sources */,
+				35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,16 +656,12 @@
 				INFOPLIST_FILE = LayerMessengerPrototype/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Pods/build/Debug-iphoneos",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-force_load",
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
-					"-l\"Pods-LayerKit\"",
 					"-lz",
 					"-framework",
 					"\"CFNetwork\"",
@@ -623,16 +693,12 @@
 				INFOPLIST_FILE = LayerMessengerPrototype/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Pods/build/Debug-iphoneos",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-force_load",
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
-					"-l\"Pods-LayerKit\"",
 					"-lz",
 					"-framework",
 					"\"CFNetwork\"",
