@@ -71,7 +71,7 @@
 		359FFB421A9C8B4900F51353 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		359FFB441A9C8B6300F51353 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		359FFB461A9C8B6D00F51353 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
-		35BB425F1A975AF2006248F8 /* LayerMessengerPrototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LayerMessengerPrototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		35BB425F1A975AF2006248F8 /* ChatMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		35BB42631A975AF2006248F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		35BB42641A975AF2006248F8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		35BB426F1A975AF2006248F8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -163,7 +163,7 @@
 		35BB42601A975AF2006248F8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				35BB425F1A975AF2006248F8 /* LayerMessengerPrototype.app */,
+				35BB425F1A975AF2006248F8 /* ChatMe.app */,
 				35BB42781A975AF2006248F8 /* LayerMessengerPrototypeTests.xctest */,
 			);
 			name = Products;
@@ -393,7 +393,7 @@
 			);
 			name = LayerMessengerPrototype;
 			productName = LayerMessengerPrototype;
-			productReference = 35BB425F1A975AF2006248F8 /* LayerMessengerPrototype.app */;
+			productReference = 35BB425F1A975AF2006248F8 /* ChatMe.app */;
 			productType = "com.apple.product-type.application";
 		};
 		35BB42771A975AF2006248F8 /* LayerMessengerPrototypeTests */ = {
@@ -674,7 +674,7 @@
 					"-framework",
 					"\"SystemConfiguration\"",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = ChatMe;
 				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
@@ -711,7 +711,7 @@
 					"-framework",
 					"\"SystemConfiguration\"",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = ChatMe;
 				PROVISIONING_PROFILE = "";
 			};
 			name = Release;

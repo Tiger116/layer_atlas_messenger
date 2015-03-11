@@ -13,6 +13,7 @@
 #import <Atlas.h>
 #import "UsersDataSource.h"
 #import "User.h"
+#import "ParticipantsViewController.h"
 
 typedef NS_ENUM(NSInteger, DetailsTableSection) {
     DetailsTableSectionTitle,
@@ -71,6 +72,33 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
+
+//- (void)presentParticipantPicker
+//{
+//    UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
+//    [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
+//        NSMutableSet* otherUsers = [NSMutableSet new];
+//        for (User* user in users)
+//        {
+//            BOOL userWasSelected = NO;
+//            for (User* participant in self.conversation.participants)
+//            {
+//                if ([participant.participantIdentifier isEqualToString:user.participantIdentifier]) {
+//                    userWasSelected = YES;
+//                }
+//            }
+//            if (!userWasSelected) {
+//                [otherUsers addObject:user];
+//            }
+//        }
+//        
+//        ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
+//        controller.delegate = self;
+//        controller.allowsMultipleSelection = NO;
+//        [self.navigationController pushViewController:controller animated:YES];
+//        
+//    }];
+//}
 
 #pragma mark - Table view data source
 
@@ -248,7 +276,32 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     return YES;
 }
 
+#pragma mark - ATLParticipantTableViewControllerDelegate
 
+//- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSelectParticipant:(id<ATLParticipant>)participant
+//{
+//    [self.addressBarController selectParticipant:participant];
+//    [self.navigationController popViewControllerAnimated:YES];
+//}
+//
+//- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSearchWithString:(NSString *)searchText completion:(void (^)(NSSet *))completion
+//{
+//    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+//    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet* matchedUsers)
+//     {
+//         NSMutableSet* usersToDisplay = [NSMutableSet new];
+//         for (User* participant in participantTableViewController.participants)
+//         {
+//             for (User* matchedUser in matchedUsers)
+//             {
+//                 if ([participant.participantIdentifier isEqualToString:matchedUser.participantIdentifier]) {
+//                     [usersToDisplay addObject:matchedUser];
+//                 }
+//             }
+//         }
+//         completion(usersToDisplay);
+//     }];
+//}
 
 
 
