@@ -47,6 +47,31 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     // Dispose of any resources that can be recreated.
 }
 
+- (void)leaveConversation
+{
+    NSSet *participants = [NSSet setWithObject:self.layerClient.authenticatedUserID];
+    NSError *error;
+    [self.conversation removeParticipants:participants error:&error];
+    if (error) {
+        NSLog(@"Error while leaving conversation: %@",error);
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+- (void)deleteConversation
+{
+    NSError *error;
+    [self.conversation delete:LYRDeletionModeAllParticipants error:&error];
+    if (error) {
+        NSLog(@"Error while deleting conversation: %@", error);
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -157,6 +182,24 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
             
         default:
             return nil;
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch ((DetailsTableSection)indexPath.section) {
+        case DetailsTableSectionParticipants:
+            if (indexPath.row == self.participantIdentifiers.count) {
+//                [self presentParticipantPicker];
+            }
+            break;
+            
+        case DetailsTableSectionLeave:
+            self.conversation.participants.count > 2 ? [self leaveConversation] : [self deleteConversation];
+            break;
+            
+        default:
+            break;
     }
 }
 

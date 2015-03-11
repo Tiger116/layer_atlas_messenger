@@ -106,6 +106,7 @@
     DetailsViewController* detailsViewController = [[DetailsViewController alloc] initWithNibName:@"DetailsViewController" bundle:nil];
     [detailsViewController setConversation:self.conversation];
     [detailsViewController setDelegate:self];
+    [detailsViewController setLayerClient:self.layerClient];
     [self.navigationController pushViewController:detailsViewController animated:YES];
 }
 

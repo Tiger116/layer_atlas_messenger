@@ -34,6 +34,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
     NSUUID *appID = [[NSUUID alloc] initWithUUIDString:LayerAppIDString];
     self.layerClient = [LYRClient clientWithAppID:appID];
     self.layerClient.delegate = self;
+    self.layerClient.autodownloadMIMETypes = [NSSet setWithObjects:ATLMIMETypeImageJPEGPreview, ATLMIMETypeTextPlain, nil];
     
     // Connect to Layer
     [self.layerClient connectWithCompletion:^(BOOL success, NSError *error) {

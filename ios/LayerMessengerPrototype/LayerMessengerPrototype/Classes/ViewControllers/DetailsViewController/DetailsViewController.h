@@ -19,5 +19,6 @@
 
 @property (nonatomic) LYRConversation *conversation;
 @property (nonatomic, weak) id<DetailsViewControllerDelegate> delegate;
+@property (nonatomic) LYRClient* layerClient;
 
 @end
