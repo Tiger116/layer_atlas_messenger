@@ -747,7 +747,7 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
         [self configureConversationForAddressBar];
         return;
     }
-    NSMutableSet *removedParticipantIdentifiers = [self.typingParticipantIDs copy];
+    NSMutableSet *removedParticipantIdentifiers = [self.typingParticipantIDs mutableCopy];
     [removedParticipantIdentifiers minusSet:self.conversation.participants];
     [self.typingParticipantIDs removeObjectsInArray:removedParticipantIdentifiers.allObjects];
     [self updateTypingIndicatorOverlay:NO];

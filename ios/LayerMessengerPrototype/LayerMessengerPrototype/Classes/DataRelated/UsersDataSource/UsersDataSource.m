@@ -56,7 +56,7 @@
     }];
 }
 
--(NSMutableSet*) getUsersForIds:(NSMutableSet*)ids
+-(NSMutableSet*) getUsersForIds:(NSSet*)ids
 {
     NSMutableSet* users = [NSMutableSet new];
     for (NSString* userId in ids)
@@ -132,6 +132,26 @@
     
     NSSet* matchedUsers = [self.users filteredSetUsingPredicate:searchPredicate];
     block(matchedUsers);
+}
+
+-(NSMutableSet*) usersFromUsers:(NSSet*)users byExcudingUsers:(NSSet*)excludingUsers
+{
+    NSMutableSet* otherUsers = [NSMutableSet new];
+    for (User* user in users)
+    {
+        BOOL userShouldBeExcluded = NO;
+        for (User* participant in excludingUsers)
+        {
+            if ([participant.participantIdentifier isEqualToString:user.participantIdentifier]) {
+                userShouldBeExcluded = YES;
+            }
+        }
+        if (!userShouldBeExcluded) {
+            [otherUsers addObject:user];
+        }
+    }
+    
+    return otherUsers;
 }
 
 @end

@@ -244,25 +244,14 @@
 {
     UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        NSMutableSet* otherUsers = [NSMutableSet new];
-        for (User* user in users)
-        {
-            BOOL userWasSelected = NO;
-            for (User* participant in addressBarViewController.selectedParticipants)
-            {
-                if ([participant.participantIdentifier isEqualToString:user.participantIdentifier]) {
-                    userWasSelected = YES;
-                }
-            }
-            if (!userWasSelected) {
-                [otherUsers addObject:user];
-            }
-        }
+        NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:addressBarViewController.selectedParticipants.set];
         
-        ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
-        controller.delegate = self;
-        controller.allowsMultipleSelection = NO;
-        [self.navigationController pushViewController:controller animated:YES];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
+            controller.delegate = self;
+            controller.allowsMultipleSelection = NO;
+            [self.navigationController pushViewController:controller animated:YES];
+        }];
         
     }];
 }
@@ -290,6 +279,12 @@
 
 -(void) conversationTitleDidChange:(NSString*) newTitle
 {
+    [self configureTitle];
+}
+
+-(void) conservationDidChange:(LYRConversation*)conversation
+{
+    self.conversation = conversation;
     [self configureTitle];
 }
 

@@ -10,7 +10,6 @@
 #import "DetailsConversationTitleCell.h"
 #import "DetailsConversationMemberCell.h"
 #import "DetailsLeaveConversationCell.h"
-#import <Atlas.h>
 #import "UsersDataSource.h"
 #import "User.h"
 #import "ParticipantsViewController.h"
@@ -22,7 +21,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     DetailsTableSectionCount,
 };
 
-@interface DetailsViewController () <UITextFieldDelegate>
+@interface DetailsViewController () 
 
 @property (nonatomic) NSMutableArray *participantIdentifiers;
 
@@ -73,32 +72,21 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
-//- (void)presentParticipantPicker
-//{
-//    UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
-//    [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-//        NSMutableSet* otherUsers = [NSMutableSet new];
-//        for (User* user in users)
-//        {
-//            BOOL userWasSelected = NO;
-//            for (User* participant in self.conversation.participants)
-//            {
-//                if ([participant.participantIdentifier isEqualToString:user.participantIdentifier]) {
-//                    userWasSelected = YES;
-//                }
-//            }
-//            if (!userWasSelected) {
-//                [otherUsers addObject:user];
-//            }
-//        }
-//        
-//        ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
-//        controller.delegate = self;
-//        controller.allowsMultipleSelection = NO;
-//        [self.navigationController pushViewController:controller animated:YES];
-//        
-//    }];
-//}
+- (void)presentParticipantPicker
+{
+    UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
+        NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:[usersDataSource getUsersForIds:self.conversation.participants]];
+        
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
+            controller.delegate = self;
+            controller.allowsMultipleSelection = NO;
+            [self.navigationController pushViewController:controller animated:YES];
+        }];
+        
+    }];
+}
 
 #pragma mark - Table view data source
 
@@ -114,7 +102,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
             return 1;
             
         case DetailsTableSectionParticipants:
-            return self.conversation.participants.count + 1;
+            return self.participantIdentifiers.count + 1;
             
         case DetailsTableSectionLeave:
             return 1;
@@ -142,7 +130,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
         }
             
         case DetailsTableSectionParticipants: {
-            if (indexPath.row < self.conversation.participants.count)
+            if (indexPath.row < self.participantIdentifiers.count)
             {
                 ATLParticipantTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"ATLParticipantTableViewCell" forIndexPath:indexPath];
                 return cell;
@@ -182,7 +170,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
             break;
             
         case DetailsTableSectionParticipants:
-            if (indexPath.row < self.conversation.participants.count)
+            if (indexPath.row < self.participantIdentifiers.count)
             {
                 UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
                 User* participant = [usersDataSource getUserForId:[self.participantIdentifiers objectAtIndex:indexPath.row]];
@@ -218,12 +206,12 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     switch ((DetailsTableSection)indexPath.section) {
         case DetailsTableSectionParticipants:
             if (indexPath.row == self.participantIdentifiers.count) {
-//                [self presentParticipantPicker];
+                [self presentParticipantPicker];
             }
             break;
             
         case DetailsTableSectionLeave:
-            self.conversation.participants.count > 2 ? [self leaveConversation] : [self deleteConversation];
+            self.participantIdentifiers.count > 1 ? [self leaveConversation] : [self deleteConversation];
             break;
             
         default:
@@ -233,25 +221,40 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ((indexPath.section == DetailsTableSectionParticipants) && (indexPath.row < self.participantIdentifiers.count)) {
+        return YES;
+    }
+    return NO;
 }
-*/
+
+
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {
+        if ([self.participantIdentifiers[indexPath.row] isEqualToString:self.layerClient.authenticatedUserID])
+        {
+            self.participantIdentifiers.count > 1 ? [self leaveConversation] : [self deleteConversation];
+        } else {
+            NSString *participantIdentifier = self.participantIdentifiers[indexPath.row];
+            NSError *error;
+            BOOL success = [self.conversation removeParticipants:[NSSet setWithObject:participantIdentifier] error:&error];
+            if (!success) {
+                NSLog(@"Error while removing participant: %@",error);
+                return;
+            }
+            [self.participantIdentifiers removeObjectAtIndex:indexPath.row];
+            [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+        }
+        
+        
+    }
+}
+
 
 #pragma mark - UITextFieldDelegate
 
@@ -278,31 +281,58 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 #pragma mark - ATLParticipantTableViewControllerDelegate
 
-//- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSelectParticipant:(id<ATLParticipant>)participant
-//{
-//    [self.addressBarController selectParticipant:participant];
-//    [self.navigationController popViewControllerAnimated:YES];
-//}
+- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSelectParticipant:(id<ATLParticipant>)participant
+{
+    [self.navigationController popViewControllerAnimated:YES];
+    
+    [self.participantIdentifiers addObject:participant.participantIdentifier];
+//    if (self.participantIdentifiers.count < 3) {
+//        [self switchToConversationForParticipants];
+//    } else {
+        NSError *error;
+        BOOL success = [self.conversation addParticipants:[NSSet setWithObject:participant.participantIdentifier] error:&error];
+        if (!success) {
+            NSLog(@"Error while adding participant: %@",error);
+        }
+//    }
+    [self.tableView reloadData];
+}
+
+- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSearchWithString:(NSString *)searchText completion:(void (^)(NSSet *))completion
+{
+    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet* matchedUsers)
+     {
+         NSMutableSet* usersToDisplay = [NSMutableSet new];
+         for (User* participant in participantTableViewController.participants)
+         {
+             for (User* matchedUser in matchedUsers)
+             {
+                 if ([participant.participantIdentifier isEqualToString:matchedUser.participantIdentifier]) {
+                     [usersToDisplay addObject:matchedUser];
+                 }
+             }
+         }
+         completion(usersToDisplay);
+     }];
+}
+
+//#pragma mark - Conversation Configuration
 //
-//- (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSearchWithString:(NSString *)searchText completion:(void (^)(NSSet *))completion
+//- (void)switchToConversationForParticipants
 //{
-//    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
-//    [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet* matchedUsers)
-//     {
-//         NSMutableSet* usersToDisplay = [NSMutableSet new];
-//         for (User* participant in participantTableViewController.participants)
-//         {
-//             for (User* matchedUser in matchedUsers)
-//             {
-//                 if ([participant.participantIdentifier isEqualToString:matchedUser.participantIdentifier]) {
-//                     [usersToDisplay addObject:matchedUser];
-//                 }
-//             }
-//         }
-//         completion(usersToDisplay);
-//     }];
+//    NSSet *participants = [NSSet setWithArray:self.participantIdentifiers];
+//    
+//    LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+//    query.predicate = [LYRPredicate predicateWithProperty:@"participants" operator:LYRPredicateOperatorIsEqualTo value:participants];
+//    query.limit = 1;
+//    
+//    LYRConversation *conversation = [self.layerClient executeQuery:query error:nil].firstObject;
+//    if (!conversation) {
+//        conversation = [self.layerClient newConversationWithParticipants:participants options:nil error:nil];
+//    }
+//    [self.delegate conservationDidChange:conversation];
+//    self.conversation = conversation;
 //}
-
-
 
 @end
