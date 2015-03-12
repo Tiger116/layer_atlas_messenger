@@ -9,11 +9,13 @@
 #import "AuthenticationViewController.h"
 #import "AppDelegate.h"
 #import "ConversationsViewController.h"
+#import "LoadingHUD.h"
 
 @interface AuthenticationViewController ()
 
 @property (strong, nonatomic) IBOutlet UITextField *usernameField;
 @property (strong, nonatomic) IBOutlet UITextField *passwordField;
+@property (weak, nonatomic) AppDelegate* appDelegate;
 
 @end
 
@@ -22,7 +24,26 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.navigationController setNavigationBarHidden:YES];
-    // Do any additional setup after loading the view from its nib.
+    self.appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    
+    // Connect to Layer
+    
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = @"Loading";
+    
+    [self.appDelegate.layerClient connectWithCompletion:^(BOOL success, NSError *error) {
+        if (!success) {
+            [hud hide:YES afterShowingText:@"Failed"];
+            NSLog(@"Failed to connect to Layer: %@", error);
+        } else {
+            [hud hide:YES];
+            if(self.appDelegate.layerClient.authenticatedUserID)
+            {
+                self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
+                [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+            }
+        }
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -32,25 +53,17 @@
 
 - (IBAction)signInButtonTapped:(UIButton *)sender
 {
-    AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-    [appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:^(BOOL success, NSError *error) {
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+    [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:^(BOOL success, NSError *error) {
         if (success) {
-            appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:appDelegate.layerClient];
-            [self.navigationController pushViewController:appDelegate.conversationsViewController animated:YES];
+            [hud hide:YES];
+            self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
+            [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
         } else {
+            [hud hide:YES afterShowingText:@"Failed"];
             NSLog(@"Failed Authenticating Layer Client with error:%@", error);
         }
     }];
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

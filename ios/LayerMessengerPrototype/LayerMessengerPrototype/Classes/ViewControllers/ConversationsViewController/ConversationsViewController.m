@@ -10,6 +10,7 @@
 #import "MessagesViewController.h"
 #import <LayerKit/LayerKit.h>
 #import "UsersDataSource.h"
+#import "LoadingHUD.h"
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
@@ -52,10 +53,13 @@
 
 - (void)singOutButtonTapped
 {
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     [self.layerClient deauthenticateWithCompletion:^(BOOL success, NSError *error) {
         if (!success) {
+            [hud hide:YES afterShowingText:@"Failed"];
             NSLog(@"Failed to deauthenticate with error: %@",error);
         } else {
+            [hud hide:YES];
             [self.navigationController popToRootViewControllerAnimated:YES];
         }
     }];

@@ -11,6 +11,7 @@
 #import "ConversationsViewController.h"
 #import <Parse/Parse.h>
 #import "UsersDataSource.h"
+#import "LoadingHUD.h"
 
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
@@ -30,30 +31,20 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
     //Initialize UsersDataSourse
     [UsersDataSource sharedUsersDataSource];
     
-    // Initializes a LYRClient object
+    //Initializes a LYRClient object
     NSUUID *appID = [[NSUUID alloc] initWithUUIDString:LayerAppIDString];
     self.layerClient = [LYRClient clientWithAppID:appID];
     self.layerClient.delegate = self;
     self.layerClient.autodownloadMIMETypes = [NSSet setWithObjects:ATLMIMETypeImageJPEGPreview, ATLMIMETypeTextPlain, nil];
     
-    // Connect to Layer
-    [self.layerClient connectWithCompletion:^(BOOL success, NSError *error) {
-        if (!success) {
-            NSLog(@"Failed to connect to Layer: %@", error);
-        } else {
-            self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
-            self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];
-            if(self.layerClient.authenticatedUserID)
-            {
-                self.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.layerClient];
-                [self.navController pushViewController:self.conversationsViewController animated:NO];
-            }
-            self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-            [self.window setRootViewController:self.navController];
-            [self.window makeKeyAndVisible];
-            
-        }
-    }];
+    //Initialize LoadingHUD style
+//    [LoadingHUD setLabelColor:[UIColor blueColor]];
+    
+    self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
+    self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.window setRootViewController:self.navController];
+    [self.window makeKeyAndVisible];
     
     return YES;
 }
@@ -128,6 +119,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
                     }];
                 }else{
                     NSLog(@"Parse User failed to log in with error: %@",error);
+                    completion(NO,error);
                 }
             }];
         }

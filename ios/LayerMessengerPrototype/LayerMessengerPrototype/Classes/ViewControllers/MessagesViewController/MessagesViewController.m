@@ -10,6 +10,7 @@
 #import "UsersDataSource.h"
 #import "ParticipantsViewController.h"
 #import "DetailsViewController.h"
+#import "LoadingHUD.h"
 
 @interface MessagesViewController () <DetailsViewControllerDelegate>
 
@@ -242,16 +243,24 @@
  */
 - (void)addressBarViewController:(ATLAddressBarViewController *)addressBarViewController didTapAddContactsButton:(UIButton *)addContactsButton
 {
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:addressBarViewController.selectedParticipants.set];
+        if (error) {
+            [hud hide:YES afterShowingText:@"Failed"];
+            NSLog(@"Failed to download user list: %@",error);
+        } else {
+            [hud hide:YES];
+            NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:addressBarViewController.selectedParticipants.set];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
+                controller.delegate = self;
+                controller.allowsMultipleSelection = NO;
+                [self.navigationController pushViewController:controller animated:YES];
+            }];
+        }
         
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
-            controller.delegate = self;
-            controller.allowsMultipleSelection = NO;
-            [self.navigationController pushViewController:controller animated:YES];
-        }];
         
     }];
 }

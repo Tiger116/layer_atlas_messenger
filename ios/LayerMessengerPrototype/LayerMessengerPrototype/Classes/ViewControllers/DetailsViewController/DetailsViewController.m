@@ -13,6 +13,7 @@
 #import "UsersDataSource.h"
 #import "User.h"
 #import "ParticipantsViewController.h"
+#import "LoadingHUD.h"
 
 typedef NS_ENUM(NSInteger, DetailsTableSection) {
     DetailsTableSectionTitle,
@@ -74,16 +75,24 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 - (void)presentParticipantPicker
 {
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     UsersDataSource *usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:[usersDataSource getUsersForIds:self.conversation.participants]];
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
-            controller.delegate = self;
-            controller.allowsMultipleSelection = NO;
-            [self.navigationController pushViewController:controller animated:YES];
-        }];
+        if (error) {
+            [hud hide:YES afterShowingText:@"Failed"];
+            NSLog(@"Failed to dowload user list: %@",error);
+        } else {
+            [hud hide:YES];
+            NSMutableSet* otherUsers = [usersDataSource usersFromUsers:users byExcudingUsers:[usersDataSource getUsersForIds:self.conversation.participants]];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                ParticipantsViewController *controller = [ParticipantsViewController participantTableViewControllerWithParticipants:otherUsers sortType:ATLParticipantPickerSortTypeFirstName];
+                controller.delegate = self;
+                controller.allowsMultipleSelection = NO;
+                [self.navigationController pushViewController:controller animated:YES];
+            }];
+        }
+       
         
     }];
 }

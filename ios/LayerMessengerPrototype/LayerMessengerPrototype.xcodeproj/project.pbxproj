@@ -30,6 +30,8 @@
 		35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BB42971A975D78006248F8 /* MessagesViewController.m */; };
 		35BF373D1AA5F1490014ED96 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF37391AA5F1490014ED96 /* User.m */; };
 		35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF373C1AA5F1490014ED96 /* UsersDataSource.m */; };
+		35D25D781AB18A560047DFC4 /* libPods-MBProgressHUD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */; };
+		35D25D7C1AB19B1F0047DFC4 /* LoadingHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */; };
 		35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */; };
 		35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */; };
 		35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */; };
@@ -89,6 +91,9 @@
 		35BF37391AA5F1490014ED96 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		35BF373B1AA5F1490014ED96 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
 		35BF373C1AA5F1490014ED96 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
+		35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-MBProgressHUD.a"; path = "Pods/../build/Debug-iphoneos/libPods-MBProgressHUD.a"; sourceTree = "<group>"; };
+		35D25D7A1AB19B1F0047DFC4 /* LoadingHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingHUD.h; sourceTree = "<group>"; };
+		35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingHUD.m; sourceTree = "<group>"; };
 		35D5B6D21AA9BAF80039AF46 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsViewController.h; sourceTree = "<group>"; };
 		35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsViewController.m; sourceTree = "<group>"; };
 		35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsViewController.xib; sourceTree = "<group>"; };
@@ -113,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D25D781AB18A560047DFC4 /* libPods-MBProgressHUD.a in Frameworks */,
 				35DFFABE1AAEE981009DA14B /* libPods.a in Frameworks */,
 				359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */,
 				359FFB451A9C8B6300F51353 /* libz.dylib in Frameworks */,
@@ -259,6 +265,7 @@
 		35BB42991A975D8A006248F8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				35D25D791AB19AFA0047DFC4 /* LoadingHUD */,
 				35D5B6E31AA9D1880039AF46 /* DetailsConversationTitleCell */,
 				35D5B6E21AA9D1880039AF46 /* DetailsConversationMemberCell */,
 				35D5B6E41AA9D1880039AF46 /* DetailsLeaveConversationCell */,
@@ -291,6 +298,15 @@
 				35BF373C1AA5F1490014ED96 /* UsersDataSource.m */,
 			);
 			path = UsersDataSource;
+			sourceTree = "<group>";
+		};
+		35D25D791AB19AFA0047DFC4 /* LoadingHUD */ = {
+			isa = PBXGroup;
+			children = (
+				35D25D7A1AB19B1F0047DFC4 /* LoadingHUD.h */,
+				35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */,
+			);
+			path = LoadingHUD;
 			sourceTree = "<group>";
 		};
 		35D5B6D11AA9BAC50039AF46 /* DetailsViewController */ = {
@@ -354,6 +370,7 @@
 		EAC00861624EB0724FA19C72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */,
 				35DFFABD1AAEE981009DA14B /* libPods.a */,
 				3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */,
 				3545AFC51AA0826200B6AF91 /* libPods-Atlas.a */,
@@ -528,6 +545,7 @@
 				35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */,
 				35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */,
 				35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */,
+				35D25D7C1AB19B1F0047DFC4 /* LoadingHUD.m in Sources */,
 				35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */,
 				35BB42651A975AF2006248F8 /* main.m in Sources */,
 				35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */,
