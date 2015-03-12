@@ -32,6 +32,12 @@
 		35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 35BF373C1AA5F1490014ED96 /* UsersDataSource.m */; };
 		35D25D781AB18A560047DFC4 /* libPods-MBProgressHUD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */; };
 		35D25D7C1AB19B1F0047DFC4 /* LoadingHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */; };
+		35D25D861AB1B5120047DFC4 /* RegistrationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D841AB1B5120047DFC4 /* RegistrationViewController.m */; };
+		35D25D871AB1B5120047DFC4 /* RegistrationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D851AB1B5120047DFC4 /* RegistrationViewController.xib */; };
+		35D25D8E1AB1B5FB0047DFC4 /* RegistrationInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D8C1AB1B5FB0047DFC4 /* RegistrationInputCell.m */; };
+		35D25D8F1AB1B5FB0047DFC4 /* RegistrationInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D8D1AB1B5FB0047DFC4 /* RegistrationInputCell.xib */; };
+		35D25D931AB1B6150047DFC4 /* RegistrationButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */; };
+		35D25D941AB1B6150047DFC4 /* RegistrationButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */; };
 		35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */; };
 		35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */; };
 		35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */; };
@@ -94,6 +100,15 @@
 		35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-MBProgressHUD.a"; path = "Pods/../build/Debug-iphoneos/libPods-MBProgressHUD.a"; sourceTree = "<group>"; };
 		35D25D7A1AB19B1F0047DFC4 /* LoadingHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingHUD.h; sourceTree = "<group>"; };
 		35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingHUD.m; sourceTree = "<group>"; };
+		35D25D831AB1B5120047DFC4 /* RegistrationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegistrationViewController.h; sourceTree = "<group>"; };
+		35D25D841AB1B5120047DFC4 /* RegistrationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegistrationViewController.m; sourceTree = "<group>"; };
+		35D25D851AB1B5120047DFC4 /* RegistrationViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegistrationViewController.xib; sourceTree = "<group>"; };
+		35D25D8B1AB1B5FB0047DFC4 /* RegistrationInputCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegistrationInputCell.h; sourceTree = "<group>"; };
+		35D25D8C1AB1B5FB0047DFC4 /* RegistrationInputCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegistrationInputCell.m; sourceTree = "<group>"; };
+		35D25D8D1AB1B5FB0047DFC4 /* RegistrationInputCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegistrationInputCell.xib; sourceTree = "<group>"; };
+		35D25D901AB1B6150047DFC4 /* RegistrationButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegistrationButtonCell.h; sourceTree = "<group>"; };
+		35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegistrationButtonCell.m; sourceTree = "<group>"; };
+		35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegistrationButtonCell.xib; sourceTree = "<group>"; };
 		35D5B6D21AA9BAF80039AF46 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsViewController.h; sourceTree = "<group>"; };
 		35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsViewController.m; sourceTree = "<group>"; };
 		35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsViewController.xib; sourceTree = "<group>"; };
@@ -236,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				359427E71AA728410027ADE7 /* AuthenticationViewController */,
+				35D25D7D1AB1B4A90047DFC4 /* RegistrationViewController */,
 				35BB428D1A975BBB006248F8 /* ConversationsViewController */,
 				35FA56581AA4AC2F0090148B /* ParticipantsController */,
 				35BB428E1A975BBB006248F8 /* MessagesViewController */,
@@ -265,6 +281,8 @@
 		35BB42991A975D8A006248F8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				35D25D8A1AB1B5D00047DFC4 /* RegistrationInputCell */,
+				35D25D881AB1B5990047DFC4 /* RegistrationButtonCell */,
 				35D25D791AB19AFA0047DFC4 /* LoadingHUD */,
 				35D5B6E31AA9D1880039AF46 /* DetailsConversationTitleCell */,
 				35D5B6E21AA9D1880039AF46 /* DetailsConversationMemberCell */,
@@ -307,6 +325,37 @@
 				35D25D7B1AB19B1F0047DFC4 /* LoadingHUD.m */,
 			);
 			path = LoadingHUD;
+			sourceTree = "<group>";
+		};
+		35D25D7D1AB1B4A90047DFC4 /* RegistrationViewController */ = {
+			isa = PBXGroup;
+			children = (
+				35D25D831AB1B5120047DFC4 /* RegistrationViewController.h */,
+				35D25D841AB1B5120047DFC4 /* RegistrationViewController.m */,
+				35D25D851AB1B5120047DFC4 /* RegistrationViewController.xib */,
+			);
+			name = RegistrationViewController;
+			path = LayerMessengerPrototype/Classes/ViewControllers/RegistrationViewController;
+			sourceTree = SOURCE_ROOT;
+		};
+		35D25D881AB1B5990047DFC4 /* RegistrationButtonCell */ = {
+			isa = PBXGroup;
+			children = (
+				35D25D901AB1B6150047DFC4 /* RegistrationButtonCell.h */,
+				35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */,
+				35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */,
+			);
+			path = RegistrationButtonCell;
+			sourceTree = "<group>";
+		};
+		35D25D8A1AB1B5D00047DFC4 /* RegistrationInputCell */ = {
+			isa = PBXGroup;
+			children = (
+				35D25D8B1AB1B5FB0047DFC4 /* RegistrationInputCell.h */,
+				35D25D8C1AB1B5FB0047DFC4 /* RegistrationInputCell.m */,
+				35D25D8D1AB1B5FB0047DFC4 /* RegistrationInputCell.xib */,
+			);
+			path = RegistrationInputCell;
 			sourceTree = "<group>";
 		};
 		35D5B6D11AA9BAC50039AF46 /* DetailsViewController */ = {
@@ -479,10 +528,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D25D8F1AB1B5FB0047DFC4 /* RegistrationInputCell.xib in Resources */,
 				35D5B6EF1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib in Resources */,
+				35D25D871AB1B5120047DFC4 /* RegistrationViewController.xib in Resources */,
 				359427EC1AA728690027ADE7 /* AuthenticationViewController.xib in Resources */,
 				35D5B6F41AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib in Resources */,
 				35BB42731A975AF2006248F8 /* LaunchScreen.xib in Resources */,
+				35D25D941AB1B6150047DFC4 /* RegistrationButtonCell.xib in Resources */,
 				35D5B6E91AA9D1A70039AF46 /* DetailsConversationMemberCell.xib in Resources */,
 				35BB42701A975AF2006248F8 /* Images.xcassets in Resources */,
 				35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */,
@@ -536,6 +588,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D25D8E1AB1B5FB0047DFC4 /* RegistrationInputCell.m in Sources */,
 				35D5B6EE1AA9D1D50039AF46 /* DetailsConversationTitleCell.m in Sources */,
 				359427EB1AA728690027ADE7 /* AuthenticationViewController.m in Sources */,
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
@@ -545,10 +598,12 @@
 				35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */,
 				35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */,
 				35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */,
+				35D25D931AB1B6150047DFC4 /* RegistrationButtonCell.m in Sources */,
 				35D25D7C1AB19B1F0047DFC4 /* LoadingHUD.m in Sources */,
 				35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */,
 				35BB42651A975AF2006248F8 /* main.m in Sources */,
 				35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */,
+				35D25D861AB1B5120047DFC4 /* RegistrationViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

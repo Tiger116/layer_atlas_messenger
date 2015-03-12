@@ -10,6 +10,7 @@
 #import "AppDelegate.h"
 #import "ConversationsViewController.h"
 #import "LoadingHUD.h"
+#import "RegistrationViewController.h"
 
 @interface AuthenticationViewController ()
 
@@ -64,6 +65,12 @@
             NSLog(@"Failed Authenticating Layer Client with error:%@", error);
         }
     }];
+}
+
+- (IBAction)registerButtonTapped:(UIButton *)sender
+{
+    RegistrationViewController* viewController = [[RegistrationViewController alloc] initWithNibName:@"RegistrationViewController" bundle:nil];
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 
 @end

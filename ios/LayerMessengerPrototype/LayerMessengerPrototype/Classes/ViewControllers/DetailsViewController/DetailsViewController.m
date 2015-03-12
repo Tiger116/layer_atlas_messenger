@@ -123,7 +123,6 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 }
 
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch (indexPath.section) {
@@ -240,8 +239,6 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     return NO;
 }
 
-
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
@@ -263,7 +260,6 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
         
     }
 }
-
 
 #pragma mark - UITextFieldDelegate
 
