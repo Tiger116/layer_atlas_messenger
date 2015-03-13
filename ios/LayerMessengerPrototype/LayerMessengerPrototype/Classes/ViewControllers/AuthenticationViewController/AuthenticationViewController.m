@@ -13,7 +13,7 @@
 #import "RegistrationViewController.h"
 #import "UsersDataSource.h"
 
-@interface AuthenticationViewController ()
+@interface AuthenticationViewController () <UITextFieldDelegate>
 
 @property (strong, nonatomic) IBOutlet UITextField *usernameField;
 @property (strong, nonatomic) IBOutlet UITextField *passwordField;
@@ -27,6 +27,8 @@
     [super viewDidLoad];
     [self.navigationController setNavigationBarHidden:YES];
     self.appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    self.usernameField.delegate = self;
+    self.passwordField.delegate = self;
     
     // Connect to Layer
     
@@ -45,6 +47,7 @@
             }
         }
     }];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -60,8 +63,16 @@
             [hud hide:YES];
             [self signIn];
         } else {
-            [hud hide:YES afterShowingText:@"Failed"];
+            [hud hide:YES];
             NSLog(@"Failed Authenticating Layer Client with error:%@", error);
+            if (error.code == 101) {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
+                                                                message:@"Invalid login credentials"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"OK"
+                                                      otherButtonTitles:nil];
+                [alert show];
+            }
         }
     }];
 }
@@ -87,6 +98,30 @@
             [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
         }
     }];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    UITouch *touch = [[event allTouches] anyObject];
+    
+    if (![[touch view] isKindOfClass:[UITextField class]]) {
+        [self.view endEditing:YES];
+    }
+    [super touchesBegan:touches withEvent:event];
+}
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if(textField == self.usernameField){
+        [self.passwordField becomeFirstResponder];
+    }
+    
+    if (textField == self.passwordField) {
+        [self signInButtonTapped:nil];
+    }
+    return YES;
 }
 
 @end

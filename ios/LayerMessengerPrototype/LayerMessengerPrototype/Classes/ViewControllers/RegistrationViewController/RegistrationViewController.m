@@ -33,11 +33,20 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     self.tableView.sectionFooterHeight = 0.0f;
     self.tableView.rowHeight = 48.0f;
     
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    [self.view addGestureRecognizer:tap];
+    [tap setCancelsTouchesInView:NO];
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)handleTap:(UITapGestureRecognizer *)recognizer
+{
+    [self.view endEditing:YES];
 }
 
 #pragma mark - Table view data source
@@ -127,7 +136,7 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
             }
             break;
         }
-        case RegistrationTableSectionButtons:
+        case RegistrationTableSectionButtons:{
             switch (indexPath.row) {
                 case 0:
                     ((RegistrationButtonCell*)cell).label.textColor = [UIColor colorWithRed:0/255.0f green:174/255.0f blue:243/255.0f alpha:1.0f];
@@ -141,6 +150,7 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
                     break;
             }
             break;
+        }
         default:
             break;
     }
@@ -160,29 +170,6 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     }
 }
 
-
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -192,7 +179,8 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
         switch (indexPath.row) {
             case 0:{
                 User* user;
-                if ((user = [self validateInputInTableView:tableView])) {
+                if ((user = [self validateInputInTableView:tableView]))
+                {
                     PFUser *parseUser = [PFUser user];
                     parseUser.username = user.username;
                     parseUser.password = user.password;
@@ -203,8 +191,27 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
                             [self dismissViewControllerAnimated:YES completion:nil];
                         } else {
                             NSLog(@"Failed to create new user: %@",error);
+                            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+                            if (error.code == 202) {
+                                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration failed"
+                                                                                message:[NSString stringWithFormat:@"Username \"%@\" already taken",user.username]
+                                                                               delegate:self
+                                                                      cancelButtonTitle:@"OK"
+                                                                      otherButtonTitles:nil];
+                                [alert show];
+                            } else {
+                                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Registration failed"
+                                                                                message:@"Uknown error"
+                                                                               delegate:self
+                                                                      cancelButtonTitle:@"OK"
+                                                                      otherButtonTitles:nil];
+                                [alert show];
+                            }
+                            
                         }
                     }];
+                }else{
+                    [tableView deselectRowAtIndexPath:indexPath animated:YES];
                 }
                 break;
             }
@@ -289,12 +296,12 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 
 - (void) showAlertWithMessage:(NSString*)message
 {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Validation error"
-                                                                    message:message
-                                                                   delegate:self
-                                                          cancelButtonTitle:@"OK"
-                                                          otherButtonTitles:nil];
-                    [alert show];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Validation error"
+                                                    message:message
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
 }
 
 

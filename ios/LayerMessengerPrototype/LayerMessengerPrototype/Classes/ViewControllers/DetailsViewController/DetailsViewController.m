@@ -41,11 +41,20 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     self.participantIdentifiers = [self.conversation.participants.allObjects mutableCopy];
     
     [self.tableView registerClass:[ATLParticipantTableViewCell class] forCellReuseIdentifier:@"ATLParticipantTableViewCell"];
+    
+    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    [self.view addGestureRecognizer:tap];
+    [tap setCancelsTouchesInView:NO];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)handleTap:(UITapGestureRecognizer *)recognizer
+{
+    [self.view endEditing:YES];
 }
 
 - (void)leaveConversation
