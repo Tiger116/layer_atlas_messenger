@@ -11,6 +11,7 @@
 #import "ConversationsViewController.h"
 #import "LoadingHUD.h"
 #import "RegistrationViewController.h"
+#import "UsersDataSource.h"
 
 @interface AuthenticationViewController ()
 
@@ -40,8 +41,7 @@
             [hud hide:YES];
             if(self.appDelegate.layerClient.authenticatedUserID)
             {
-                self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
-                [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+                [self signIn];
             }
         }
     }];
@@ -58,8 +58,7 @@
     [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:^(BOOL success, NSError *error) {
         if (success) {
             [hud hide:YES];
-            self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
-            [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+            [self signIn];
         } else {
             [hud hide:YES afterShowingText:@"Failed"];
             NSLog(@"Failed Authenticating Layer Client with error:%@", error);
@@ -71,6 +70,23 @@
 {
     RegistrationViewController* viewController = [[RegistrationViewController alloc] initWithNibName:@"RegistrationViewController" bundle:nil];
     [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void) signIn
+{
+    //Initialize UsersDataSourse
+    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+    UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
+    [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
+        if (error) {
+            [hud hide:YES afterShowingText:@"Failed"];
+            NSLog(@"Failed to download users from Parse:%@", error);
+        } else {
+            [hud hide:YES];
+            self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
+            [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+        }
+    }];
 }
 
 @end

@@ -9,6 +9,8 @@
 #import "RegistrationViewController.h"
 #import "RegistrationInputCell.h"
 #import "RegistrationButtonCell.h"
+#import <Parse/Parse.h>
+#import "User.h"
 
 typedef NS_ENUM(NSInteger, RegistrationTableSection)
 {
@@ -180,35 +182,121 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 }
 */
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
 
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
 #pragma mark - Table view delegate
 
-// In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Navigation logic may go here, for example:
-    // Create the next view controller.
-    <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:<#@"Nib name"#> bundle:nil];
-    
-    // Pass the selected object to the new view controller.
-    
-    // Push the view controller.
-    [self.navigationController pushViewController:detailViewController animated:YES];
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == RegistrationTableSectionButtons)
+    {
+        switch (indexPath.row) {
+            case 0:{
+                User* user;
+                if ((user = [self validateInputInTableView:tableView])) {
+                    PFUser *parseUser = [PFUser user];
+                    parseUser.username = user.username;
+                    parseUser.password = user.password;
+                    parseUser[@"firstName"] = user.firstName;
+                    parseUser[@"lastName"] = user.lastName;
+                    [parseUser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                        if (succeeded) {
+                            [self dismissViewControllerAnimated:YES completion:nil];
+                        } else {
+                            NSLog(@"Failed to create new user: %@",error);
+                        }
+                    }];
+                }
+                break;
+            }
+            case 1:{
+                [self dismissViewControllerAnimated:YES completion:nil];
+                break;
+            }
+                
+            default:
+                break;
+        }
+    }
 }
-*/
+
+#pragma mark - Input validation
+
+- (User*) validateInputInTableView:(UITableView*)tableView
+{
+    NSString* username;
+    NSString* password;
+    NSString* firstName;
+    NSString* lastName;
+    //Username
+    RegistrationInputCell* cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
+                                                                                                              inSection:RegistrationTableSectionUsername]];
+    if ([self textFieldIsEmpty:cell.inputText]){
+        [self showAlertWithMessage:@"Username is empty"];
+        return nil;
+    }
+    username = cell.inputText.text;
+    
+    //Password
+    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
+                                                                                        inSection:RegistrationTableSectionPassword]];
+    RegistrationInputCell* confirmationCell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1
+                                                                                                                          inSection:RegistrationTableSectionPassword]];
+    if ([self textFieldIsEmpty:cell.inputText]){
+        [self showAlertWithMessage:@"Password is empty"];
+        return nil;
+    }
+    if ([self textFieldIsEmpty:confirmationCell.inputText]){
+        [self showAlertWithMessage:@"Confirmation password is empty"];
+        return nil;
+    }
+    if (! [cell.inputText.text isEqualToString:confirmationCell.inputText.text]){
+        [self showAlertWithMessage:@"Passwords are not equal"];
+        return nil;
+    }
+    password = cell.inputText.text;
+    
+    //First name
+    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
+                                                                                       inSection:RegistrationTableSectionUserInfo]];
+    if ([self textFieldIsEmpty:cell.inputText]){
+        [self showAlertWithMessage:@"First name is empty"];
+        return nil;
+    }
+    firstName = cell.inputText.text;
+    
+    //Last name
+    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1
+                                                                                       inSection:RegistrationTableSectionUserInfo]];
+    if ([self textFieldIsEmpty:cell.inputText]){
+        [self showAlertWithMessage:@"Last name is empty"];
+        return nil;
+    }
+    lastName = cell.inputText.text;
+    
+    User* user = [[User alloc] initWithFirstName:firstName lastName:lastName userId:nil];
+    user.username = username;
+    user.password = password;
+    return user;
+}
+
+- (BOOL) textFieldIsEmpty:(UITextField*)textField
+{
+    if (!textField || !textField.text || ([textField.text stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].length == 0)) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void) showAlertWithMessage:(NSString*)message
+{
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Validation error"
+                                                                    message:message
+                                                                   delegate:self
+                                                          cancelButtonTitle:@"OK"
+                                                          otherButtonTitles:nil];
+                    [alert show];
+}
+
 
 
 @end

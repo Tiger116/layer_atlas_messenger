@@ -19,8 +19,8 @@
 
 +(instancetype) sharedUsersDataSource
 {
-    static UsersDataSource *usersDataSource = nil;
     static dispatch_once_t onceToken;
+    static UsersDataSource *usersDataSource = nil;
     dispatch_once(&onceToken,^{
         usersDataSource = [[self alloc] init];
     });
@@ -30,11 +30,6 @@
 -(instancetype) init
 {
     self = [super init];
-    [self getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        if (error) {
-            NSLog(@"Error when retrieving users from Parse: %@",error);
-        }
-    }];
     return self;
 }
 

@@ -43,11 +43,11 @@
                     <textInputTraits key="textInputTraits"/>
                 </textField>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oeI-gF-et3">
-                    <rect key="frame" x="260" y="350" width="80" height="30"/>
+                    <rect key="frame" x="260" y="550" width="80" height="30"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="80" id="Idr-z5-AP7"/>
                     </constraints>
-                    <state key="normal" title="Register">
+                    <state key="normal" title="Sign up">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
@@ -60,10 +60,10 @@
                 <constraint firstItem="nwC-rD-aOF" firstAttribute="top" secondItem="xuL-cl-gL9" secondAttribute="bottom" constant="8" id="1Sr-x2-BfX"/>
                 <constraint firstItem="xuL-cl-gL9" firstAttribute="top" secondItem="hNO-Ct-uAi" secondAttribute="bottom" constant="8" id="1Zi-9V-I6d"/>
                 <constraint firstAttribute="centerX" secondItem="hNO-Ct-uAi" secondAttribute="centerX" id="AaK-mb-yuw"/>
-                <constraint firstItem="oeI-gF-et3" firstAttribute="top" secondItem="nwC-rD-aOF" secondAttribute="bottom" constant="35" id="EeF-Z6-5dN"/>
                 <constraint firstAttribute="centerX" secondItem="oeI-gF-et3" secondAttribute="centerX" id="Vpd-mt-UAK"/>
                 <constraint firstAttribute="centerX" secondItem="xuL-cl-gL9" secondAttribute="centerX" id="XtY-Bx-jCc"/>
                 <constraint firstAttribute="centerX" secondItem="nwC-rD-aOF" secondAttribute="centerX" id="Yud-HB-0YH"/>
+                <constraint firstAttribute="bottom" secondItem="oeI-gF-et3" secondAttribute="bottom" constant="20" id="dEq-5C-hSF"/>
                 <constraint firstAttribute="centerY" secondItem="nwC-rD-aOF" secondAttribute="centerY" id="kh2-4o-D5T"/>
             </constraints>
             <point key="canvasLocation" x="605" y="308"/>
