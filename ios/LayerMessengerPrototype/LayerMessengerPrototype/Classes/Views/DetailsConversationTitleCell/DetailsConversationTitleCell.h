@@ -10,6 +10,8 @@
 
 @interface DetailsConversationTitleCell : UITableViewCell
 
+@property (strong, nonatomic) IBOutlet UITextField *titleTextField;
+
 -(void) configureCellWithConversationName:(NSString*)title;
 -(void)setTextFieldDelegate:(id<UITextFieldDelegate>)delegate;
 

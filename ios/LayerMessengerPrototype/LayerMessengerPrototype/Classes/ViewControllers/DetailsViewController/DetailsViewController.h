@@ -12,7 +12,7 @@
 
 @protocol DetailsViewControllerDelegate <NSObject>
 
--(void) conversationTitleDidChange:(NSString*) newTitle;
+-(void) conversationTitleDidChange;
 -(void) conservationDidChange:(LYRConversation*)conversation;
 
 @end

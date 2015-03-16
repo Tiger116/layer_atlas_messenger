@@ -10,7 +10,7 @@
 
 @interface DetailsConversationTitleCell ()
 
-@property (strong, nonatomic) IBOutlet UITextField *titleTextField;
+
 
 @end
 
@@ -28,12 +28,9 @@
 
 -(void) configureCellWithConversationName:(NSString*)title
 {
-    if (title) {
-        //self.titleTextField.textColor = [UIColor blackColor];
+    if (title)
+    {
         self.titleTextField.text = title;
-    } else {
-        //self.titleTextField.textColor = [UIColor grayColor];
-        //self.titleTextField.text = @"Enter conversation name";
     }
     
 }
@@ -42,13 +39,5 @@
 {
     self.titleTextField.delegate = delegate;
 }
-
-//- (IBAction)titleEditingDidEnd:(UITextField *)sender
-//{
-//    if (sender.text)
-//    {
-//        <#statements#>
-//    }
-//}
 
 @end

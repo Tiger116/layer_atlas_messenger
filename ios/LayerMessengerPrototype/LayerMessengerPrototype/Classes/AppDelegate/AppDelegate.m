@@ -122,12 +122,28 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
     }];
 }
 
-//- (void)requestIdentityTokenForUserID:(NSString *)userID nonce:(NSString *)nonce completion:(void(^)(NSString *identityToken, NSError *error))completion
-//{
-//    
-//}
-
 #pragma - mark LYRClientDelegate Delegate Methods
+
+- (void)layerClient:(LYRClient *)client objectsDidChange:(NSArray *)changes
+{
+    NSLog(@"Layer Client objects did change");
+    for (NSDictionary *change in changes)
+    {
+        id changedObject = change[LYRObjectChangeObjectKey];
+        if (![changedObject isKindOfClass:[LYRConversation class]]) continue;
+        
+        LYRObjectChangeType changeType = [change[LYRObjectChangeTypeKey] integerValue];
+        NSString *changedProperty = change[LYRObjectChangePropertyKey];
+        
+        if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"metadata"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ConversationMetadataDidChangeNotification" object:changedObject];
+        }
+        
+        if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"participants"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"ConversationParticipantsDidChangeNotification" object:changedObject];
+        }
+    }
+}
 
 - (void)layerClient:(LYRClient *)client didReceiveAuthenticationChallengeWithNonce:(NSString *)nonce
 {

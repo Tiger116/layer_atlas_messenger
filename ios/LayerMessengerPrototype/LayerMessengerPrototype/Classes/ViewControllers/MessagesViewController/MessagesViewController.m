@@ -27,7 +27,7 @@
     [self.navigationItem setRightBarButtonItem:detailsButton];
     
     [self configureUserInterfaceAttributes];
-    //[self setupLayerNotificationObservers];
+    [self registerNotificationObservers];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -286,7 +286,7 @@
 
 #pragma mark - DetailsViewControllerDelegate
 
--(void) conversationTitleDidChange:(NSString*) newTitle
+-(void) conversationTitleDidChange
 {
     [self configureTitle];
 }
@@ -305,5 +305,29 @@
     [self configureTitle];
 }
 
+#pragma mark - Notifications
+
+- (void)registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:@"ConversationMetadataDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:@"ConversationParticipantsDidChangeNotification" object:nil];
+}
+
+- (void)conversationMetadataDidChange:(NSNotification*) notification
+{
+    if (!self.conversation) return;
+    if (!notification.object) return;
+    if (![notification.object isEqual:self.conversation]) return;
+    
+    [self configureTitle];
+}
+
+- (void)conversationParticipantsDidChange:(NSNotification*) notification
+{
+    if (self.conversation.participants.count == 0) {
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+}
 
 @end

@@ -14,6 +14,7 @@
 #import "User.h"
 #import "ParticipantsViewController.h"
 #import "LoadingHUD.h"
+#import "AppDelegate.h"
 
 typedef NS_ENUM(NSInteger, DetailsTableSection) {
     DetailsTableSectionTitle,
@@ -45,6 +46,8 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     [self.view addGestureRecognizer:tap];
     [tap setCancelsTouchesInView:NO];
+    
+    [self registerNotificationObservers];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -65,8 +68,8 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     if (error) {
         NSLog(@"Error while leaving conversation: %@",error);
     } else {
-        [self.navigationController popViewControllerAnimated:YES];
-        [self.navigationController popViewControllerAnimated:YES];
+        AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+        [self.navigationController popToViewController:appDelegate.conversationsViewController animated:YES];
     }
 }
 
@@ -77,8 +80,8 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     if (error) {
         NSLog(@"Error while deleting conversation: %@", error);
     } else {
-        [self.navigationController popViewControllerAnimated:YES];
-        [self.navigationController popViewControllerAnimated:YES];
+        AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+        [self.navigationController popToViewController:appDelegate.conversationsViewController animated:YES];
     }
 }
 
@@ -108,13 +111,8 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 - (NSMutableArray*) participantIdentifiersExcudingCurrentUser
 {
-    NSMutableArray* otherParticipants = [NSMutableArray new];
-    for (NSString* userId in self.participantIdentifiers)
-    {
-        if (![userId isEqualToString:self.layerClient.authenticatedUserID]) {
-            [otherParticipants addObject:userId];
-        }
-    }
+    NSMutableArray* otherParticipants = [self.participantIdentifiers mutableCopy];
+    [otherParticipants removeObject:self.layerClient.authenticatedUserID];
     return otherParticipants;
 }
 
@@ -278,7 +276,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     NSString *title = [self.conversation.metadata valueForKey:@"title"];
     if (![textField.text isEqualToString:title]) {
         [self.conversation setValue:textField.text forMetadataAtKeyPath:@"title"];
-        [self.delegate conversationTitleDidChange:nil];
+        [self.delegate conversationTitleDidChange];
     }
 }
 
@@ -289,7 +287,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     } else {
         [self.conversation deleteValueForMetadataAtKeyPath:@"title"];
     }
-    [self.delegate conversationTitleDidChange:nil];
+    [self.delegate conversationTitleDidChange];
     [textField resignFirstResponder];
     return YES;
 }
@@ -346,5 +344,44 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 //    [self.delegate conservationDidChange:conversation];
 //    self.conversation = conversation;
 //}
+
+#pragma mark - Notifications
+
+- (void)registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:@"ConversationMetadataDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:@"ConversationParticipantsDidChangeNotification" object:nil];
+}
+
+- (void)conversationMetadataDidChange:(NSNotification*)notification
+{
+    if (!self.conversation) return;
+    if (!notification.object) return;
+    if (![notification.object isEqual:self.conversation]) return;
+    
+    NSIndexPath *nameIndexPath = [NSIndexPath indexPathForRow:0 inSection:DetailsTableSectionTitle];
+    DetailsConversationTitleCell *titleCell = (DetailsConversationTitleCell *)[self.tableView cellForRowAtIndexPath:nameIndexPath];
+    if (!titleCell) return;
+    if ([titleCell.titleTextField isFirstResponder]) return;
+    
+    [titleCell configureCellWithConversationName:self.conversation.metadata[@"title"]];
+    [self.delegate conversationTitleDidChange];
+}
+
+- (void)conversationParticipantsDidChange:(NSNotification*)notification
+{
+    if (!self.conversation) return;
+    if (!notification.object) return;
+    if (![notification.object isEqual:self.conversation]) return;
+    
+    if (self.conversation.participants.count == 0) {
+        AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+        [self.navigationController popToViewController:appDelegate.conversationsViewController animated:YES];
+        return;
+    }
+    
+    self.participantIdentifiers = [self.conversation.participants.allObjects mutableCopy];
+    [self.tableView reloadData];
+}
 
 @end
