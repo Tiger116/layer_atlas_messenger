@@ -25,7 +25,6 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 @interface DetailsViewController () 
 
 @property (nonatomic) NSMutableArray *participantIdentifiers;
-@property (nonatomic) NSMutableArray *participantIdentifiersExcudingCurrentUser;
 
 @end
 
@@ -107,20 +106,16 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }];
 }
 
-#pragma mark - Getters
-
 - (NSMutableArray*) participantIdentifiersExcudingCurrentUser
 {
-    if (!_participantIdentifiersExcudingCurrentUser) {
-        NSMutableArray* otherParticipants = [NSMutableArray new];
-        for (NSString* userId in self.participantIdentifiers) {
-            if (![userId isEqualToString:self.layerClient.authenticatedUserID]) {
-                [otherParticipants addObject:userId];
-            }
+    NSMutableArray* otherParticipants = [NSMutableArray new];
+    for (NSString* userId in self.participantIdentifiers)
+    {
+        if (![userId isEqualToString:self.layerClient.authenticatedUserID]) {
+            [otherParticipants addObject:userId];
         }
-        return otherParticipants;
     }
-    return _participantIdentifiersExcudingCurrentUser;
+    return otherParticipants;
 }
 
 #pragma mark - Table view data source
@@ -137,7 +132,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
             return 1;
             
         case DetailsTableSectionParticipants:
-            return self.participantIdentifiersExcudingCurrentUser.count + 1;
+            return [self participantIdentifiersExcudingCurrentUser].count + 1;
             
         case DetailsTableSectionLeave:
             return 1;
@@ -164,7 +159,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
         }
             
         case DetailsTableSectionParticipants: {
-            if (indexPath.row < self.participantIdentifiersExcudingCurrentUser.count)
+            if (indexPath.row < [self participantIdentifiersExcudingCurrentUser].count)
             {
                 ATLParticipantTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"ATLParticipantTableViewCell" forIndexPath:indexPath];
                 return cell;
@@ -204,10 +199,10 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
             break;
             
         case DetailsTableSectionParticipants:
-            if (indexPath.row < self.participantIdentifiersExcudingCurrentUser.count)
+            if (indexPath.row < [self participantIdentifiersExcudingCurrentUser].count)
             {
                 UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
-                User* participant = [usersDataSource getUserForId:[self.participantIdentifiersExcudingCurrentUser objectAtIndex:indexPath.row]];
+                User* participant = [usersDataSource getUserForId:[[self participantIdentifiersExcudingCurrentUser] objectAtIndex:indexPath.row]];
                 [((ATLParticipantTableViewCell*)cell) presentParticipant:participant withSortType:ATLParticipantPickerSortTypeFirstName shouldShowAvatarItem:YES];
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
             }
@@ -239,7 +234,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 {
     switch ((DetailsTableSection)indexPath.section) {
         case DetailsTableSectionParticipants:
-            if (indexPath.row == self.participantIdentifiers.count) {
+            if (indexPath.row == [self participantIdentifiersExcudingCurrentUser].count) {
                 [self presentParticipantPicker];
             }
             break;
@@ -253,13 +248,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
-
-
-
-
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ((indexPath.section == DetailsTableSectionParticipants) && (indexPath.row < self.participantIdentifiers.count)) {
+    if ((indexPath.section == DetailsTableSectionParticipants) && (indexPath.row < [self participantIdentifiersExcudingCurrentUser].count)) {
         return YES;
     }
     return NO;
@@ -268,22 +259,15 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
-        if ([self.participantIdentifiers[indexPath.row] isEqualToString:self.layerClient.authenticatedUserID])
-        {
-            self.participantIdentifiers.count > 1 ? [self leaveConversation] : [self deleteConversation];
-        } else {
-            NSString *participantIdentifier = self.participantIdentifiers[indexPath.row];
-            NSError *error;
-            BOOL success = [self.conversation removeParticipants:[NSSet setWithObject:participantIdentifier] error:&error];
-            if (!success) {
-                NSLog(@"Error while removing participant: %@",error);
-                return;
-            }
-            [self.participantIdentifiers removeObjectAtIndex:indexPath.row];
-            [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+        NSString *participantIdentifier = [self participantIdentifiersExcudingCurrentUser][indexPath.row];
+        NSError *error;
+        BOOL success = [self.conversation removeParticipants:[NSSet setWithObject:participantIdentifier] error:&error];
+        if (!success) {
+            NSLog(@"Error while removing participant: %@",error);
+            return;
         }
-        
-        
+        [self.participantIdentifiers removeObject:participantIdentifier];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
     }
 }
 
@@ -343,6 +327,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
          completion(usersToDisplay);
      }];
 }
+
 
 //#pragma mark - Conversation Configuration
 //
