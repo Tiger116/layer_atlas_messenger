@@ -27,6 +27,7 @@
     self.delegate = self;
     self.dataSource = self;
     self.allowsEditing = YES;
+    self.deletionModes = [NSArray new];
     
     // Left navigation item
     UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sing out" style:UIBarButtonItemStylePlain target:self action:@selector(singOutButtonTapped)];
@@ -113,7 +114,6 @@
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didSearchForText:(NSString *)searchText completion:(void (^)(NSSet *))completion
 {
-    //TODO: Add search for conversation titles
     UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getUsersMatchingSearchText:searchText completion:^(NSSet *participants) {
         completion(participants);

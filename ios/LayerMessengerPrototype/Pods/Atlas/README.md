@@ -1,6 +1,6 @@
 ![Atlas Header](Assets/atlas-github-header.png)
 
-[![Build Status](http://img.shields.io/travis/layerhq/Atlas-iOS/development.svg?style=flat)](https://travis-ci.org/layerhq/Atlas-iOS)
+[![Build Status](http://img.shields.io/travis/layerhq/Atlas-iOS.svg?style=flat)](https://travis-ci.org/layerhq/Atlas-iOS)
 [![Pod Version](http://img.shields.io/cocoapods/v/Atlas.svg?style=flat)](http://cocoadocs.org/docsets/Atlas/)
 [![Pod Platform](http://img.shields.io/cocoapods/p/Atlas.svg?style=flat)](http://cocoadocs.org/docsets/Atlas/)
 [![Pod License](http://img.shields.io/cocoapods/l/Atlas.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0.html)
@@ -30,7 +30,7 @@ The table below details the most important classes in Atlas and is hyperlinked d
 <table>
     <tr><th colspan="2" style="text-align:center;">Controllers</th></tr>
     <tr>
-        <td><a href="Code/Controllers/ATLUIAddressBarController.h">ATLUIAddressBarController</a></td>
+        <td><a href="Code/Controllers/ATLAddressBarViewController.h">ATLAddressBarViewController</a></td>
         <td>A controller that provides a searchable address input experience for selecting users to message.</td>
     </tr>
     <tr>
@@ -81,6 +81,8 @@ The table below details the most important classes in Atlas and is hyperlinked d
     </tr>
 </table>
 
+The complete API documentation can be found on [CocoaDocs](http://cocoadocs.org/docsets/Atlas/1.0.0/).
+
 ## Installation
 
 Atlas can be installed directly into your application via CocoaPods or by directly importing the source code files. Please note that Atlas has a direct dependency on LayerKit that must be satisfied in order to build the components.
@@ -115,6 +117,8 @@ If you wish to install Atlas directly into your application from source, then cl
 1. Drag and drop the files from the `Code` and `Resources` directories onto your project, instructing Xcode to copy items into your destination group's folder.
 2. Update your project settings to include the linker flags: `-ObjC -lz`
 3. Add the following Cocoa SDK frameworks to your project: `'CFNetwork', 'Security', 'MobileCoreServices', 'SystemConfiguration', 'CoreLocation'`
+
+**Please note that LayerKit is a dependecy of `Atlas`. When manually installing `Atlas`, the same must be done with `LayerKit`. Instructions on doing so can be found in the [LayerKit releases repository](https://github.com/layerhq/releases-ios#framework-installation).**
 
 Build and run your project to verify installation was successful.
 
@@ -166,7 +170,7 @@ The `ATLConversationViewController` provides a customizable `UICollectionViewCon
 #### Initialization
 
 ```objc
-ATLConverationViewController *viewController = [ATLConversationViewController conversationViewControllerWithConversation:conversation layerClient:self.layerClient];
+ATLConverationViewController *viewController = [ATLConversationViewController conversationViewControllerWithLayerClient:self.layerClient];
 ```
 
 #### Customization

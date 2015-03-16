@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRQuery.h
+../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRQuery.h
