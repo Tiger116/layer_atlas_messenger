@@ -11,8 +11,11 @@
 #import "ParticipantsViewController.h"
 #import "DetailsViewController.h"
 #import "LoadingHUD.h"
+#import "AppDelegate.h"
 
 @interface MessagesViewController () <DetailsViewControllerDelegate>
+
+@property (nonatomic, strong) UIBarButtonItem* detailsButton;
 
 @end
 
@@ -23,8 +26,11 @@
     self.dataSource = self;
     self.delegate = self;
     
-    UIBarButtonItem *detailsButton = [[UIBarButtonItem alloc] initWithTitle:@"Details" style:UIBarButtonItemStylePlain target:self action:@selector(detailsButtonTapped)];
-    [self.navigationItem setRightBarButtonItem:detailsButton];
+    self.detailsButton = [[UIBarButtonItem alloc] initWithTitle:@"Details" style:UIBarButtonItemStylePlain target:self action:@selector(detailsButtonTapped)];
+    if (self.conversation)
+    {
+        [self.navigationItem setRightBarButtonItem:self.detailsButton];
+    }
     
     [self configureUserInterfaceAttributes];
     [self registerNotificationObservers];
@@ -43,9 +49,9 @@
 
 - (void)configureTitle
 {
-    if ([self.conversation.metadata valueForKey:@"title"])
+    if ([self.conversation.metadata valueForKey:metadataTitleKey])
     {
-        NSString *conversationTitle = [self.conversation.metadata valueForKey:@"title"];
+        NSString *conversationTitle = [self.conversation.metadata valueForKey:metadataTitleKey];
         if (conversationTitle.length)
         {
             self.title = conversationTitle;
@@ -203,6 +209,14 @@
     return [[NSAttributedString alloc] initWithString:statusString attributes:@{NSFontAttributeName : [UIFont boldSystemFontOfSize:11]}];
 }
 
+- (LYRConversation *)conversationViewController:(ATLConversationViewController *)viewController conversationWithParticipants:(NSSet *)participants
+{
+    NSSet *participantIdentifiers = [participants valueForKey:@"participantIdentifier"];
+    BOOL deliveryReceiptsEnabled = participants.count <= 5;
+    NSDictionary *options = @{LYRConversationOptionsDeliveryReceiptsEnabledKey: @(deliveryReceiptsEnabled)};
+    return [self.layerClient newConversationWithParticipants:participantIdentifiers options:options error:nil];
+}
+
 #pragma mark - ATLParticipantTableViewControllerDelegate
 
 /**
@@ -309,8 +323,10 @@
 
 - (void)registerNotificationObservers
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:@"ConversationMetadataDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:@"ConversationParticipantsDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:ConversationMetadataDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:ConversationParticipantsDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDidTapLink:) name:ATLUserDidTapLinkNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationDidCreated:) name:ConversationDidCreated object:nil];
 }
 
 - (void)conversationMetadataDidChange:(NSNotification*) notification
@@ -328,6 +344,17 @@
         [self.navigationController popViewControllerAnimated:YES];
         return;
     }
+}
+
+- (void)userDidTapLink:(NSNotification *)notification
+{
+    [[UIApplication sharedApplication] openURL:notification.object];
+}
+
+- (void)conversationDidCreated:(NSNotification*) notification
+{
+    [self.navigationItem setRightBarButtonItem:self.detailsButton];
+    [((LYRConversation*)notification.object) setValue:self.layerClient.authenticatedUserID forMetadataAtKeyPath:metadataOwnerIdKey];
 }
 
 @end

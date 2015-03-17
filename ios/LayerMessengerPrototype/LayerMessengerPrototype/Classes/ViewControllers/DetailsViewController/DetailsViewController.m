@@ -192,7 +192,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 {
     switch (indexPath.section) {
         case DetailsTableSectionTitle:
-            [((DetailsConversationTitleCell*)cell) configureCellWithConversationName:self.conversation.metadata[@"title"]];
+            [((DetailsConversationTitleCell*)cell) configureCellWithConversationName:self.conversation.metadata[metadataTitleKey]];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             break;
             
@@ -248,7 +248,10 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ((indexPath.section == DetailsTableSectionParticipants) && (indexPath.row < [self participantIdentifiersExcudingCurrentUser].count)) {
+    if (([self.layerClient.authenticatedUserID isEqualToString:self.conversation.metadata[metadataOwnerIdKey]])
+            && (indexPath.section == DetailsTableSectionParticipants)
+            && (indexPath.row < [self participantIdentifiersExcudingCurrentUser].count))
+    {
         return YES;
     }
     return NO;
@@ -273,9 +276,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    NSString *title = [self.conversation.metadata valueForKey:@"title"];
+    NSString *title = [self.conversation.metadata valueForKey:metadataTitleKey];
     if (![textField.text isEqualToString:title]) {
-        [self.conversation setValue:textField.text forMetadataAtKeyPath:@"title"];
+        [self.conversation setValue:textField.text forMetadataAtKeyPath:metadataTitleKey];
         [self.delegate conversationTitleDidChange];
     }
 }
@@ -283,9 +286,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField.text.length > 0) {
-        [self.conversation setValue:textField.text forMetadataAtKeyPath:@"title"];
+        [self.conversation setValue:textField.text forMetadataAtKeyPath:metadataTitleKey];
     } else {
-        [self.conversation deleteValueForMetadataAtKeyPath:@"title"];
+        [self.conversation deleteValueForMetadataAtKeyPath:metadataTitleKey];
     }
     [self.delegate conversationTitleDidChange];
     [textField resignFirstResponder];
@@ -349,8 +352,8 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 - (void)registerNotificationObservers
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:@"ConversationMetadataDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:@"ConversationParticipantsDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:ConversationMetadataDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:ConversationParticipantsDidChangeNotification object:nil];
 }
 
 - (void)conversationMetadataDidChange:(NSNotification*)notification
@@ -364,7 +367,7 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     if (!titleCell) return;
     if ([titleCell.titleTextField isFirstResponder]) return;
     
-    [titleCell configureCellWithConversationName:self.conversation.metadata[@"title"]];
+    [titleCell configureCellWithConversationName:self.conversation.metadata[metadataTitleKey]];
     [self.delegate conversationTitleDidChange];
 }
 

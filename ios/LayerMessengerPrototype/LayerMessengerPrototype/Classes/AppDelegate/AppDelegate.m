@@ -15,6 +15,13 @@
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
 
+NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
+NSString *const ConversationParticipantsDidChangeNotification = @"ConversationParticipantsDidChangeNotification";
+NSString *const ConversationDidCreated = @"ConversationDidCreated";
+
+NSString* const metadataTitleKey = @"title";
+NSString* const metadataOwnerIdKey = @"owner";
+
 @interface AppDelegate () <LYRClientDelegate>
 
 @end
@@ -136,11 +143,15 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
         NSString *changedProperty = change[LYRObjectChangePropertyKey];
         
         if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"metadata"]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ConversationMetadataDidChangeNotification" object:changedObject];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationMetadataDidChangeNotification object:changedObject];
         }
         
         if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"participants"]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ConversationParticipantsDidChangeNotification" object:changedObject];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationParticipantsDidChangeNotification object:changedObject];
+        }
+        
+        if (changeType == LYRObjectChangeTypeCreate) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationDidCreated object:changedObject];
         }
     }
 }

@@ -9,6 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <Atlas.h>
 #import "AuthenticationViewController.h"
+
+extern NSString *const ConversationMetadataDidChangeNotification;
+extern NSString *const ConversationParticipantsDidChangeNotification;
+extern NSString *const ConversationDidCreated;
+
+extern NSString* const metadataTitleKey;
+extern NSString* const metadataOwnerIdKey;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;

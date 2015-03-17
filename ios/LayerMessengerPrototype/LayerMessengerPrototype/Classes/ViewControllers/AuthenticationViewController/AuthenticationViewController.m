@@ -58,6 +58,7 @@
 - (IBAction)signInButtonTapped:(UIButton *)sender
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = @"Signing in";
     [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:^(BOOL success, NSError *error) {
         if (success) {
             [hud hide:YES];
@@ -87,6 +88,7 @@
 {
     //Initialize UsersDataSourse
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = @"Signing in";
     UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
         if (error) {

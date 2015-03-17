@@ -11,6 +11,7 @@
 #import <LayerKit/LayerKit.h>
 #import "UsersDataSource.h"
 #import "LoadingHUD.h"
+#import "AppDelegate.h"
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
@@ -128,7 +129,7 @@
 - (NSString *)conversationListViewController:(ATLConversationListViewController *)conversationListViewController titleForConversation:(LYRConversation *)conversation
 {
     // If we have a Conversation name in metadata, return it.
-    NSString *conversationTitle = conversation.metadata[@"title"];
+    NSString *conversationTitle = conversation.metadata[metadataTitleKey];
     if (conversationTitle.length) {
         return conversationTitle;
     }
@@ -157,6 +158,13 @@
     NSString *firstNamesString = [firstNames componentsJoinedByString:@", "];
     return firstNamesString;
 
+}
+
+#pragma mark - UITableViewDataSource
+
+- (BOOL) tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return NO;
 }
 
 @end
