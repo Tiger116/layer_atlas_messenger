@@ -12,7 +12,7 @@
 
 extern NSString *const ConversationMetadataDidChangeNotification;
 extern NSString *const ConversationParticipantsDidChangeNotification;
-extern NSString *const ConversationDidCreated;
+extern NSString *const ConversationDidCreatedNotification;
 
 extern NSString* const metadataTitleKey;
 extern NSString* const metadataOwnerIdKey;

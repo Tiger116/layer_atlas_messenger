@@ -16,6 +16,14 @@
 
 @implementation LoadingHUD
 
+/**
+ *  Creates a new HUD, adds it to given view and shows it.
+ *
+ *  @param view     The view that the HUD will be added to
+ *  @param animated If set to YES the HUD will appear using the current animationType. If set to NO the HUD will not use animations while appearing.
+ *
+ *  @return A reference to the created HUD.
+ */
 + (MB_INSTANCETYPE)showHUDAddedTo:(UIView *)view animated:(BOOL)animated
 {
     LoadingHUD* hud = [super showHUDAddedTo:view animated:animated];
@@ -49,6 +57,12 @@ static UIColor* _labelColor;
     _labelColor = color;
 }
 
+/**
+ * Displays given text for preset '_delayForShowingText' time, then hides HUD
+ *
+ *  @param animated If set to YES the HUD will disappear using the current animationType. If set to NO the HUD will not use animations while disappearing.
+ *  @param text     The text which will be displayed before HUD hides.
+ */
 -(void) hide:(BOOL)animated afterShowingText:(NSString*)text
 {
     [self hide:YES];

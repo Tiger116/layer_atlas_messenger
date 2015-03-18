@@ -17,7 +17,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 
 NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
 NSString *const ConversationParticipantsDidChangeNotification = @"ConversationParticipantsDidChangeNotification";
-NSString *const ConversationDidCreated = @"ConversationDidCreated";
+NSString *const ConversationDidCreatedNotification = @"ConversationDidCreatedNotification";
 
 NSString* const metadataTitleKey = @"title";
 NSString* const metadataOwnerIdKey = @"owner";
@@ -28,6 +28,10 @@ NSString* const metadataOwnerIdKey = @"owner";
 
 @implementation AppDelegate
 
+/**
+ *  Tells the delegate that the launch process is almost done and the app is almost ready to run. Method initializes Parse and LYRClient object, displays first view controller (AuthenticationViewController).
+ *
+ */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Initialize Parse.
@@ -77,6 +81,13 @@ NSString* const metadataOwnerIdKey = @"owner";
 
 #pragma mark - Layer Authentication Methods
 
+/**
+ *  Method requests authentication nonce from Layer. Then uses it, given username and password to get an identity token from Parse. Executes completion block when finished.
+ *
+ *  @param username   Username for Parse user.
+ *  @param password   Password for Parse user.
+ *  @param completion Block that will be executed in the end. If method finished succesfully block's parameters are (YES, nil), else - (NO, error)
+ */
 - (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion
 {
     if (self.layerClient.authenticatedUserID) {
@@ -131,6 +142,12 @@ NSString* const metadataOwnerIdKey = @"owner";
 
 #pragma - mark LYRClientDelegate Delegate Methods
 
+/**
+ *  Tells the delegate that objects associated with the client have changed due to local mutation or synchronization activities. Method identifies changes and posts notifications about them.
+ *
+ *  @param client  The client that received the changes.
+ *  @param changes An array of `NSDictionary` objects, each one describing a change.
+ */
 - (void)layerClient:(LYRClient *)client objectsDidChange:(NSArray *)changes
 {
     NSLog(@"Layer Client objects did change");
@@ -151,7 +168,7 @@ NSString* const metadataOwnerIdKey = @"owner";
         }
         
         if (changeType == LYRObjectChangeTypeCreate) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationDidCreated object:changedObject];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationDidCreatedNotification object:changedObject];
         }
     }
 }

@@ -21,6 +21,11 @@
 
 @implementation ConversationsViewController
 
+/**
+ *  Called after the controller's view is loaded into memory.
+ *
+ *  Finishes view controller's initialization.
+ */
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -48,11 +53,17 @@
     // Dispose of any resources that can be recreated.
 }
 
+/**
+ *  Method will be called if "Compose" button is tapped.
+ */
 - (void)composeButtonTapped
 {
     [self presentControllerWithConversation:nil];
 }
 
+/**
+ *  Method will be called if "Sign out" button is tapped. It deauthenticates user and returns to AuthenticationViewController if succes.
+ */
 - (void)singOutButtonTapped
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
@@ -69,6 +80,11 @@
 
 #pragma mark - Conversation Selection
 
+/**
+ *  Creates view controller for given conversation ('MessagesViewController') and pushed it into navigation controller.
+ *
+ *  @param conversation 'LYRConversation' object to initialize created view controller.
+ */
 - (void)presentControllerWithConversation:(LYRConversation *)conversation
 {
     BOOL shouldShowAddressBar = (conversation.participants.count > 2 || !conversation.participants.count);
@@ -95,7 +111,7 @@
 }
 
 /**
- Atlas - Informs the delegate a conversation was deleted. Atlas Messenger does not need to react as the superclass will handle removing the conversation in response to a deletion.
+ *  Informs the delegate a conversation was deleted. Delegate does not need to react as the superclass will handle removing the conversation in response to a deletion.
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didDeleteConversation:(LYRConversation *)conversation deletionMode:(LYRDeletionMode)deletionMode
 {
@@ -103,7 +119,7 @@
 }
 
 /**
- Atlas - Informs the delegate that a conversation deletion attempt failed. Atlas Messenger does not do anything in response.
+ *  Informs the delegate that a conversation deletion attempt failed. Delegate does not do anything in response.
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didFailDeletingConversation:(LYRConversation *)conversation deletionMode:(LYRDeletionMode)deletionMode error:(NSError *)error
 {
@@ -111,7 +127,7 @@
 }
 
 /**
- Atlas - Informs the delegate that a search has been performed. Atlas messenger queries for, and returns objects conforming to the `ATLParticipant` protocol whose `fullName` property contains the search text.
+ *  Informs the delegate that a search has been performed. It queries for, and returns objects conforming to the `ATLParticipant` protocol whose `fullName` property contains the search text.
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didSearchForText:(NSString *)searchText completion:(void (^)(NSSet *))completion
 {
@@ -124,7 +140,11 @@
 #pragma mark - ATLConversationListViewControllerDataSource
 
 /**
- Atlas - Returns a label that is used to represent the conversation. Atlas Messenger puts the name representing the `lastMessage.sentByUserID` property first in the string.
+ *  Returns a label that is used to represent the conversation.
+ *  Conversation title - if it is stored in metadata.
+ *  "Personal Conversation" - if conversation haven't other participants except authenticated user.
+ *  Other participant's full name - if there is only one other participant.
+ *  "Group" - if there are more then one other participants.
  */
 - (NSString *)conversationListViewController:(ATLConversationListViewController *)conversationListViewController titleForConversation:(LYRConversation *)conversation
 {
@@ -162,6 +182,16 @@
 
 #pragma mark - UITableViewDataSource
 
+/**
+ *  Asks the data source to verify that the given row is editable.
+ *
+ *  Denies deleting conversations.
+ *
+ *  @param tableView The table-view object requesting this information.
+ *  @param indexPath An index path locating a row in tableView.
+ *
+ *  @return YES if the row indicated by indexPath is editable; otherwise, NO.
+ */
 - (BOOL) tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return NO;

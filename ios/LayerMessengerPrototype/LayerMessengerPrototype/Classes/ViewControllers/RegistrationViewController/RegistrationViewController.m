@@ -27,6 +27,10 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 
 @implementation RegistrationViewController
 
+/**
+ *  Called after the controller's view is loaded into memory.
+ *  It finishes view controller's initialization.
+ */
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.sectionHeaderHeight = 48.0f;
@@ -44,6 +48,11 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     // Dispose of any resources that can be recreated.
 }
 
+/**
+ *  Methot will be called when user tappes to RegistrationViewController's view. It will end editing of any text field to dismiss keyboard.
+ *
+ *  @param recognizer UITapGestureRecognizer object which recognized tap.
+ */
 - (void)handleTap:(UITapGestureRecognizer *)recognizer
 {
     [self.view endEditing:YES];
@@ -72,6 +81,16 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     }
 }
 
+/**
+ *  Asks the data source for a cell to insert in a particular location of the table view.
+ *
+ *  Fetches previously created cell or creates new one.
+ *
+ *  @param tableView A table-view object requesting the cell.
+ *  @param indexPath An index path locating a row in tableView.
+ *
+ *  @return 'RegistrationInputCell' for cells to user's input, 'RegistrationButtonCell' for "OK" and "Cancel" buttons.
+ */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
         case RegistrationTableSectionUsername:
@@ -99,6 +118,15 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     }
 }
 
+/**
+ *  Tells the delegate the table view is about to draw a cell for a particular row.
+ *
+ *  Configures cell's appearance.
+ *
+ *  @param tableView The table-view object informing the delegate of this impending event.
+ *  @param cell      A table-view cell object that tableView is going to use when drawing the row.
+ *  @param indexPath An index path locating the row in tableView.
+ */
 - (void) tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch (indexPath.section) {
@@ -172,6 +200,14 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 
 #pragma mark - Table view delegate
 
+/**
+ *  Tells the delegate that the specified row is now selected.
+ *
+ *  Calls 'validateInputInTableView' method to check user's input for correctness. If success registers new user in Parse and returns to view controller with sign-in form ('AuthenticationViewController'). If registration fails show alertView with failure reason.
+ *
+ *  @param tableView A table-view object informing the delegate about the new row selection.
+ *  @param indexPath An index path locating the new selected row in tableView.
+ */
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == RegistrationTableSectionButtons)
@@ -228,6 +264,16 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 
 #pragma mark - Input validation
 
+/**
+ *  Checks text fields in this RegistrationViewController's tableViews's cells for folowing conditions:
+ *  Text fileds are not empty;
+ *  Entered passwords are equal.
+ *
+ *
+ *  @param tableView UITableView object where cell will be gotten from.
+ *
+ *  @return User object with entered information if success. Nil in other case.
+ */
 - (User*) validateInputInTableView:(UITableView*)tableView
 {
     NSString* username;
@@ -286,6 +332,13 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     return user;
 }
 
+/**
+ *  Checks if given UITextField object's text is empty or contains only spaces.
+ *
+ *  @param textField Object that will be checked.
+ *
+ *  @return YES if given object is null, or objects's text is null, or text is empty or contains only spaces. NO in other cases.
+ */
 - (BOOL) textFieldIsEmpty:(UITextField*)textField
 {
     if (!textField || !textField.text || ([textField.text stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].length == 0)) {
@@ -294,6 +347,11 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     return NO;
 }
 
+/**
+ *  Creates and shows UIAlertView object with "Validation error" title, given message and one "OK" button.
+ *
+ *  @param message Message that will be displayed in UIAlertView.
+ */
 - (void) showAlertWithMessage:(NSString*)message
 {
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Validation error"

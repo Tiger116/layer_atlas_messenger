@@ -23,6 +23,10 @@
 
 @implementation AuthenticationViewController
 
+/**
+ *  Called after the controller's view is loaded into memory. 
+    It finishes view controller's initialization and connects to Layer. If user is already authenticated it calls 'signIn' method, which proceeds to next view controller ('ConversationsViewController').
+ */
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.navigationController setNavigationBarHidden:YES];
@@ -55,6 +59,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+/**
+ *  Method will be called if "Sign in" button is tapped. It tries to authenticate with entered in TextFields username and password.
+ *
+ *  @param sender Button that was tapped.
+ */
 - (IBAction)signInButtonTapped:(UIButton *)sender
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
@@ -78,12 +87,20 @@
     }];
 }
 
+/**
+ *  Method will be called if "Sign up" button is tapped. It presents view controller ('RegistrationViewController') for user to registrate.
+ *
+ *  @param sender Button that was tapped.
+ */
 - (IBAction)registerButtonTapped:(UIButton *)sender
 {
     RegistrationViewController* viewController = [[RegistrationViewController alloc] initWithNibName:@"RegistrationViewController" bundle:nil];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 
+/**
+ *  Method initializes singleton 'UsersDataSourse' object and pushes view controllers with conversations ('ConversationsViewController').
+ */
 - (void) signIn
 {
     //Initialize UsersDataSourse
@@ -102,6 +119,12 @@
     }];
 }
 
+/**
+ *  Tells the receiver when one or more fingers touch down in a view or window. It will end editing of any text field to dismiss keyboard.
+ *
+ *  @param touches A set of UITouch instances that represent the touches for the starting phase of the event represented by event.
+ *  @param event   An object representing the event to which the touches belong.
+ */
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
     UITouch *touch = [[event allTouches] anyObject];
@@ -114,6 +137,15 @@
 
 #pragma mark - UITextFieldDelegate
 
+/**
+ *  Asks the delegate if the text field should process the pressing of the return button.
+ *  If return button was pressed in the username text field then password text field become active.
+ *  If button was pressed in the password text field then it is considered as "Sign in" button was tapped.
+ *
+ *  @param textField The text field whose return button was pressed.
+ *
+ *  @return YES if the text field should implement its default behavior for the return button; otherwise, NO.
+ */
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if(textField == self.usernameField){

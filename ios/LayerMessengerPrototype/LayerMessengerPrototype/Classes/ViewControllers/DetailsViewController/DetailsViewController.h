@@ -12,8 +12,13 @@
 
 @protocol DetailsViewControllerDelegate <NSObject>
 
+/**
+ *  Informs the delegate that conversation's title was changed.
+ */
 -(void) conversationTitleDidChange;
--(void) conservationDidChange:(LYRConversation*)conversation;
+
+
+//-(void) conservationDidChange:(LYRConversation*)conversation;
 
 @end
 

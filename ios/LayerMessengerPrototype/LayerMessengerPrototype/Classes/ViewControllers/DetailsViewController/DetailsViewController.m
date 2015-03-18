@@ -31,6 +31,11 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 @implementation DetailsViewController
 
+/**
+ *  Called after the controller's view is loaded into memory.
+ *
+ *  Finishes view controller's initialization.
+ */
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"Details";
@@ -55,11 +60,19 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     // Dispose of any resources that can be recreated.
 }
 
+/**
+ *  Methot will be called when user tappes to ('DetailsViewController *')self view. It will end editing of any text field to dismiss keyboard.
+ *
+ *  @param recognizer UITapGestureRecognizer object which recognized tap.
+ */
 - (void)handleTap:(UITapGestureRecognizer *)recognizer
 {
     [self.view endEditing:YES];
 }
 
+/**
+ *  Removes authenticated user from current conversation and returns to view controller with conversations ('ConversationsViewController').
+ */
 - (void)leaveConversation
 {
     NSSet *participants = [NSSet setWithObject:self.layerClient.authenticatedUserID];
@@ -73,6 +86,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Deletes current conversation and returns to view controller with conversations ('ConversationsViewController').
+ */
 - (void)deleteConversation
 {
     NSError *error;
@@ -85,6 +101,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Downloads user list. And presents view controller with it ('ParticipantsViewController') to user to select participant.
+ */
 - (void)presentParticipantPicker
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
@@ -109,6 +128,11 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }];
 }
 
+/**
+ *  Creates 'NSMutableArray' object with participant's identifiers except authenticated user's identifier.
+ *
+ *  @return Created 'NSMutableArray' object.
+ */
 - (NSMutableArray*) participantIdentifiersExcudingCurrentUser
 {
     NSMutableArray* otherParticipants = [self.participantIdentifiers mutableCopy];
@@ -142,6 +166,16 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 }
 
+/**
+ *  Asks the data source for a cell to insert in a particular location of the table view.
+ *
+ *  Fetches previously created cell or creates new one.
+ *
+ *  @param tableView A table-view object requesting the cell.
+ *  @param indexPath An index path locating a row in tableView.
+ *
+ *  @return 'DetailsConversationTitleCell' for cell with title, 'ATLParticipantTableViewCell' for cells with participants, 'DetailsConversationMemberCell' for cell-button "Add participant", 'DetailsLeaveConversationCell' for cell-button for leaving conversation.
+ */
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch (indexPath.section) {
@@ -188,6 +222,15 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Tells the delegate the table view is about to draw a cell for a particular row.
+ *
+ *  Configures cell's appearance.
+ *
+ *  @param tableView The table-view object informing the delegate of this impending event.
+ *  @param cell      A table-view cell object that tableView is going to use when drawing the row.
+ *  @param indexPath An index path locating the row in tableView.
+ */
 - (void) tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch (indexPath.section) {
@@ -228,6 +271,15 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Tells the delegate that the specified row is now selected.
+ *
+ *  If selected "Add participant" cell - calls 'presentParticipantPicker' method.
+ *  If selected "Leave conversation" cell - leaves conversation or deletes one if user was last participant.
+ *
+ *  @param tableView A table-view object informing the delegate about the new row selection.
+ *  @param indexPath An index path locating the new selected row in tableView.
+ */
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     switch ((DetailsTableSection)indexPath.section) {
@@ -246,6 +298,16 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Asks the data source to verify that the given row is editable.
+ *
+ *  Allows deleting only rows with participants and deleting can perform only owner of the conversation.
+ *
+ *  @param tableView The table-view object requesting this information.
+ *  @param indexPath An index path locating a row in tableView.
+ *
+ *  @return YES if the row indicated by indexPath is editable; otherwise, NO.
+ */
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (([self.layerClient.authenticatedUserID isEqualToString:self.conversation.metadata[metadataOwnerIdKey]])
@@ -257,6 +319,15 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     return NO;
 }
 
+/**
+ *  Asks the data source to commit the insertion or deletion of a specified row in the receiver.
+ *
+ *  Removes participant from the conversation and deletes his row.
+ *
+ *  @param tableView    The table-view object requesting the insertion or deletion.
+ *  @param editingStyle The cell editing style corresponding to a insertion or deletion requested for the row specified by indexPath.
+ *  @param indexPath    An index path locating the row in tableView.
+ */
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
@@ -274,6 +345,13 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 #pragma mark - UITextFieldDelegate
 
+/**
+ *  Tells the delegate that editing stopped for the specified text field.
+ *
+ *  Saves entered title in conversation's metadata and informs delegate about title's change.
+ *
+ *  @param textField The text field for which editing ended.
+ */
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
     NSString *title = [self.conversation.metadata valueForKey:metadataTitleKey];
@@ -283,6 +361,13 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     }
 }
 
+/**
+ *  Asks the delegate if the text field should process the pressing of the return button.
+ *
+ *  Saves entered title in conversation's metadata and informs delegate about title's change.
+ *
+ *  @param textField The text field for which editing ended.
+ */
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField.text.length > 0) {
@@ -297,6 +382,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 #pragma mark - ATLParticipantTableViewControllerDelegate
 
+/**
+ *  Informs the delegate that the user selected an participant. Delegate in turn, returns to 'DetailsViewController' and adds selected participant to the conversation.
+ */
 - (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSelectParticipant:(id<ATLParticipant>)participant
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -310,6 +398,9 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     [self.tableView reloadData];
 }
 
+/**
+ *  Informs the delegate that the user is searching for participants. Delegate queries for participants whose `fullName` property contains the give search string.
+ */
 - (void)participantTableViewController:(ATLParticipantTableViewController *)participantTableViewController didSearchWithString:(NSString *)searchText completion:(void (^)(NSSet *))completion
 {
     UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
@@ -350,12 +441,20 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
 
 #pragma mark - Notifications
 
+/**
+ *  Adds ('DetailsViewController *')self as observer to different notifications.
+ */
 - (void)registerNotificationObservers
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:ConversationMetadataDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:ConversationParticipantsDidChangeNotification object:nil];
 }
 
+/**
+ *  Handles ConversationMetadataDidChangeNotification. Changes text field's text value for cell with conversation's title and informs the delegate that conversation's title was changed.
+ *
+ *  @param notification received notification.
+ */
 - (void)conversationMetadataDidChange:(NSNotification*)notification
 {
     if (!self.conversation) return;
@@ -371,6 +470,11 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     [self.delegate conversationTitleDidChange];
 }
 
+/**
+ *  Handles ConversationParticipantsDidChangeNotification. If user has been removed from the conversation then returns to previous view controller, else changes table's section with participants.
+ *
+ *  @param notification received notification.
+ */
 - (void)conversationParticipantsDidChange:(NSNotification*)notification
 {
     if (!self.conversation) return;
