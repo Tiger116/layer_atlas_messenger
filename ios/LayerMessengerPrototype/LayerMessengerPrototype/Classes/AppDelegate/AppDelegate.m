@@ -13,6 +13,7 @@
 #import "LoadingHUD.h"
 
 
+
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
 
 NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
@@ -45,6 +46,18 @@ NSString* const metadataOwnerIdKey = @"owner";
     self.layerClient.delegate = self;
     self.layerClient.autodownloadMIMETypes = [NSSet setWithObjects:ATLMIMETypeImageJPEGPreview, ATLMIMETypeTextPlain, nil];
     
+    //Register for remote notifications
+    // Checking if app is running iOS 8
+    if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
+        // Register device for iOS8
+        UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound categories:nil];
+        [application registerUserNotificationSettings:notificationSettings];
+        [application registerForRemoteNotifications];
+    } else {
+        // Register device for iOS7
+        [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeBadge];
+    }
+    
     //Initialize LoadingHUD style
 //    [LoadingHUD setLabelColor:[UIColor blueColor]];
     
@@ -55,6 +68,30 @@ NSString* const metadataOwnerIdKey = @"owner";
     [self.window makeKeyAndVisible];
     
     return YES;
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSError *error;
+    BOOL success = [self.layerClient updateRemoteNotificationDeviceToken:deviceToken error:&error];
+    if (success) {
+        NSLog(@"Application did register for remote notifications");
+    } else {
+        NSLog(@"Error updating Layer device token for push:%@", error);
+    }
+}
+
+- (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    if (application.applicationState == UIApplicationStateInactive)
+    {
+        if (!self.messagesViewController
+            || !(self.navController.topViewController == self.messagesViewController)
+            || ![[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:userInfo[@"layer"][@"conversation_identifier"]])
+        {
+            [self.navController popToViewController:self.conversationsViewController animated:YES];
+        }
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

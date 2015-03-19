@@ -16,7 +16,7 @@
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
 @property (strong,nonatomic) NSOrderedSet* conversations;
-@property (nonatomic) BOOL synchronizationIsFinished;
+@property (atomic) BOOL synchronizationIsFinished;
 
 @property (nonatomic) LYRQueryController *queryController;
 
@@ -74,6 +74,10 @@
                                                      point.y - self.refreshControl.frame.size.height
                                                      - self.searchDisplayController.searchBar.frame.size.height)
                                 animated:YES];
+        if (self.synchronizationIsFinished)
+        {
+            [self.refreshControl endRefreshing];
+        }
     }
 }
 
@@ -130,17 +134,18 @@
 - (void)presentControllerWithConversation:(LYRConversation *)conversation
 {
     BOOL shouldShowAddressBar = (conversation.participants.count > 2 || !conversation.participants.count);
-    MessagesViewController *messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient];
-    messagesViewController.displaysAddressBar = shouldShowAddressBar;
-    messagesViewController.conversation = conversation;
+    AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient];
+    appDelegate.messagesViewController.displaysAddressBar = shouldShowAddressBar;
+    appDelegate.messagesViewController.conversation = conversation;
     
     if (self.navigationController.topViewController == self) {
-        [self.navigationController pushViewController:messagesViewController animated:YES];
+        [self.navigationController pushViewController:appDelegate.messagesViewController animated:YES];
     } else {
         NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
         NSUInteger listViewControllerIndex = [self.navigationController.viewControllers indexOfObject:self];
         NSRange replacementRange = NSMakeRange(listViewControllerIndex + 1, viewControllers.count - listViewControllerIndex - 1);
-        [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[messagesViewController]];
+        [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[appDelegate.messagesViewController]];
         [self.navigationController setViewControllers:viewControllers animated:YES];
     }
 }

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <Atlas.h>
 #import "AuthenticationViewController.h"
+#import "MessagesViewController.h"
 
 extern NSString *const ConversationMetadataDidChangeNotification;
 extern NSString *const ConversationParticipantsDidChangeNotification;
@@ -24,6 +25,7 @@ extern NSString* const metadataOwnerIdKey;
 @property (strong, nonatomic) ATLConversationListViewController* conversationsViewController;
 @property (strong, nonatomic) UINavigationController* navController;
 @property (strong, nonatomic) AuthenticationViewController* authViewController;
+@property (nonatomic,strong) MessagesViewController* messagesViewController;
 @property (nonatomic) LYRClient *layerClient;
 
 - (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion;
