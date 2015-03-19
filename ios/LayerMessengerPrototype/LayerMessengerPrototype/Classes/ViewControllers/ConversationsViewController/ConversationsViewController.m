@@ -16,6 +16,9 @@
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
 @property (strong,nonatomic) NSOrderedSet* conversations;
+@property (nonatomic) BOOL synchronizationIsFinished;
+
+@property (nonatomic) LYRQueryController *queryController;
 
 @end
 
@@ -34,6 +37,8 @@
     self.dataSource = self;
     self.allowsEditing = YES;
     self.deletionModes = [NSArray new];
+    self.synchronizationIsFinished = NO;
+    [self registerNotificationObservers];
     
     // Left navigation item
     UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sing out" style:UIBarButtonItemStylePlain target:self action:@selector(singOutButtonTapped)];
@@ -43,14 +48,51 @@
     UIBarButtonItem *composeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeButtonTapped)];
     [self.navigationItem setRightBarButtonItem:composeButton];
     
+    // Display navigation bar
     [self.navigationController setNavigationBarHidden:NO];
     
+    //Pull-to-refresh
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(pulledToRefresh) forControlEvents:UIControlEventValueChanged];
+}
+
+/**
+ *  Notifies the view controller that its view was added to a view hierarchy.
+ *
+ *  Presents refreshing spinner until data finished loading.
+ *
+ *  @param animated If YES, the view was added to the window using an animation.
+ */
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    if (!self.synchronizationIsFinished)
+    {
+        [self.refreshControl beginRefreshing];
+        CGPoint point = self.tableView.contentOffset;
+        [self.tableView setContentOffset:CGPointMake(point.x,
+                                                     point.y - self.refreshControl.frame.size.height
+                                                     - self.searchDisplayController.searchBar.frame.size.height)
+                                animated:YES];
+    }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+/**
+ *  Called when user pulls to refresh. Reloads table data.
+ */
+- (void) pulledToRefresh
+{
+    NSError* error;
+    BOOL success = [self.queryController execute:&error];
+    if (!success) NSLog(@"LayerKit failed to execute query with error: %@", error);
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
 }
 
 /**
@@ -195,6 +237,29 @@
 - (BOOL) tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return NO;
+}
+
+#pragma mark - Notifications
+
+/**
+ *  Adds ('ConversationViewController *')self as observer to different notifications.
+ */
+- (void)registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidFinishSynchronizationNotification object:nil];
+}
+
+/**
+ *  Handles LayerClientDidFinishSynchronizationNotification.
+ *
+ *  Hides refreshing spinner.
+ *
+ *  @param notification received notification.
+ */
+- (void) synchronizationDidFinished:(NSNotification*) notification
+{
+    self.synchronizationIsFinished = YES;
+    [self.refreshControl endRefreshing];
 }
 
 @end
