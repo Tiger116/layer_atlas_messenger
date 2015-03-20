@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import <LayerKit/LayerKit.h>
-#import "ConversationsViewController.h"
 #import <Parse/Parse.h>
 #import "LoadingHUD.h"
 
@@ -70,6 +69,11 @@ NSString* const metadataOwnerIdKey = @"owner";
     return YES;
 }
 
+/**
+ *  Tells the delegate that the app successfully registered with Apple Push Notification service (APNs).
+ *
+ *  Provided device token is submited to Layer.
+ */
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
     NSError *error;
@@ -81,15 +85,26 @@ NSString* const metadataOwnerIdKey = @"owner";
     }
 }
 
+/**
+ *  Tells the delegate that the running app received a remote notification.
+ *
+ *  If application wasn't in foreground method will present view controller with conversation where message in notification comes from.
+ */
 - (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     if (application.applicationState == UIApplicationStateInactive)
     {
-        if (!self.messagesViewController
-            || !(self.navController.topViewController == self.messagesViewController)
-            || ![[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:userInfo[@"layer"][@"conversation_identifier"]])
+        if (self.messagesViewController
+            && [self.navController.viewControllers containsObject:self.messagesViewController]
+            && [[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:userInfo[@"layer"][@"conversation_identifier"]])
         {
-            [self.navController popToViewController:self.conversationsViewController animated:YES];
+            [self.navController popToViewController:self.messagesViewController animated:YES];
+        }else
+        {
+            LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+            query.predicate = [LYRPredicate predicateWithProperty:@"identifier" operator:LYRPredicateOperatorIsEqualTo value:userInfo[@"layer"][@"conversation_identifier"]];
+            LYRConversation *conversation = [[self.layerClient executeQuery:query error:nil] firstObject];
+            [self.conversationsViewController presentControllerWithConversation:conversation];
         }
     }
 }
