@@ -11,6 +11,7 @@
 #import "RegistrationButtonCell.h"
 #import <Parse/Parse.h>
 #import "User.h"
+#import <MBProgressHUD.h>
 
 typedef NS_ENUM(NSInteger, RegistrationTableSection)
 {
@@ -133,17 +134,17 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
         case RegistrationTableSectionUsername:
             ((RegistrationInputCell*)cell).inputText.placeholder = @"Username";
             ((RegistrationInputCell*)cell).selectionStyle = UITableViewCellSelectionStyleNone;
+            ((RegistrationInputCell*)cell).inputText.secureTextEntry = NO;
             break;
         case RegistrationTableSectionPassword:{
             ((RegistrationInputCell*)cell).selectionStyle = UITableViewCellSelectionStyleNone;
+            ((RegistrationInputCell*)cell).inputText.secureTextEntry = YES;
             switch (indexPath.row) {
                 case 0:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"Password";
-                    ((RegistrationInputCell*)cell).inputText.secureTextEntry = YES;
                     break;
                 case 1:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"Confirm password";
-                    ((RegistrationInputCell*)cell).inputText.secureTextEntry = YES;
                     break;
                 default:
                     break;
@@ -152,6 +153,7 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
         }
         case RegistrationTableSectionUserInfo:{
             ((RegistrationInputCell*)cell).selectionStyle = UITableViewCellSelectionStyleNone;
+            ((RegistrationInputCell*)cell).inputText.secureTextEntry = NO;
             switch (indexPath.row) {
                 case 0:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"First name";

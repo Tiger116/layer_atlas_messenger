@@ -38,6 +38,12 @@
 		35D25D8F1AB1B5FB0047DFC4 /* RegistrationInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D8D1AB1B5FB0047DFC4 /* RegistrationInputCell.xib */; };
 		35D25D931AB1B6150047DFC4 /* RegistrationButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */; };
 		35D25D941AB1B6150047DFC4 /* RegistrationButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */; };
+		35D29E061ABC13E400BEFBE0 /* libPods-Ubertesters.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E051ABC13E400BEFBE0 /* libPods-Ubertesters.a */; };
+		35D29E081ABC175E00BEFBE0 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E071ABC175E00BEFBE0 /* AdSupport.framework */; };
+		35D29E0A1ABC176D00BEFBE0 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E091ABC176D00BEFBE0 /* CoreImage.framework */; };
+		35D29E0C1ABC178000BEFBE0 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E0B1ABC178000BEFBE0 /* CoreTelephony.framework */; };
+		35D29E0E1ABC179100BEFBE0 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E0D1ABC179100BEFBE0 /* OpenGLES.framework */; };
+		35D29E101ABC179B00BEFBE0 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E0F1ABC179B00BEFBE0 /* CoreMotion.framework */; };
 		35D5B6D51AA9BAF80039AF46 /* DetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */; };
 		35D5B6D61AA9BAF80039AF46 /* DetailsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */; };
 		35D5B6E81AA9D1A70039AF46 /* DetailsConversationMemberCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6E61AA9D1A70039AF46 /* DetailsConversationMemberCell.m */; };
@@ -109,6 +115,12 @@
 		35D25D901AB1B6150047DFC4 /* RegistrationButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegistrationButtonCell.h; sourceTree = "<group>"; };
 		35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegistrationButtonCell.m; sourceTree = "<group>"; };
 		35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegistrationButtonCell.xib; sourceTree = "<group>"; };
+		35D29E051ABC13E400BEFBE0 /* libPods-Ubertesters.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-Ubertesters.a"; path = "Pods/../build/Debug-iphoneos/libPods-Ubertesters.a"; sourceTree = "<group>"; };
+		35D29E071ABC175E00BEFBE0 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
+		35D29E091ABC176D00BEFBE0 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		35D29E0B1ABC178000BEFBE0 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		35D29E0D1ABC179100BEFBE0 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		35D29E0F1ABC179B00BEFBE0 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		35D5B6D21AA9BAF80039AF46 /* DetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsViewController.h; sourceTree = "<group>"; };
 		35D5B6D31AA9BAF80039AF46 /* DetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsViewController.m; sourceTree = "<group>"; };
 		35D5B6D41AA9BAF80039AF46 /* DetailsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsViewController.xib; sourceTree = "<group>"; };
@@ -133,6 +145,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D29E101ABC179B00BEFBE0 /* CoreMotion.framework in Frameworks */,
+				35D29E0E1ABC179100BEFBE0 /* OpenGLES.framework in Frameworks */,
+				35D29E0C1ABC178000BEFBE0 /* CoreTelephony.framework in Frameworks */,
+				35D29E0A1ABC176D00BEFBE0 /* CoreImage.framework in Frameworks */,
+				35D29E081ABC175E00BEFBE0 /* AdSupport.framework in Frameworks */,
+				35D29E061ABC13E400BEFBE0 /* libPods-Ubertesters.a in Frameworks */,
 				35D25D781AB18A560047DFC4 /* libPods-MBProgressHUD.a in Frameworks */,
 				35DFFABE1AAEE981009DA14B /* libPods.a in Frameworks */,
 				359FFB471A9C8B6D00F51353 /* libsqlite3.dylib in Frameworks */,
@@ -419,6 +437,12 @@
 		EAC00861624EB0724FA19C72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				35D29E0F1ABC179B00BEFBE0 /* CoreMotion.framework */,
+				35D29E0D1ABC179100BEFBE0 /* OpenGLES.framework */,
+				35D29E0B1ABC178000BEFBE0 /* CoreTelephony.framework */,
+				35D29E091ABC176D00BEFBE0 /* CoreImage.framework */,
+				35D29E071ABC175E00BEFBE0 /* AdSupport.framework */,
+				35D29E051ABC13E400BEFBE0 /* libPods-Ubertesters.a */,
 				35D25D771AB18A560047DFC4 /* libPods-MBProgressHUD.a */,
 				35DFFABD1AAEE981009DA14B /* libPods.a */,
 				3545AFC71AA0826D00B6AF91 /* libPods-LayerKit.a */,
@@ -735,6 +759,8 @@
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
+					"-force_load",
+					"$(SRCROOT)/Pods/Ubertesters/UbertestersSDK.framework/UbertestersSDK",
 					"-lz",
 					"-framework",
 					"\"CFNetwork\"",
@@ -772,6 +798,8 @@
 					"$(SRCROOT)/Pods/LayerKit/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
+					"-force_load",
+					"$(SRCROOT)/Pods/Ubertesters/UbertestersSDK.framework/UbertestersSDK",
 					"-lz",
 					"-framework",
 					"\"CFNetwork\"",

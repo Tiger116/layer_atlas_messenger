@@ -3,14 +3,17 @@ PODS:
     - LayerKit (>= 0.10.3)
   - LayerKit (0.10.3)
   - MBProgressHUD (0.9.1)
+  - Ubertesters (2.0.3)
 
 DEPENDENCIES:
   - Atlas (~> 1.0.0)
   - MBProgressHUD (~> 0.8)
+  - Ubertesters (~> 2.0.3)
 
 SPEC CHECKSUMS:
   Atlas: 2059e544cdea455b463167d77069d3dadde23b15
   LayerKit: 67cefd07350644909c91250c9b70063630858d07
   MBProgressHUD: f3747dcbd45a9e855a6b0674550651e0b7ed250c
+  Ubertesters: 703e378604d52cf051f525a28c2d94bd501d9433
 
 COCOAPODS: 0.36.0.rc.1

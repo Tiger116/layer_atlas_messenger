@@ -10,7 +10,7 @@
 #import <LayerKit/LayerKit.h>
 #import <Parse/Parse.h>
 #import "LoadingHUD.h"
-
+#import <UbertestersSDK/Ubertesters.h>
 
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
@@ -59,6 +59,9 @@ NSString* const metadataOwnerIdKey = @"owner";
     
     //Initialize LoadingHUD style
 //    [LoadingHUD setLabelColor:[UIColor blueColor]];
+    
+    //Ubertersters SDK initialization
+    [[Ubertesters shared] initialize];
     
     self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
     self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];

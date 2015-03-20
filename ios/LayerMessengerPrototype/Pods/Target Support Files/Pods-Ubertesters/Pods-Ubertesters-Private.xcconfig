@@ -1,0 +1,7 @@
+#include "Pods-Ubertesters.xcconfig"
+FRAMEWORK_SEARCH_PATHS = ${PODS_UBERTESTERS_FRAMEWORK_SEARCH_PATHS}
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Private" "${PODS_ROOT}/Headers/Private/Ubertesters" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/Atlas" "${PODS_ROOT}/Headers/Public/Atlas/Controllers" "${PODS_ROOT}/Headers/Public/Atlas/Models" "${PODS_ROOT}/Headers/Public/Atlas/Protocols" "${PODS_ROOT}/Headers/Public/Atlas/Utilities" "${PODS_ROOT}/Headers/Public/Atlas/Views" "${PODS_ROOT}/Headers/Public/LayerKit" "${PODS_ROOT}/Headers/Public/MBProgressHUD" "${PODS_ROOT}/Headers/Public/Ubertesters"
+OTHER_LDFLAGS = ${PODS_UBERTESTERS_OTHER_LDFLAGS} -ObjC
+PODS_ROOT = ${SRCROOT}
+SKIP_INSTALL = YES
