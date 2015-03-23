@@ -60,6 +60,11 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /**
  *  Methot will be called when user tappes to ('DetailsViewController *')self view. It will end editing of any text field to dismiss keyboard.
  *

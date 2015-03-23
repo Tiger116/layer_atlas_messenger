@@ -756,7 +756,7 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(SRCROOT)/Pods/LayerKit/LayerKit.framework/LayerKit",
+					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
 					"-force_load",
@@ -795,7 +795,7 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-force_load",
-					"$(SRCROOT)/Pods/LayerKit/LayerKit.framework/LayerKit",
+					"$(SRCROOT)/Pods/LayerKit/LayerKit.embeddedframework/LayerKit.framework/LayerKit",
 					"-force_load",
 					"$(BUILT_PRODUCTS_DIR)/libPods-Atlas.a",
 					"-force_load",

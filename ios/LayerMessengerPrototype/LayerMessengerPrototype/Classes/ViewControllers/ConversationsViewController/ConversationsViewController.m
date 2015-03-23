@@ -87,6 +87,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /**
  *  Called when user pulls to refresh. Reloads table data.
  */

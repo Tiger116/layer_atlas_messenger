@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRProgress.h
+../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRProgress.h

@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRPolicy.h
+../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRPolicy.h

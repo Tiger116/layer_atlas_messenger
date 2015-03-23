@@ -273,18 +273,33 @@ NSString *const ATLConversationTableViewAccessibilityIdentifier = @"Conversation
     for (NSNumber *deletionMode in self.deletionModes) {
         NSString *actionString;
         UIColor *actionColor;
-        switch (deletionMode.integerValue) {
-            case LYRDeletionModeLocal:
-                actionString = @"Local";
-                actionColor = [UIColor redColor];
-                break;
-            case LYRDeletionModeAllParticipants:
-                actionString = @"Global";
-                actionColor = [UIColor grayColor];
-                break;
-
-            default:
-                break;
+        if ([self.dataSource respondsToSelector:@selector(conversationListViewController:textForButtonWithDeletionMode:)]) {
+            actionString = [self.dataSource conversationListViewController:self textForButtonWithDeletionMode:deletionMode.integerValue];
+        } else {
+            switch (deletionMode.integerValue) {
+                case LYRDeletionModeLocal:
+                    actionString = @"Local";
+                    break;
+                case LYRDeletionModeAllParticipants:
+                    actionString = @"Global";
+                    break;
+                default:
+                    break;
+            }
+        }
+        if ([self.dataSource respondsToSelector:@selector(conversationListViewController:colorForButtonWithDeletionMode:)]) {
+            actionColor = [self.dataSource conversationListViewController:self colorForButtonWithDeletionMode:deletionMode.integerValue];
+        } else {
+            switch (deletionMode.integerValue) {
+                case LYRDeletionModeLocal:
+                    actionColor = [UIColor redColor];
+                    break;
+                case LYRDeletionModeAllParticipants:
+                    actionColor = [UIColor grayColor];
+                    break;
+                default:
+                    break;
+            }
         }
         UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:actionString handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
             [self deleteConversationAtIndexPath:indexPath withDeletionMode:deletionMode.integerValue];
@@ -390,19 +405,21 @@ NSString *const ATLConversationTableViewAccessibilityIdentifier = @"Conversation
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
 {
-    [self.delegate conversationListViewController:self didSearchForText:searchString completion:^(NSSet *filteredParticipants) {
-        if (![searchString isEqualToString:controller.searchBar.text]) return;
-        NSSet *participantIdentifiers = [filteredParticipants valueForKey:@"participantIdentifier"];
-        
-        LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
-        query.predicate = [LYRPredicate predicateWithProperty:@"participants" operator:LYRPredicateOperatorIsIn value:participantIdentifiers];
-        query.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"lastMessage.receivedAt" ascending:NO]];
-        self.searchQueryController = [self.layerClient queryControllerWithQuery:query];
-        
-        NSError *error;
-        [self.searchQueryController execute:&error];
-        [self.searchController.searchResultsTableView reloadData];
-    }];
+    if ([self.delegate respondsToSelector:@selector(conversationListViewController:didSearchForText:completion:)]) {
+        [self.delegate conversationListViewController:self didSearchForText:searchString completion:^(NSSet *filteredParticipants) {
+            if (![searchString isEqualToString:controller.searchBar.text]) return;
+            NSSet *participantIdentifiers = [filteredParticipants valueForKey:@"participantIdentifier"];
+            
+            LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+            query.predicate = [LYRPredicate predicateWithProperty:@"participants" operator:LYRPredicateOperatorIsIn value:participantIdentifiers];
+            query.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"lastMessage.receivedAt" ascending:NO]];
+            self.searchQueryController = [self.layerClient queryControllerWithQuery:query];
+            
+            NSError *error;
+            [self.searchQueryController execute:&error];
+            [self.searchController.searchResultsTableView reloadData];
+        }];
+    }
     return NO;
 }
 

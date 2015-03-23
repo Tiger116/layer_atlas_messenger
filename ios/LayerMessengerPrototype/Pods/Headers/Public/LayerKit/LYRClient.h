@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRClient.h
+../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRClient.h

@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRMessagePart.h
+../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRMessagePart.h

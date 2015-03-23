@@ -1,1 +1,1 @@
-../../../LayerKit/LayerKit.framework/Versions/A/Headers/LYRErrors.h
+../../../LayerKit/LayerKit.embeddedframework/LayerKit.framework/Versions/A/Headers/LYRErrors.h

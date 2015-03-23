@@ -46,6 +46,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 /**
  *  Notifies the view controller that its view is about to be added to a view hierarchy.
  *
