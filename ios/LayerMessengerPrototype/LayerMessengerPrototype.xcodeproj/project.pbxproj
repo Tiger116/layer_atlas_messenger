@@ -38,6 +38,8 @@
 		35D25D8F1AB1B5FB0047DFC4 /* RegistrationInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D8D1AB1B5FB0047DFC4 /* RegistrationInputCell.xib */; };
 		35D25D931AB1B6150047DFC4 /* RegistrationButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */; };
 		35D25D941AB1B6150047DFC4 /* RegistrationButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */; };
+		35D27D3D1AC044910041B815 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D27D3C1AC044910041B815 /* EventKit.framework */; };
+		35D27D3F1AC0449A0041B815 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D27D3E1AC0449A0041B815 /* EventKitUI.framework */; };
 		35D29E061ABC13E400BEFBE0 /* libPods-Ubertesters.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E051ABC13E400BEFBE0 /* libPods-Ubertesters.a */; };
 		35D29E081ABC175E00BEFBE0 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E071ABC175E00BEFBE0 /* AdSupport.framework */; };
 		35D29E0A1ABC176D00BEFBE0 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D29E091ABC176D00BEFBE0 /* CoreImage.framework */; };
@@ -115,6 +117,8 @@
 		35D25D901AB1B6150047DFC4 /* RegistrationButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegistrationButtonCell.h; sourceTree = "<group>"; };
 		35D25D911AB1B6150047DFC4 /* RegistrationButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegistrationButtonCell.m; sourceTree = "<group>"; };
 		35D25D921AB1B6150047DFC4 /* RegistrationButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RegistrationButtonCell.xib; sourceTree = "<group>"; };
+		35D27D3C1AC044910041B815 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		35D27D3E1AC0449A0041B815 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		35D29E051ABC13E400BEFBE0 /* libPods-Ubertesters.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-Ubertesters.a"; path = "Pods/../build/Debug-iphoneos/libPods-Ubertesters.a"; sourceTree = "<group>"; };
 		35D29E071ABC175E00BEFBE0 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		35D29E091ABC176D00BEFBE0 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -145,6 +149,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35D27D3F1AC0449A0041B815 /* EventKitUI.framework in Frameworks */,
+				35D27D3D1AC044910041B815 /* EventKit.framework in Frameworks */,
 				35D29E101ABC179B00BEFBE0 /* CoreMotion.framework in Frameworks */,
 				35D29E0E1ABC179100BEFBE0 /* OpenGLES.framework in Frameworks */,
 				35D29E0C1ABC178000BEFBE0 /* CoreTelephony.framework in Frameworks */,
@@ -437,6 +443,8 @@
 		EAC00861624EB0724FA19C72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				35D27D3E1AC0449A0041B815 /* EventKitUI.framework */,
+				35D27D3C1AC044910041B815 /* EventKit.framework */,
 				35D29E0F1ABC179B00BEFBE0 /* CoreMotion.framework */,
 				35D29E0D1ABC179100BEFBE0 /* OpenGLES.framework */,
 				35D29E0B1ABC178000BEFBE0 /* CoreTelephony.framework */,

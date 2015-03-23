@@ -29,6 +29,7 @@ CGFloat const ATLMessageBubbleMapHeight = 200.0f;
 CGFloat const ATLMessageBubbleDefaultHeight = 40.0f;
 
 NSString *const ATLUserDidTapLinkNotification = @"ATLUserDidTapLinkNotification";
+NSString *const LMPUserDidTapDateNotification = @"LMPUserDidTapDateNotification";
 
 typedef NS_ENUM(NSInteger, ATLBubbleViewContentType) {
     ATLBubbleViewContentTypeText,
@@ -43,6 +44,7 @@ typedef NS_ENUM(NSInteger, ATLBubbleViewContentType) {
 @property (nonatomic) CLLocationCoordinate2D locationShown;
 @property (nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (nonatomic) NSURL *tappedURL;
+@property (nonatomic) NSDate *tappedDate;
 @property (nonatomic) NSLayoutConstraint *imageWidthConstraint;
 @property (nonatomic) MKMapSnapshotter *snapshotter;
 @property (nonatomic) ATLProgressView *progressView;
@@ -307,6 +309,15 @@ typedef NS_ENUM(NSInteger, ATLBubbleViewContentType) {
             return YES;
         }
     }
+    
+    results = LMPDateResultsForText(self.bubbleViewLabel.attributedText.string);
+    for (NSTextCheckingResult *result in results) {
+        if (NSLocationInRange(characterIndex, result.range)) {
+            self.tappedDate = result.date;
+            return YES;
+        }
+    }
+    
     return NO;
 }
 
@@ -314,8 +325,16 @@ typedef NS_ENUM(NSInteger, ATLBubbleViewContentType) {
 
 - (void)handleLabelTap:(UITapGestureRecognizer *)tapGestureRecognizer
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ATLUserDidTapLinkNotification object:self.tappedURL];
-    self.tappedURL = nil;
+    if (self.tappedURL)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:ATLUserDidTapLinkNotification object:self.tappedURL];
+        self.tappedURL = nil;
+    } else if (self.tappedDate)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:LMPUserDidTapDateNotification object:self.tappedDate];
+        self.tappedDate = nil;
+    }
+
 }
 
 - (void)dealloc

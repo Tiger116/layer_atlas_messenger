@@ -87,3 +87,5 @@ void ATLLastPhotoTaken(void(^completionHandler)(UIImage *image, NSError *error))
 UIImage *ATLPinPhotoForSnapshot(MKMapSnapshot *snapshot, CLLocationCoordinate2D location);
 
 NSArray *ATLLinkResultsForText(NSString *text);
+
+NSArray *LMPDateResultsForText(NSString *text);

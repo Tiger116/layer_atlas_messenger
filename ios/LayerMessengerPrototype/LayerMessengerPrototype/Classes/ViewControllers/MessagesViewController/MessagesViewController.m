@@ -12,8 +12,9 @@
 #import "DetailsViewController.h"
 #import "LoadingHUD.h"
 #import "AppDelegate.h"
+#import <EventKitUI/EventKitUI.h>
 
-@interface MessagesViewController () <DetailsViewControllerDelegate>
+@interface MessagesViewController () <DetailsViewControllerDelegate, EKEventEditViewDelegate>
 
 @property (nonatomic, strong) UIBarButtonItem* detailsButton;
 
@@ -150,6 +151,28 @@
     [detailsViewController setDelegate:self];
     [detailsViewController setLayerClient:self.layerClient];
     [self.navigationController pushViewController:detailsViewController animated:YES];
+}
+
+- (void)createEventWithDate:(NSDate*)date andPresentViewController:store
+{
+    EKEvent *event = [EKEvent eventWithEventStore:store];
+    
+    event.calendar = [store defaultCalendarForNewEvents];
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [[NSDateComponents alloc] init];
+    event.startDate = date;
+    components.hour = 1;
+    event.endDate = [calendar dateByAddingComponents:components
+                                              toDate:event.startDate
+                                             options:0];
+    
+    EKEventEditViewController *controller = [[EKEventEditViewController alloc] init];
+    controller.event = event;
+    controller.eventStore = store;
+    controller.editViewDelegate = self;
+    
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark - ATLConversationViewControllerDataSource
@@ -380,6 +403,13 @@
 //    [self configureTitle];
 //}
 
+#pragma mark - EKEventEditViewDelegate
+
+- (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 #pragma mark - Accessors
 
 - (void)setConversation:(LYRConversation *)conversation
@@ -398,6 +428,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationMetadataDidChange:) name:ConversationMetadataDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationParticipantsDidChange:) name:ConversationParticipantsDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDidTapLink:) name:ATLUserDidTapLinkNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDidTapDate:) name:LMPUserDidTapDateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conversationDidCreated:) name:ConversationDidCreatedNotification object:nil];
 }
 
@@ -436,6 +467,20 @@
 - (void)userDidTapLink:(NSNotification *)notification
 {
     [[UIApplication sharedApplication] openURL:notification.object];
+}
+
+- (void)userDidTapDate:(NSNotification *)notification
+{
+    EKEventStore *store = [[EKEventStore alloc] init];
+    [store requestAccessToEntityType:EKEntityTypeEvent
+                          completion:^(BOOL granted, NSError *error) {
+                              if (granted)
+                              {
+                                  dispatch_async(dispatch_get_main_queue(), ^{
+                                      [self createEventWithDate:(NSDate*)notification.object andPresentViewController:store];
+                                  });
+                              }
+    }];
 }
 
 /**

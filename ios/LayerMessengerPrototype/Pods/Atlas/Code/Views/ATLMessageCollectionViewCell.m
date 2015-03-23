@@ -266,6 +266,15 @@ CGFloat const ATLMessageCellHorizontalMargin = 16.0f;
                                          NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
         [attributedString addAttributes:linkAttributes range:result.range];
     }
+    
+    NSArray *dateResults = LMPDateResultsForText(text);
+    for (NSTextCheckingResult *result in dateResults)
+    {
+        NSDictionary *dateAttributes = @{NSForegroundColorAttributeName : self.messageLinkTextColor,
+                                         NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle)};
+        [attributedString addAttributes:dateAttributes range:result.range];
+    }
+    
     return attributedString;
 }
 
