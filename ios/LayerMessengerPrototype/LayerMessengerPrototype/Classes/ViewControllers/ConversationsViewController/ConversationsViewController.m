@@ -28,6 +28,8 @@
  */
 @property (nonatomic) LYRQueryController *queryController;
 
+@property (nonatomic) CGPoint contentOffsetForTableOnly;
+
 @end
 
 @implementation ConversationsViewController
@@ -76,17 +78,20 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    self.contentOffsetForTableOnly = self.tableView.contentOffset;
     
     if (!self.synchronizationIsFinished)
     {
         [self.refreshControl beginRefreshing];
-        CGPoint point = self.tableView.contentOffset;
-        [self.tableView setContentOffset:CGPointMake(point.x,
-                                                     point.y - self.refreshControl.frame.size.height
+        [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
+                                                     self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
                                                      - self.searchDisplayController.searchBar.frame.size.height)
                                 animated:YES];
         if (self.synchronizationIsFinished)
         {
+            [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
+                                                         self.contentOffsetForTableOnly.y)
+                                    animated:YES];
             [self.refreshControl endRefreshing];
         }
     }
@@ -112,6 +117,9 @@
     BOOL success = [self.queryController execute:&error];
     if (!success) NSLog(@"LayerKit failed to execute query with error: %@", error);
     [self.tableView reloadData];
+    [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
+                                                 self.contentOffsetForTableOnly.y)
+                            animated:YES];
     [self.refreshControl endRefreshing];
 }
 
@@ -276,8 +284,11 @@
  */
 - (void) synchronizationDidFinished:(NSNotification*) notification
 {
-    self.synchronizationIsFinished = YES;
-    [self.refreshControl endRefreshing];
+    if (!self.synchronizationIsFinished)
+    {
+        self.synchronizationIsFinished = YES;
+        [self.refreshControl endRefreshing];
+    }
 }
 
 @end
