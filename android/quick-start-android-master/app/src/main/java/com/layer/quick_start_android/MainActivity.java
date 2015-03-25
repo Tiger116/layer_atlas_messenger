@@ -1,165 +1,298 @@
 package com.layer.quick_start_android;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
 
 import com.layer.sdk.LayerClient;
+import com.layer.sdk.changes.LayerChangeEvent;
+import com.layer.sdk.listeners.LayerChangeEventListener;
+import com.layer.sdk.messaging.Conversation;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-/*
- * Handles the main activity and conversationView view
- */
+import static com.layer.quick_start_android.LayerApplication.layerClient;
 
-public class MainActivity extends ActionBarActivity {
-
-    //Replace this with your App ID from the Layer Developer page.
-    //Go http://developer.layer.com, click on "Dashboard" and select "Info"
-    public static String Layer_App_ID = "07b40518-aaaa-11e4-bceb-a25d000000f4";
-
-    //Replace this with your Project Number from http://console.developers.google.com
-    public static String GCM_Project_Number = "00000";
-
-    //Global variables used to manage the Layer Client and the conversations in this app
-    private LayerClient layerClient;
-    private ConversationViewController conversationView;
+public class MainActivity extends ActionBarActivity implements LayerChangeEventListener.BackgroundThread {
 
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
 
+
+    public static final int requestCodeLogin = 0;
+    public static final int requestCodeUsers = 1;
+
+    private ProgressDialog dialog;
+    private ArrayAdapter<String> adapter;
+    private List<Conversation> conversations;
+    private ArrayList<String> conversNames = new ArrayList<>();
+    private static ArrayList<String> participants;
+
+    private int count = 0;
+
     //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        //If we haven't created a LayerClient, show the loading splash screen
-        if(layerClient == null)
-            setContentView(R.layout.activity_loading);
-
-        LayerClient.setLogLevel(LayerClient.LogLevel.VERBOSE);
-
-        //Create the callback listeners
-
-        if(connectionListener == null)
+        if (connectionListener == null)
             connectionListener = new MyConnectionListener(this);
 
-        if(authenticationListener == null)
+        if (authenticationListener == null)
             authenticationListener = new MyAuthenticationListener(this);
+
+        ListView lvMain = (ListView) findViewById(R.id.list_view);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, conversNames);
+        layerClient.registerEventListener(this);
+        conversations = new ArrayList<>();
+        lvMain.setAdapter(adapter);
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Conversation conversation = conversations.get(position);
+                participants = new ArrayList<>(conversation.getParticipants());
+                Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
+                intent.putExtra(getString(R.string.title_label), conversNames.get(position));
+                intent.putExtra(getString(R.string.conversation_id_key), conversation.getId().toString());
+                startActivity(intent);
+            }
+        });
+        registerForContextMenu(lvMain);
     }
 
-    //onResume is called on App Start and when the app is brought to the foreground
-    protected void onResume(){
+    private void dataChange() {
+        conversations.clear();
+        if (layerClient.isAuthenticated()) {
+            conversations = layerClient.getConversations();
+            if (!conversations.isEmpty()) {
+                conversNames.clear();
+                for (Conversation conversation : conversations) {
+                    String s;
+                    if (conversation.getMetadata().get(getString(R.string.title_label)) == null)
+                        s = conversation.getParticipants().toString();
+                    else
+                        s = conversation.getMetadata().get(getString(R.string.title_label)).toString();
+                    conversNames.add(s);
+                }
+                adapter.notifyDataSetChanged();
+                if (dialog != null)
+                    dialog.dismiss();
+            } else {
+                if (count < 4) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(r, 1000);
+                } else {
+                    count = 0;
+                    if (dialog != null)
+                        dialog.dismiss();
+                }       // Toast.makeText(MainActivity.this,"Error sync with server! Please try later", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private Runnable r = new Runnable() {
+        @Override
+        public void run() {
+            count++;
+            dataChange();
+        }
+    };
+
+    @Override
+    protected void onResume() {
         super.onResume();
 
         //Connect to Layer and Authenticate a user
         loadLayerClient();
-
-        //Every time the app is brought to the foreground, register the typing indicator
-        if(layerClient != null && conversationView != null)
-            layerClient.registerTypingIndicator(conversationView);
     }
 
-    //onPause is called when the app is sent to the background
-    protected void onPause(){
-        super.onPause();
+    public static List<String> getCurrentParticipants() {
+        if (participants != null) {
+            return participants;
+        }
+        return new ArrayList<>();
+    }
 
-        //When the app is moved to the background, unregister the typing indicator
-        if(layerClient != null && conversationView != null)
-            layerClient.unregisterTypingIndicator(conversationView);
+    public static void setParticipants(ArrayList<String> participants) {
+        MainActivity.participants = participants;
+    }
+
+    public static void addParticipant(String participant) {
+        MainActivity.participants.add(participant);
+    }
+
+    public static void removeParticipant(String participant) {
+        MainActivity.participants.remove(participant);
     }
 
     //Checks to see if the SDK is connected to Layer and whether a user is authenticated
     //The respective callbacks are executed in MyConnectionListener and MyAuthenticationListener
-    private void loadLayerClient(){
+    private void loadLayerClient() {
 
-        // Check if Sample App is using a valid app ID.
-        if (isValidAppID()) {
-
-            if(layerClient == null){
-
-                LayerClient.setLogLevel(LayerClient.LogLevel.DETAILED);
-
-                // Initializes a LYRClient object
-                UUID appID = UUID.fromString(Layer_App_ID);
-                layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
-
-                //Register the connection and authentication listeners
-                layerClient.registerConnectionListener(connectionListener);
-                layerClient.registerAuthenticationListener(authenticationListener);
-            }
-
-
-            if (!layerClient.isAuthenticated()) {
-                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
-                startActivity(intent);
-                //First we try to authenticate the user. if the LayerClient is not connected, "connect()"
-                //will be called automatically by the Layer SDK.
-                layerClient.authenticate();
-
-            } else if (!layerClient.isConnected()) {
-
-                //If the user is authenticated, but Layer is not connected, make sure we connect in
-                //order to send/receive messages
-                layerClient.connect();
-
+        if (layerClient != null) {
+            layerClient.registerConnectionListener(connectionListener);
+            layerClient.registerAuthenticationListener(authenticationListener);
+            if (ParseUser.getCurrentUser() != null) {
+                if (!layerClient.isAuthenticated()) layerClient.authenticate();
+                else if (!layerClient.isConnected()) layerClient.connect();
+                else onUserAuthenticated();
             } else {
-
-                // If connected to Layer and the user is authenticated, start the conversationView view
-                onUserAuthenticated();
-
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivityForResult(intent, requestCodeLogin);
             }
         }
     }
 
-    //If you haven't replaced "LAYER_APP_ID" with your App ID, send a message
-    private boolean isValidAppID() {
-        if(Layer_App_ID.equalsIgnoreCase("LAYER_APP_ID")) {
-
-            // Instantiate an AlertDialog.Builder with its constructor
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            // Chain together various setter methods to set the dialog characteristics
-            builder.setMessage("To correctly use this project you need to replace LAYER_APP_ID in MainActivity.java (line 21) with your App ID from developer.layer.com.")
-                    .setTitle(":-(");
-
-            // Get the AlertDialog from create() and then show() it
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-            return false;
-        }
-
-        return true;
-    }
-
-    //Return "Simulator" if this is an emulator, or "Device" if running on hardware
-    public static String getUserID(){
-        if(Build.FINGERPRINT.startsWith("generic"))
-            return "Simulator";
-
-        return "Device";
-    }
-
-    //By default, create a conversationView between these 3 participants
-    public static List<String> getAllParticipants(){
-        return Arrays.asList("Device", "Simulator", "Dashboard");
+    public void onAuthenticateStart() {
+        dialog = new ProgressDialog(MainActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setTitle("Loading");
+        dialog.setMessage("Please wait...");
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 
     //Once the user has successfully authenticated, begin the conversationView
-    public void onUserAuthenticated(){
+    public void onUserAuthenticated() {
+        dataChange();
+    }
 
-        if(conversationView == null) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-            conversationView = new ConversationViewController(this, layerClient);
-
-            if (layerClient != null) {
-                layerClient.registerTypingIndicator(conversationView);
-            }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.log_out_menu:
+                logOut();
+                return true;
+            case R.id.action_add_dialog:
+                Intent intent = new Intent(MainActivity.this, UsersActivity.class);
+                startActivityForResult(intent, requestCodeUsers);
+                return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut() {
+        ParseUser.logOut();
+        layerClient.deauthenticate();
+        conversNames.clear();
+        adapter.notifyDataSetChanged();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivityForResult(intent, requestCodeLogin);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        switch (v.getId()) {
+            case R.id.list_view:
+                menu.setHeaderTitle(getString(R.string.options_label));
+                menu.add("Rename");
+                menu.add("Delete");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final Conversation conversation = conversations.get(info.position);
+        String menuItemText = String.valueOf(item.getTitle());
+        switch (menuItemText) {
+            case "Delete":
+                conversations.get(info.position).delete(LayerClient.DeletionMode.ALL_PARTICIPANTS);
+                dataChange();
+                break;
+            case "Rename":
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle("Rename");
+                dialog.setMessage("Enter new dialog name:");
+
+                final EditText input = new EditText(dialog.getContext());
+                input.setSingleLine(true);
+                input.setText(conversNames.get(info.position));
+                input.setSelection(input.getText().length());
+                dialog.setView(input);
+
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String title = input.getEditableText().toString();
+                        if (title.isEmpty())
+                            title = conversation.getParticipants().toString();
+                        conversation.putMetadataAtKeyPath(getString(R.string.title_label), title);
+                        dataChange();
+                    }
+                });
+                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog alertDialog = dialog.create();
+                alertDialog.show();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case requestCodeLogin:
+                if (resultCode == RESULT_OK) {
+                    onAuthenticateStart();
+                    layerClient.authenticate();
+                } else
+                    this.finish();
+                break;
+            case requestCodeUsers:
+                if (resultCode == RESULT_OK) {
+                    String participantName = data.getExtras().getString(getString(R.string.participants));
+                    if (!participantName.equals(layerClient.getAuthenticatedUserId())) {
+                        participants = new ArrayList<>(Arrays.asList(layerClient.getAuthenticatedUserId(), participantName));
+                        Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
+                        intent.putExtra(getString(R.string.title_label), getCurrentParticipants().toString());
+                        startActivity(intent);
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    public void onEventAsync(LayerChangeEvent layerChangeEvent) {
+        Log.d(MainActivity.class.toString(), "Data changed");
+        dataChange();
     }
 }

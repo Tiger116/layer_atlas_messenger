@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.layer.quick_start_android" >
+    package="com.layer.quick_start_android">
 
     <!-- Layer SDK uses these for monitoring network state and receiving GCM -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,22 +19,14 @@
     <uses-permission android:name="com.layer.quick_start_android.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".LayerApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        android:theme="@style/AppTheme">
 
         <!-- Layer SDK has these for monitoring network, boot, and GCM -->
-        <receiver android:name="com.layer.sdk.services.LayerReceiver" >
+        <receiver android:name="com.layer.sdk.services.LayerReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.intent.action.ANY_DATA_STATE" />
@@ -43,7 +35,7 @@
         </receiver>
         <receiver
             android:name="com.layer.sdk.services.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
@@ -53,7 +45,7 @@
 
         <service android:name="com.layer.sdk.services.GcmIntentService" />
 
-        <receiver android:name=".LayerPushReceiver" >
+        <receiver android:name=".LayerPushReceiver">
             <intent-filter>
                 <action android:name="com.layer.sdk.PUSH" />
 
@@ -67,8 +59,37 @@
         </receiver>
 
         <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name=".MessengerActivity"
+            android:label="@string/title_activity_messenger">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".UsersActivity"
+            android:label="@string/title_activity_users">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MessengerActivity" />
+        </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:label="@string/title_activity_register">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
         </activity>
     </application>
 

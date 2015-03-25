@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.arcadia.layerclient.UsersActivity">
+
+    <LinearLayout
+        android:id="@+id/search_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="@dimen/abc_button_padding_horizontal_material"
+        android:paddingRight="@dimen/abc_button_padding_horizontal_material"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/abc_ic_search_api_mtrl_alpha"
+            tools:ignore="ContentDescription" />
+
+        <EditText
+            android:id="@+id/search_text"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:hint="@string/search_hint"
+            android:layout_marginLeft="@dimen/abc_control_padding_material"
+            android:layout_marginRight="@dimen/abc_control_padding_material"
+            android:singleLine="true"
+            android:background="@drawable/abc_textfield_search_material"
+            android:inputType="text"
+            android:imeOptions="actionSend" />
+    </LinearLayout>
+
+    <com.layer.quick_start_android.contacts_utils.pinned_header_utils.PinnedHeaderListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@null"
+        android:dividerHeight="0px"
+        android:fastScrollEnabled="true"
+        android:listSelector="@drawable/listview_selector"
+        android:scrollingCache="true"
+        android:fastScrollAlwaysVisible="true"
+        tools:listitem="@layout/listview_item"
+        android:layout_below="@+id/search_box" />
+
+</RelativeLayout>

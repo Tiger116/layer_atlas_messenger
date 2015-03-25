@@ -20,7 +20,6 @@ public class MyConnectionListener implements LayerConnectionListener {
             main_activity.onUserAuthenticated();
         else
             client.authenticate();
-
     }
 
     @Override

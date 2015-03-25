@@ -2,11 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
-
+    buildToolsVersion "22"
     defaultConfig {
         applicationId "com.layer.quick_start_android"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -17,16 +16,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 repositories {
-    maven { url "https://raw.githubusercontent.com/layerhq/releases-android/master/releases/" }
-
+    maven {
+        url "https://raw.githubusercontent.com/layerhq/releases-android/master/releases/"
+    }
     mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile "com.google.android.gms:play-services-base:6.5.+"
-    compile "com.layer.sdk:layer-sdk:0.9.+"
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.android.gms:play-services-base:6.5.+'
+    compile 'com.layer.sdk:layer-sdk:0.11.+'
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile files('libs/Parse-1.8.2.jar')
+
 }

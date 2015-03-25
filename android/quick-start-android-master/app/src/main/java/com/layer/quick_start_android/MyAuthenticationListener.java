@@ -1,23 +1,26 @@
 package com.layer.quick_start_android;
 
-import android.os.AsyncTask;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.util.Log;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerAuthenticationListener;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
+import java.util.HashMap;
+
 
 public class MyAuthenticationListener implements LayerAuthenticationListener {
 
     private MainActivity main_activity;
 
-    public MyAuthenticationListener(MainActivity ma){
+    public MyAuthenticationListener(MainActivity ma) {
         main_activity = ma;
     }
 
@@ -25,45 +28,37 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     //You will need to set up an Authentication Service to take a Layer App ID, User ID, and the
     //nonce to create a Identity Token to pass back to Layer
     public void onAuthenticationChallenge(final LayerClient client, final String nonce) {
-        final String mUserId = MainActivity.getUserID();
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+        String userID = null;
+        if (user != null)
+            userID = user.getUsername();
 
         //Note: This Layer Authentication Service is for TESTING PURPOSES ONLY
         //When going into production, you will need to create your own web service
         //Check out https://developer.layer.com/docs/guides#authentication for guidance
-        (new AsyncTask<Void, Void, Void>() {
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("userID", userID);
+        params.put("nonce", nonce);
+
+        ParseCloud.callFunctionInBackground("generateToken", params, new FunctionCallback<String>() {
             @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    HttpPost post = new HttpPost("https://layer-identity-provider.herokuapp.com/identity_tokens");
-                    post.setHeader("Content-Type", "application/json");
-                    post.setHeader("Accept", "application/json");
-
-                    JSONObject json = new JSONObject()
-                            .put("app_id", client.getAppId())
-                            .put("user_id", mUserId)
-                            .put("nonce", nonce );
-                    post.setEntity(new StringEntity(json.toString()));
-
-                    HttpResponse response = (new DefaultHttpClient()).execute(post);
-                    String eit = (new JSONObject(EntityUtils.toString(response.getEntity())))
-                            .optString("identity_token");
-
-                    client.answerAuthenticationChallenge(eit);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+            public void done(String o, ParseException e) {
+                if (e == null) {
+                    client.answerAuthenticationChallenge(o);
+                } else {
+                    Log.d(this.toString(), "Parse Cloud function failed to be called to generate token with error: " + e.getMessage());
                 }
-                return null;
             }
-        }).execute();
+        });
     }
 
     //Called when the user has successfully authenticated
-    public void onAuthenticated(LayerClient client, String arg1) {
-
+    public void onAuthenticated(LayerClient client, String userId) {
         //Start the conversation view after a successful authentication
         System.out.println("Authentication successful");
-        if(main_activity != null)
+        if (main_activity != null)
             main_activity.onUserAuthenticated();
     }
 
