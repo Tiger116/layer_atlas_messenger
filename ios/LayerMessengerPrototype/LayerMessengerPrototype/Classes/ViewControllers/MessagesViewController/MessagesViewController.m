@@ -22,6 +22,15 @@
 
 @implementation MessagesViewController
 
++ (instancetype) conversationViewControllerWithLayerClient:(LYRClient *)layerClient andConversation:(LYRConversation *)conversation
+{
+    BOOL shouldShowAddressBar = (conversation.participants.count > 2 || !conversation.participants.count);
+    MessagesViewController* controller = [self conversationViewControllerWithLayerClient:layerClient];
+    controller.displaysAddressBar = shouldShowAddressBar;
+    controller.conversation = conversation;
+    return controller;
+}
+
 /**
  *  Called after the controller's view is loaded into memory.
  *
@@ -153,6 +162,11 @@
     [self.navigationController pushViewController:detailsViewController animated:YES];
 }
 
+/**
+ *  Presents view controller for creating calendar event at prodided date.
+ *
+ *  @param date Dare for event.
+ */
 - (void)createEventWithDate:(NSDate*)date andPresentViewController:store
 {
     EKEvent *event = [EKEvent eventWithEventStore:store];
@@ -469,6 +483,13 @@
     [[UIApplication sharedApplication] openURL:notification.object];
 }
 
+/**
+ *  Handles LMPUserDidTapDateNotification
+ *
+ *  Requests access to calendar and if granted calls 'createEventWithDate:andPresentViewController:' method to create a calendar event.
+ *
+ *  @param notification received notification.
+ */
 - (void)userDidTapDate:(NSNotification *)notification
 {
     EKEventStore *store = [[EKEventStore alloc] init];

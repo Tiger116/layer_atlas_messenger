@@ -15,9 +15,17 @@
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
-@property (strong,nonatomic) NSOrderedSet* conversations;
+//Can't remember why it's here. Probably it isn't used.
+//@property (strong,nonatomic) NSOrderedSet* conversations;
+
+/**
+ *  Used to remove loading spinner if synchronization with Layer is finished.
+ */
 @property (atomic) BOOL synchronizationIsFinished;
 
+/**
+ *  Used to reload data in table.
+ */
 @property (nonatomic) LYRQueryController *queryController;
 
 @end
@@ -48,12 +56,14 @@
     UIBarButtonItem *composeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeButtonTapped)];
     [self.navigationItem setRightBarButtonItem:composeButton];
     
-    // Display navigation bar
-    [self.navigationController setNavigationBarHidden:NO];
-    
     //Pull-to-refresh
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(pulledToRefresh) forControlEvents:UIControlEventValueChanged];
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
 }
 
 /**
@@ -66,6 +76,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
     if (!self.synchronizationIsFinished)
     {
         [self.refreshControl beginRefreshing];
@@ -138,11 +149,8 @@
  */
 - (void)presentControllerWithConversation:(LYRConversation *)conversation
 {
-    BOOL shouldShowAddressBar = (conversation.participants.count > 2 || !conversation.participants.count);
     AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-    appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient];
-    appDelegate.messagesViewController.displaysAddressBar = shouldShowAddressBar;
-    appDelegate.messagesViewController.conversation = conversation;
+    appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient andConversation:conversation];
     
     if (self.navigationController.topViewController == self) {
         [self.navigationController pushViewController:appDelegate.messagesViewController animated:YES];

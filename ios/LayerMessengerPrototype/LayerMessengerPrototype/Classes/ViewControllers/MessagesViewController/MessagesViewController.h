@@ -12,6 +12,6 @@
 
 @interface MessagesViewController : ATLConversationViewController <ATLConversationViewControllerDataSource, ATLConversationViewControllerDelegate, ATLParticipantTableViewControllerDelegate>
 
-
++ (instancetype) conversationViewControllerWithLayerClient:(LYRClient *)layerClient andConversation:(LYRConversation *)conversation;
 
 @end

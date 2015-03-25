@@ -51,7 +51,7 @@
             }
         }
     }];
-    
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -108,13 +108,38 @@
     hud.labelText = @"Signing in";
     UsersDataSource* usersDataSource = [UsersDataSource sharedUsersDataSource];
     [usersDataSource getAllUsersInBackgroundWithCompletion:^(NSMutableSet *users, NSError *error) {
-        if (error) {
+        if (error)
+        {
             [hud hide:YES afterShowingText:@"Failed"];
             NSLog(@"Failed to download users from Parse:%@", error);
-        } else {
+        } else
+        {
             [hud hide:YES];
             self.appDelegate.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.appDelegate.layerClient];
-            [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+            
+            if (self.appDelegate.launchOptions && self.appDelegate.launchOptions[launchOptionsKeyForRemoteNotifications])
+            {
+                LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+                query.predicate = [LYRPredicate predicateWithProperty:@"identifier"
+                                                             operator:LYRPredicateOperatorIsEqualTo
+                                                                value:self.appDelegate.launchOptions[launchOptionsKeyForRemoteNotifications][@"layer"][@"conversation_identifier"]];
+                LYRConversation *conversation = [[self.appDelegate.layerClient executeQuery:query error:nil] firstObject];
+                self.appDelegate.launchOptions = nil;
+        
+                self.appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.appDelegate.layerClient andConversation:conversation];
+                
+                NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
+                NSUInteger listViewControllerIndex = [self.navigationController.viewControllers indexOfObject:self];
+                NSRange replacementRange = NSMakeRange(listViewControllerIndex + 1, viewControllers.count - listViewControllerIndex - 1);
+                [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[self.appDelegate.conversationsViewController, self.appDelegate.messagesViewController]];
+                [self.navigationController setViewControllers:viewControllers animated:YES];
+
+                
+            }else
+            {
+                [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+            }
+            [self.navigationController setNavigationBarHidden:NO];
         }
     }];
 }

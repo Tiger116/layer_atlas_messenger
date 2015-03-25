@@ -23,6 +23,8 @@ NSString *const LayerClientDidFinishSynchronizationNotification = @"LayerClientD
 NSString* const metadataTitleKey = @"title";
 NSString* const metadataOwnerIdKey = @"owner";
 
+NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOptionsRemoteNotificationKey";
+
 @interface AppDelegate () <LYRClientDelegate>
 
 @end
@@ -62,6 +64,8 @@ NSString* const metadataOwnerIdKey = @"owner";
     
     //Ubertersters SDK initialization
     [[Ubertesters shared] initialize];
+    
+    self.launchOptions = launchOptions;
     
     self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
     self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];

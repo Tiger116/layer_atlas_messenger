@@ -20,6 +20,8 @@ extern NSString *const LayerClientDidFinishSynchronizationNotification;
 extern NSString* const metadataTitleKey;
 extern NSString* const metadataOwnerIdKey;
 
+extern NSString* const launchOptionsKeyForRemoteNotifications;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
@@ -28,6 +30,7 @@ extern NSString* const metadataOwnerIdKey;
 @property (strong, nonatomic) AuthenticationViewController* authViewController;
 @property (nonatomic,strong) MessagesViewController* messagesViewController;
 @property (nonatomic) LYRClient *layerClient;
+@property (nonatomic) NSDictionary* launchOptions;
 
 - (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion;
 
