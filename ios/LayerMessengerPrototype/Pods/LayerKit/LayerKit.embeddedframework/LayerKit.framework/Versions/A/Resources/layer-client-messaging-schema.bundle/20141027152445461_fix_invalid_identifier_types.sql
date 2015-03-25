@@ -15,11 +15,15 @@ CREATE TABLE new_conversation_participants (
 );
 
 INSERT INTO new_conversation_participants SELECT * FROM conversation_participants;
+
 DROP TABLE conversation_participants;
+
 ALTER TABLE new_conversation_participants RENAME TO conversation_participants;
 
 CREATE INDEX conversation_participants_conversation_database_identifier_idx ON conversation_participants(conversation_database_identifier);
+
 CREATE INDEX conversation_participants_deleted_at_idx ON conversation_participants(deleted_at);
+
 CREATE INDEX conversation_participants_event_database_identifier_idx ON conversation_participants(event_database_identifier);
 
 CREATE TRIGGER track_deletes_of_conversation_participants AFTER UPDATE OF deleted_at ON conversation_participants
@@ -60,11 +64,15 @@ CREATE TABLE new_events (
 );
 
 INSERT INTO new_events SELECT * FROM events;
+
 DROP TABLE events;
+
 ALTER TABLE new_events RENAME TO events;
 
 CREATE INDEX events_seq_idx ON events(seq);
+
 CREATE INDEX events_stream_database_identifier_idx ON events(stream_database_identifier);
+
 CREATE INDEX events_client_id_idx ON events(client_id);
 
 CREATE TRIGGER tombstone_duplicate_events_by_client_id 
@@ -117,7 +125,9 @@ CREATE TABLE new_keyed_values (
 );
 
 INSERT INTO new_keyed_values SELECT * FROM keyed_values;
+
 DROP TABLE keyed_values;
+
 ALTER TABLE new_keyed_values RENAME TO keyed_values;
 
 CREATE TRIGGER track_deletes_of_keyed_values AFTER UPDATE OF deleted_at ON keyed_values
@@ -148,7 +158,9 @@ CREATE TABLE new_message_parts (
 );
 
 INSERT INTO new_message_parts SELECT * FROM message_parts;
+
 DROP TABLE message_parts;
+
 ALTER TABLE new_message_parts RENAME TO message_parts;
 
 CREATE INDEX message_parts_message_database_identifier_idx ON message_parts(message_database_identifier);
@@ -164,7 +176,9 @@ CREATE TABLE new_message_recipient_status (
 );
 
 INSERT INTO new_message_recipient_status SELECT * FROM message_recipient_status;
+
 DROP TABLE message_recipient_status;
+
 ALTER TABLE new_message_recipient_status RENAME TO message_recipient_status;
 
 CREATE INDEX message_recipient_status_message_database_identifier_idx ON message_recipient_status(message_database_identifier);
@@ -194,12 +208,17 @@ CREATE TABLE new_messages (
 );
 
 INSERT INTO new_messages SELECT * FROM messages;
+
 DROP TABLE messages;
+
 ALTER TABLE new_messages RENAME TO messages;
 
 CREATE INDEX messages_conversation_database_identifier_idx ON messages(conversation_database_identifier);
+
 CREATE INDEX messages_deleted_at_idx ON messages(deleted_at);
+
 CREATE INDEX messages_event_database_identifier_idx ON messages(event_database_identifier);
+
 CREATE INDEX messages_message_index_idx ON messages(message_index);
 
 CREATE TRIGGER track_deletes_of_messages AFTER UPDATE OF deleted_at ON messages
@@ -225,10 +244,13 @@ CREATE TABLE new_stream_members (
 );
 
 INSERT INTO new_stream_members SELECT * FROM stream_members;
+
 DROP TABLE stream_members;
+
 ALTER TABLE new_stream_members RENAME TO stream_members;
 
 CREATE INDEX stream_members_deleted_at_idx ON stream_members(deleted_at);
+
 CREATE INDEX stream_members_stream_database_identifier_idx ON stream_members(stream_database_identifier);
 
 CREATE TRIGGER track_deletes_of_stream_members AFTER UPDATE OF deleted_at ON stream_members
@@ -255,10 +277,13 @@ CREATE TABLE new_streams (
   max_synced_seq INTEGER);
   
 INSERT INTO new_streams SELECT * FROM streams;
+
 DROP TABLE streams;
+
 ALTER TABLE new_streams RENAME TO streams;
 
 CREATE INDEX streams_deleted_at_idx ON streams(deleted_at);
+
 CREATE INDEX streams_client_id_idx ON streams(client_id);
 
 CREATE TRIGGER track_deletes_of_streams AFTER UPDATE OF deleted_at ON streams

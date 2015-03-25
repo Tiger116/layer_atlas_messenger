@@ -2,6 +2,7 @@
 
 -- Update triggers to work without the `is_draft` column
 DROP TRIGGER track_message_send_on_insert;
+
 DROP TRIGGER track_message_send_on_update;
 
 CREATE TRIGGER track_message_send_on_insert AFTER INSERT ON messages

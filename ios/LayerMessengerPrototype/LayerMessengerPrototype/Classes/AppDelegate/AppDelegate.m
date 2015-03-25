@@ -8,12 +8,22 @@
 
 #import "AppDelegate.h"
 #import <LayerKit/LayerKit.h>
-#import "ConversationsViewController.h"
 #import <Parse/Parse.h>
-#import "UsersDataSource.h"
+#import "LoadingHUD.h"
+#import <UbertestersSDK/Ubertesters.h>
 
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
+
+NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
+NSString *const ConversationParticipantsDidChangeNotification = @"ConversationParticipantsDidChangeNotification";
+NSString *const ConversationDidCreatedNotification = @"ConversationDidCreatedNotification";
+NSString *const LayerClientDidFinishSynchronizationNotification = @"LayerClientDidFinishSynchronizationNotification";
+
+NSString* const metadataTitleKey = @"title";
+NSString* const metadataOwnerIdKey = @"owner";
+
+NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOptionsRemoteNotificationKey";
 
 @interface AppDelegate () <LYRClientDelegate>
 
@@ -21,40 +31,89 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 
 @implementation AppDelegate
 
+/**
+ *  Tells the delegate that the launch process is almost done and the app is almost ready to run. Method initializes Parse and LYRClient object, displays first view controller (AuthenticationViewController).
+ *
+ */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Initialize Parse.
     [Parse setApplicationId:@"hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8"
                   clientKey:@"XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx"];
     
-    //Initialize UsersDataSourse
-    [UsersDataSource sharedUsersDataSource];
-    
-    // Initializes a LYRClient object
+    //Initializes a LYRClient object
     NSUUID *appID = [[NSUUID alloc] initWithUUIDString:LayerAppIDString];
     self.layerClient = [LYRClient clientWithAppID:appID];
     self.layerClient.delegate = self;
+    self.layerClient.autodownloadMIMETypes = [NSSet setWithObjects:ATLMIMETypeImageJPEGPreview, ATLMIMETypeTextPlain, nil];
     
-    // Connect to Layer
-    [self.layerClient connectWithCompletion:^(BOOL success, NSError *error) {
-        if (!success) {
-            NSLog(@"Failed to connect to Layer: %@", error);
-        } else {
-            self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
-            self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];
-            if(self.layerClient.authenticatedUserID)
-            {
-                self.conversationsViewController = [ConversationsViewController conversationListViewControllerWithLayerClient:self.layerClient];
-                [self.navController pushViewController:self.conversationsViewController animated:NO];
-            }
-            self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-            [self.window setRootViewController:self.navController];
-            [self.window makeKeyAndVisible];
-            
-        }
-    }];
+    //Register for remote notifications
+    // Checking if app is running iOS 8
+    if ([application respondsToSelector:@selector(registerForRemoteNotifications)]) {
+        // Register device for iOS8
+        UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound categories:nil];
+        [application registerUserNotificationSettings:notificationSettings];
+        [application registerForRemoteNotifications];
+    } else {
+        // Register device for iOS7
+        [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeBadge];
+    }
+    
+    //Initialize LoadingHUD style
+//    [LoadingHUD setLabelColor:[UIColor blueColor]];
+    
+    //Ubertersters SDK initialization
+    [[Ubertesters shared] initialize];
+    
+    self.launchOptions = launchOptions;
+    
+    self.authViewController = [[AuthenticationViewController alloc] initWithNibName:@"AuthenticationViewController" bundle:nil];
+    self.navController = [[UINavigationController alloc] initWithRootViewController:self.authViewController];
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.window setRootViewController:self.navController];
+    [self.window makeKeyAndVisible];
     
     return YES;
+}
+
+/**
+ *  Tells the delegate that the app successfully registered with Apple Push Notification service (APNs).
+ *
+ *  Provided device token is submited to Layer.
+ */
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSError *error;
+    BOOL success = [self.layerClient updateRemoteNotificationDeviceToken:deviceToken error:&error];
+    if (success) {
+        NSLog(@"Application did register for remote notifications");
+    } else {
+        NSLog(@"Error updating Layer device token for push:%@", error);
+    }
+}
+
+/**
+ *  Tells the delegate that the running app received a remote notification.
+ *
+ *  If application wasn't in foreground method will present view controller with conversation where message in notification comes from.
+ */
+- (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    if (application.applicationState == UIApplicationStateInactive)
+    {
+        if (self.messagesViewController
+            && [self.navController.viewControllers containsObject:self.messagesViewController]
+            && [[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:userInfo[@"layer"][@"conversation_identifier"]])
+        {
+            [self.navController popToViewController:self.messagesViewController animated:YES];
+        }else
+        {
+            LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+            query.predicate = [LYRPredicate predicateWithProperty:@"identifier" operator:LYRPredicateOperatorIsEqualTo value:userInfo[@"layer"][@"conversation_identifier"]];
+            LYRConversation *conversation = [[self.layerClient executeQuery:query error:nil] firstObject];
+            [self.conversationsViewController presentControllerWithConversation:conversation];
+        }
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -82,6 +141,13 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 
 #pragma mark - Layer Authentication Methods
 
+/**
+ *  Method requests authentication nonce from Layer. Then uses it, given username and password to get an identity token from Parse. Executes completion block when finished.
+ *
+ *  @param username   Username for Parse user.
+ *  @param password   Password for Parse user.
+ *  @param completion Block that will be executed in the end. If method finished succesfully block's parameters are (YES, nil), else - (NO, error)
+ */
 - (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion
 {
     if (self.layerClient.authenticatedUserID) {
@@ -127,18 +193,45 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
                     }];
                 }else{
                     NSLog(@"Parse User failed to log in with error: %@",error);
+                    completion(NO,error);
                 }
             }];
         }
     }];
 }
 
-//- (void)requestIdentityTokenForUserID:(NSString *)userID nonce:(NSString *)nonce completion:(void(^)(NSString *identityToken, NSError *error))completion
-//{
-//    
-//}
-
 #pragma - mark LYRClientDelegate Delegate Methods
+
+/**
+ *  Tells the delegate that objects associated with the client have changed due to local mutation or synchronization activities. Method identifies changes and posts notifications about them.
+ *
+ *  @param client  The client that received the changes.
+ *  @param changes An array of `NSDictionary` objects, each one describing a change.
+ */
+- (void)layerClient:(LYRClient *)client objectsDidChange:(NSArray *)changes
+{
+    NSLog(@"Layer Client objects did change");
+    for (NSDictionary *change in changes)
+    {
+        id changedObject = change[LYRObjectChangeObjectKey];
+        if (![changedObject isKindOfClass:[LYRConversation class]]) continue;
+        
+        LYRObjectChangeType changeType = [change[LYRObjectChangeTypeKey] integerValue];
+        NSString *changedProperty = change[LYRObjectChangePropertyKey];
+        
+        if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"metadata"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationMetadataDidChangeNotification object:changedObject];
+        }
+        
+        if (changeType == LYRObjectChangeTypeUpdate && [changedProperty isEqualToString:@"participants"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationParticipantsDidChangeNotification object:changedObject];
+        }
+        
+        if (changeType == LYRObjectChangeTypeCreate) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ConversationDidCreatedNotification object:changedObject];
+        }
+    }
+}
 
 - (void)layerClient:(LYRClient *)client didReceiveAuthenticationChallengeWithNonce:(NSString *)nonce
 {
@@ -158,6 +251,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 - (void)layerClient:(LYRClient *)client didFinishSynchronizationWithChanges:(NSArray *)changes
 {
     NSLog(@"Layer Client did finish sychronization");
+    [[NSNotificationCenter defaultCenter] postNotificationName:LayerClientDidFinishSynchronizationNotification object:nil];
 }
 
 - (void)layerClient:(LYRClient *)client didFailSynchronizationWithError:(NSError *)error

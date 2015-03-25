@@ -12,4 +12,6 @@
 
 @interface ConversationsViewController : ATLConversationListViewController
 
+- (void)presentControllerWithConversation:(LYRConversation *)conversation;
+
 @end

@@ -33,6 +33,8 @@ extern CGFloat const ATLMessageBubbleDefaultHeight;
  */
 extern NSString *const ATLUserDidTapLinkNotification;
 
+extern NSString *const LMPUserDidTapDateNotification;
+
 /**
  @abstract The `ATLMessageBubbleView` class provides a lightweight, customizable view that 
  handles displaying the actual message content within a collection view cell.

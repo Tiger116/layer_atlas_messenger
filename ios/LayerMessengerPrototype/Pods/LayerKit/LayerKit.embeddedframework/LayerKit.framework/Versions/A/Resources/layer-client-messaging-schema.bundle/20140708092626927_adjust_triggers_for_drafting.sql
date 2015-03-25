@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS conversation_participants;
+
 CREATE TABLE conversation_participants (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   conversation_database_identifier INTEGER NOT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE conversation_participants (
 );
 
 DROP TABLE IF EXISTS conversations;
+
 CREATE TABLE conversations (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   stream_database_identifier INTEGER UNIQUE,
@@ -23,6 +25,7 @@ CREATE TABLE conversations (
 );
 
 DROP TABLE IF EXISTS event_content_parts;
+
 CREATE TABLE event_content_parts (
   event_content_part_id INTEGER NOT NULL,
   event_database_identifier INTEGER NOT NULL,
@@ -33,6 +36,7 @@ CREATE TABLE event_content_parts (
 );
 
 DROP TABLE IF EXISTS event_metadata;
+
 CREATE TABLE event_metadata (
   event_database_identifier INTEGER NOT NULL,
   key TEXT NOT NULL,
@@ -42,6 +46,7 @@ CREATE TABLE event_metadata (
 );
 
 DROP TABLE IF EXISTS events;
+
 CREATE TABLE events (
   database_identifier INTEGER PRIMARY KEY AUTOINCREMENT,
   type INTEGER NOT NULL,
@@ -61,6 +66,7 @@ CREATE TABLE events (
 );
 
 DROP TABLE IF EXISTS keyed_values;
+
 CREATE TABLE keyed_values (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   object_type STRING NOT NULL,
@@ -74,6 +80,7 @@ CREATE TABLE keyed_values (
 );
 
 DROP TABLE IF EXISTS message_index;
+
 CREATE TABLE message_index (
   conversation_database_identifier INTEGER NOT NULL,
   message_database_identifier INTEGER UNIQUE NOT NULL,
@@ -81,6 +88,7 @@ CREATE TABLE message_index (
 );
 
 DROP TABLE IF EXISTS message_parts;
+
 CREATE TABLE message_parts (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   message_database_identifier INTEGER NOT NULL,
@@ -91,6 +99,7 @@ CREATE TABLE message_parts (
 );
 
 DROP TABLE IF EXISTS message_recipient_status;
+
 CREATE TABLE message_recipient_status (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   message_database_identifier INTEGER NOT NULL,
@@ -101,6 +110,7 @@ CREATE TABLE message_recipient_status (
 );
 
 DROP TABLE IF EXISTS messages;
+
 CREATE TABLE messages (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -120,6 +130,7 @@ CREATE TABLE messages (
 );
 
 DROP TABLE IF EXISTS stream_members;
+
 CREATE TABLE stream_members (
   stream_database_identifier INTEGER NOT NULL,
   member_id STRING NOT NULL,
@@ -128,6 +139,7 @@ CREATE TABLE stream_members (
 );
 
 DROP TABLE IF EXISTS streams;
+
 CREATE TABLE streams (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   stream_id BLOB UNIQUE,
@@ -137,6 +149,7 @@ CREATE TABLE streams (
 );
 
 DROP TABLE IF EXISTS syncable_changes;
+
 CREATE TABLE syncable_changes (
   change_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   table_name TEXT NOT NULL,
@@ -145,6 +158,7 @@ CREATE TABLE syncable_changes (
 );
 
 DROP TABLE IF EXISTS unprocessed_events;
+
 CREATE TABLE unprocessed_events (
   database_identifier INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   event_database_identifier INTEGER NOT NULL UNIQUE,

@@ -272,3 +272,13 @@ NSArray *ATLLinkResultsForText(NSString *text)
     if (error) return nil;
     return [detector matchesInString:text options:kNilOptions range:NSMakeRange(0, text.length)];
 }
+
+NSArray *LMPDateResultsForText(NSString *text)
+{
+    if (!text) return nil;
+    
+    NSError *error;
+    NSDataDetector *detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:&error];
+    if (error) return nil;
+    return [detector matchesInString:text options:kNilOptions range:NSMakeRange(0, text.length)];
+}

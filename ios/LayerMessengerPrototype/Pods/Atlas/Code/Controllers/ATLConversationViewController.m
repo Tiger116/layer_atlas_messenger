@@ -136,6 +136,9 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
         [self configureAddressBarForConversation];
     }
     self.canDisableAddressBar = YES;
+    if (!self.hasAppeared) {
+        [self.collectionView layoutIfNeeded];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -357,7 +360,8 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
     } else {
         [cell updateWithSender:nil];
     }
-    if (message.isUnread) {
+    if (message.isUnread && [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+        
         [message markAsRead:nil];
     }
 }
@@ -747,10 +751,12 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
         [self configureConversationForAddressBar];
         return;
     }
-    NSMutableSet *removedParticipantIdentifiers = [self.typingParticipantIDs copy];
-    [removedParticipantIdentifiers minusSet:self.conversation.participants];
-    [self.typingParticipantIDs removeObjectsInArray:removedParticipantIdentifiers.allObjects];
-    [self updateTypingIndicatorOverlay:NO];
+    NSMutableSet *removedParticipantIdentifiers = [NSMutableSet setWithArray:[self.typingParticipantIDs array]];
+    if (removedParticipantIdentifiers.count) {
+        [removedParticipantIdentifiers minusSet:self.conversation.participants];
+        [self.typingParticipantIDs removeObjectsInArray:removedParticipantIdentifiers.allObjects];
+        [self updateTypingIndicatorOverlay:NO];
+    }
     [self configureAddressBarForChangedParticipants];
     [self configureControllerForConversation];
     [self.collectionView reloadData];

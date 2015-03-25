@@ -3,8 +3,11 @@
 
 -- Drop related triggers, to avoid errors when dropping old tables.
 DROP TRIGGER track_deletes_of_conversations;
+
 DROP TRIGGER track_inserts_of_conversations;
+
 DROP TRIGGER track_deletes_of_messages;
+
 DROP TRIGGER track_message_send_on_insert;
 
 -------------------------------------

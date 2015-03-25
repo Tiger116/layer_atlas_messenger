@@ -1,0 +1,2 @@
+PODS_UBERTESTERS_FRAMEWORK_SEARCH_PATHS = "$(PODS_ROOT)/Ubertesters"
+PODS_UBERTESTERS_OTHER_LDFLAGS = -framework "AdSupport" -framework "AudioToolbox" -framework "CoreImage" -framework "CoreLocation" -framework "CoreMotion" -framework "CoreTelephony" -framework "OpenGLES" -framework "QuartzCore" -framework "SystemConfiguration" -framework "UbertestersSDK"

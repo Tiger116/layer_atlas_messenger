@@ -1,4 +1,5 @@
 DROP TRIGGER track_inserts_of_messages;
+
 DROP TRIGGER track_sending_of_messages;
 
 CREATE TRIGGER track_message_send_on_insert AFTER INSERT ON messages

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "35BB425E1A975AF2006248F8"
-               BuildableName = "LayerMessengerPrototype.app"
+               BuildableName = "ChatMe.app"
                BlueprintName = "LayerMessengerPrototype"
                ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
             </BuildableReference>
@@ -57,7 +57,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "35BB425E1A975AF2006248F8"
-            BuildableName = "LayerMessengerPrototype.app"
+            BuildableName = "ChatMe.app"
             BlueprintName = "LayerMessengerPrototype"
             ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
          </BuildableReference>
@@ -72,11 +72,12 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "35BB425E1A975AF2006248F8"
-            BuildableName = "LayerMessengerPrototype.app"
+            BuildableName = "ChatMe.app"
             BlueprintName = "LayerMessengerPrototype"
             ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
          </BuildableReference>
@@ -90,11 +91,12 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "35BB425E1A975AF2006248F8"
-            BuildableName = "LayerMessengerPrototype.app"
+            BuildableName = "ChatMe.app"
             BlueprintName = "LayerMessengerPrototype"
             ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
          </BuildableReference>

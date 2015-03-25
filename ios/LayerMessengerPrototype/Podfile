@@ -2,3 +2,5 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '7.0'
 
 pod 'Atlas', '~> 1.0.0'
+pod 'MBProgressHUD', '~> 0.8'
+pod 'Ubertesters', '~>2.0.3'
