@@ -38,9 +38,9 @@ public class LayerPushReceiver extends BroadcastReceiver {
                 .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE);
 
         // Set the action to take when a user taps the notification
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, MessengerActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        resultIntent.putExtra("layer-conversation-id", conversationId);
+        resultIntent.putExtra(context.getString(R.string.conversation_id_key), conversationId.toString());
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 

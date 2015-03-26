@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
                 Conversation conversation = conversations.get(position);
                 participants = new ArrayList<>(conversation.getParticipants());
                 Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
+                conversation.putMetadataAtKeyPath(getString(R.string.title_label),conversNames.get(position));
                 intent.putExtra(getString(R.string.title_label), conversNames.get(position));
                 intent.putExtra(getString(R.string.conversation_id_key), conversation.getId().toString());
                 startActivity(intent);
@@ -77,7 +78,11 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         registerForContextMenu(lvMain);
     }
 
-    private void dataChange() {
+    public void dataChange() {
+        if (dialog == null)
+            showProgressDialog();
+        if (!dialog.isShowing())
+            dialog.show();
         conversations.clear();
         if (layerClient.isAuthenticated()) {
             conversations = layerClient.getConversations();
@@ -95,13 +100,13 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
                 if (dialog != null)
                     dialog.dismiss();
             } else {
-                if (count < 4) {
+                if (count < 6) {
                     Handler handler = new Handler();
-                    handler.postDelayed(r, 1000);
+                    handler.postDelayed(r, 500);
                 } else {
-                    count = 0;
                     if (dialog != null)
                         dialog.dismiss();
+//                    count = 0;
                 }       // Toast.makeText(MainActivity.this,"Error sync with server! Please try later", Toast.LENGTH_LONG).show();
             }
         }
@@ -152,7 +157,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
             if (ParseUser.getCurrentUser() != null) {
                 if (!layerClient.isAuthenticated()) layerClient.authenticate();
                 else if (!layerClient.isConnected()) layerClient.connect();
-                else onUserAuthenticated();
+                else dataChange();
             } else {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, requestCodeLogin);
@@ -160,7 +165,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         }
     }
 
-    public void onAuthenticateStart() {
+    public void showProgressDialog() {
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setTitle("Loading");
@@ -170,10 +175,6 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         dialog.show();
     }
 
-    //Once the user has successfully authenticated, begin the conversationView
-    public void onUserAuthenticated() {
-        dataChange();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -266,7 +267,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         switch (requestCode) {
             case requestCodeLogin:
                 if (resultCode == RESULT_OK) {
-                    onAuthenticateStart();
+                    showProgressDialog();
                     layerClient.authenticate();
                 } else
                     this.finish();

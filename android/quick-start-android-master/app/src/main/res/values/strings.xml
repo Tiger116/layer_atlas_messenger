@@ -31,6 +31,6 @@
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="btn_register_text">Register</string>
     <string name="email_hint">Email</string>
-    <string name="conversation_id_key">URI</string>
+    <string name="conversation_id_key">layer-conversation-id</string>
 
 </resources>

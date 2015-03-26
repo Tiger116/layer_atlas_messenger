@@ -1,6 +1,5 @@
 package com.layer.quick_start_android;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,13 +12,12 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parse.ParseObject;
@@ -34,6 +32,7 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
 public class MessengerActivity extends ActionBarActivity {
     private ConversationViewController conversationView;
     private MyAutoCompleteTextView usersView;
+    private EditText userInput;
     private ArrayAdapter<String> myAutoCompleteAdapter;
     private ArrayList<String> availableUsers;
 
@@ -42,15 +41,26 @@ public class MessengerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messenger);
 
-        setTitle(getIntent().getExtras().getString(getString(R.string.title_label)));
         String conversationId = getIntent().getExtras().getString(getString(R.string.conversation_id_key));
-
         if (conversationView == null) {
             conversationView = new ConversationViewController(this, conversationId);
             if (layerClient != null) {
                 layerClient.registerTypingIndicator(conversationView);
             }
         }
+        String title = "";
+        if (getIntent().getExtras().containsKey(getString(R.string.title_label)))
+            title = getIntent().getExtras().getString(getString(R.string.title_label));
+        else if (conversationView.getConversation() != null)
+            if (conversationView.getConversation().getMetadata() != null) {
+                if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
+                    title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
+            }
+
+        setTitle(title);
+
+
+        userInput = (EditText) findViewById(R.id.input);
         usersView = (MyAutoCompleteTextView) findViewById(R.id.participants_text);
         availableUsers = getAvailableUsers();
         usersView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -58,11 +68,6 @@ public class MessengerActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TextView c = (TextView) view;
                 addUser(c.getText().toString());
-                usersView.clearFocus();
-                usersView.requestFocus();
-                InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                mgr.showSoftInput(usersView, InputMethodManager.SHOW_IMPLICIT);
-                Log.d("Focus", "" + usersView.isFocused());
             }
         });
         myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUsers);
@@ -78,7 +83,6 @@ public class MessengerActivity extends ActionBarActivity {
                 List<String> textUsers = new ArrayList<>(Arrays.asList(s.toString().split(", ")));
                 if (textUsers.contains(""))
                     textUsers.removeAll(Collections.singleton(""));
-                Log.d("Text change", String.format("%d, %d, %d", before, start, count));
                 if (count == 0) {
                     if ((MainActivity.getCurrentParticipants().size() - 1) > textUsers.size()) {
                         for (String participant : MainActivity.getCurrentParticipants()) {
@@ -93,11 +97,11 @@ public class MessengerActivity extends ActionBarActivity {
                         }
                     }
                 }
-                usersView.requestFocus();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                usersView.requestFocus();
             }
         });
 
@@ -106,6 +110,7 @@ public class MessengerActivity extends ActionBarActivity {
                 addBubble(userName);
             }
         }
+        userInput.requestFocus();
     }
 
     private void addUser(String userName) {
@@ -142,6 +147,7 @@ public class MessengerActivity extends ActionBarActivity {
 
         usersView.setMovementMethod(LinkMovementMethod.getInstance());
         usersView.append(sb);
+        usersView.requestFocus();
     }
 
     public TextView createContactTextView(String text) {
@@ -215,7 +221,7 @@ public class MessengerActivity extends ActionBarActivity {
             case MainActivity.requestCodeUsers:
                 if (resultCode == RESULT_OK) {
                     String participantName = data.getExtras().getString(getString(R.string.participants));
-                    if (!usersView.getText().toString().contains(participantName)&&!usersView.getText().toString().contains(layerClient.getAuthenticatedUserId())) {
+                    if (!usersView.getText().toString().contains(participantName) && !usersView.getText().toString().contains(layerClient.getAuthenticatedUserId())) {
                         addUser(participantName);
                     }
                 }

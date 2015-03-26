@@ -3,6 +3,7 @@ package com.layer.quick_start_android;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +21,6 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +54,6 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private Hashtable<String, MessageView> allMessages;
 
     private LayoutInflater inflater;
-    private LinearLayout rootLayout;
     private MessengerActivity ma;
     private String conversationId;
 
@@ -83,7 +82,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Capture user input
         sendButton.setOnClickListener(this);
-        userInput.setText(getInitialMessage());
+        userInput.setText("");
         userInput.addTextChangedListener(this);
 
         //If there is an active conversation between the Device, Simulator, and Dashboard (web client), cache it
@@ -116,7 +115,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Formats the push notification that the other participants will receive
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("layer-push-message", ParseUser.getCurrentUser().getUsername() + ": " + text);
+        metadata.put("layer-push-message", layerClient.getAuthenticatedUserId() + ": " + text);
         message.setMetadata(metadata);
 
         //Sends the message
@@ -190,15 +189,10 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
             //Build the GUI element and save it
             LinearLayout messageLayout = (LinearLayout) inflater.inflate(R.layout.message, conversationView, false);
 //            rootLayout.addView(messageLayout);
-            MessageView msgView = new MessageView(conversationView, messageLayout, msg);
+            MessageView msgView = new MessageView(conversationView,getConversation().getId().toString(), messageLayout, msg);
             allMessages.put(msgId, msgView);
         }
     }
-
-    public static String getInitialMessage() {
-        return "Hey, everyone! This is your friend, " + ParseUser.getCurrentUser().getUsername();
-    }
-
 
     //================================================================================
     // View.OnClickListener methods
@@ -214,7 +208,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     //================================================================================
     // LayerChangeEventListener methods
     //================================================================================
-
+    @Override
     public void onEventMainThread(LayerChangeEvent event) {
 
         //You can choose to handle changes to conversations or messages however you'd like:
@@ -228,12 +222,16 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
                 switch (change.getChangeType()) {
                     case INSERT:
+                        Log.d("Conversation","INSERT");
                         break;
 
                     case UPDATE:
+                        Log.d("Conversation","UPDATE");
                         break;
 
                     case DELETE:
+                        ma.finish();
+                        Log.d("Conversation","DELETE");
                         break;
                 }
 

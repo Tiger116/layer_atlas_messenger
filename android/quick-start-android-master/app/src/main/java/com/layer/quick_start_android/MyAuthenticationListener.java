@@ -59,7 +59,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
         //Start the conversation view after a successful authentication
         System.out.println("Authentication successful");
         if (main_activity != null)
-            main_activity.onUserAuthenticated();
+            main_activity.dataChange();
     }
 
     //Called when there was a problem authenticating

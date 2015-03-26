@@ -17,7 +17,7 @@ public class MyConnectionListener implements LayerConnectionListener {
         System.out.println("Connected to Layer");
 
         if(client.isAuthenticated())
-            main_activity.onUserAuthenticated();
+            main_activity.dataChange();
         else
             client.authenticate();
     }

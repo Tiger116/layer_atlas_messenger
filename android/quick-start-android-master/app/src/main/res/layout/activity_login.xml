@@ -32,40 +32,45 @@
             tools:ignore="ContentDescription" />
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:padding="10dp">
 
-        <EditText
-            android:id="@+id/userName"
-            android:singleLine="true"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="@drawable/abc_edit_text_material"
-            android:hint="@string/username_hint"
-            android:textColorHint="#bbbbbb" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/password"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="@string/password_hint"
-            android:background="@drawable/abc_edit_text_material"
-            android:textColorHint="#bbbbbb"
-            android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/userName"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/abc_edit_text_material"
+                android:hint="@string/username_hint"
+                android:textColorHint="#bbbbbb" />
 
-        <Button
-            android:id="@+id/btnSingIn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_margin="4dp"
-            android:text="@string/button_text" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/password"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:hint="@string/password_hint"
+                android:background="@drawable/abc_edit_text_material"
+                android:textColorHint="#bbbbbb"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/btnSingIn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_margin="4dp"
+                android:text="@string/button_text" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

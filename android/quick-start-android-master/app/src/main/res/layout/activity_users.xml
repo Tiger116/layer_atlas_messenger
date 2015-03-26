@@ -36,7 +36,7 @@
             android:singleLine="true"
             android:background="@drawable/abc_textfield_search_material"
             android:inputType="text"
-            android:imeOptions="actionSend" />
+            android:imeOptions="actionSearch" />
     </LinearLayout>
 
     <com.layer.quick_start_android.contacts_utils.pinned_header_utils.PinnedHeaderListView

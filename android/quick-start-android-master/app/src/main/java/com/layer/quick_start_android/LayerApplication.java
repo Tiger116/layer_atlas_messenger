@@ -16,7 +16,7 @@ public class LayerApplication extends Application implements LayerChangeEventLis
     public static String Layer_App_ID = "07b40518-aaaa-11e4-bceb-a25d000000f4";
 
     //Replace this with your Project Number from http://console.developers.google.com
-    public static String GCM_Project_Number = "00000";
+    public static String GCM_Project_Number = "520065212067";
 
     //Global variables used to manage the Layer Client and the conversations in this app
     public static LayerClient layerClient;

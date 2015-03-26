@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.parse.ParseUser;
@@ -25,7 +26,7 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
 public class MessageView {
 
     //The parent object (in this case, a LinearLayout object with a ScrollView parent)
-    private LinearLayout myParent;
+    private LinearLayout layout;
     private LinearLayout messageLayout;
 
     //The sender and message views
@@ -33,15 +34,15 @@ public class MessageView {
     private TextView senderTV;
     private TextView sendTime;
     private TextView messageTV;
+    private String conversation;
     private ImageView statusImage;
 
     private Context context;
 
-    private final int pad = 4;
-
     //Takes the Layout parent object and message
-    public MessageView(LinearLayout parent, LinearLayout meLayout, Message msg) {
-        this.myParent = parent;
+    public MessageView(LinearLayout parent, String conversationId, LinearLayout meLayout, Message msg) {
+        this.conversation = conversationId;
+        this.layout = parent;
         this.context = LayerApplication.getContext();
         this.messageLayout = meLayout;
         senderPhoto = (ImageView) messageLayout.findViewById(R.id.message_user_photo);
@@ -52,7 +53,7 @@ public class MessageView {
         messageTV = (TextView) messageLayout.findViewById(R.id.message_text);
         //Populates the text views
         craftMessage(msg);
-        myParent.addView(messageLayout);
+        layout.addView(messageLayout);
     }
 
     private void craftMessage(Message msg) {
@@ -114,7 +115,8 @@ public class MessageView {
     private Message.RecipientStatus getMessageStatus(Message msg) {
 
         //If we didn't send the message, we already know the status - we have read it
-        if (!msg.getSentByUserId().equalsIgnoreCase(ParseUser.getCurrentUser().getUsername()))
+        if (!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId())
+                && msg.getConversation().getId().toString().equals(conversation))
             return Message.RecipientStatus.READ;
 
         //Assume the message has been sent
@@ -142,7 +144,6 @@ public class MessageView {
                     return Message.RecipientStatus.READ;
             }
         }
-
         return status;
     }
 

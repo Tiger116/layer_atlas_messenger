@@ -32,64 +32,68 @@
             tools:ignore="ContentDescription" />
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:layout_centerVertical="true">
 
-        <EditText
-            android:id="@+id/log_in_name"
-            android:singleLine="true"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="@drawable/abc_edit_text_material"
-            android:hint="@string/name_hint"
-            android:textColorHint="#bbbbbb" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/email"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:background="@drawable/abc_edit_text_material"
-            android:hint="@string/email_hint"
-            android:textColorHint="#bbbbbb"
-            android:inputType="textEmailAddress|textEmailSubject" />
+            <EditText
+                android:id="@+id/log_in_name"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/abc_edit_text_material"
+                android:hint="@string/name_hint"
+                android:textColorHint="#bbbbbb" />
 
-        <EditText
-            android:id="@+id/password"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="@string/password_hint"
-            android:background="@drawable/abc_edit_text_material"
-            android:textColorHint="#bbbbbb"
-            android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/email"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:background="@drawable/abc_edit_text_material"
+                android:hint="@string/email_hint"
+                android:textColorHint="#bbbbbb"
+                android:inputType="textEmailAddress|textEmailSubject" />
 
-        <EditText
-            android:id="@+id/password_confirm"
-            android:singleLine="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:hint="@string/confirm_password_hint"
-            android:background="@drawable/abc_edit_text_material"
-            android:textColorHint="#bbbbbb"
-            android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/password"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:hint="@string/password_hint"
+                android:background="@drawable/abc_edit_text_material"
+                android:textColorHint="#bbbbbb"
+                android:inputType="textPassword" />
 
-        <Button
-            android:id="@+id/btn_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_margin="4dp"
-            android:text="@string/btn_register_text" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/password_confirm"
+                android:singleLine="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:hint="@string/confirm_password_hint"
+                android:background="@drawable/abc_edit_text_material"
+                android:textColorHint="#bbbbbb"
+                android:inputType="textPassword" />
 
+            <Button
+                android:id="@+id/btn_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_margin="4dp"
+                android:text="@string/btn_register_text" />
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
