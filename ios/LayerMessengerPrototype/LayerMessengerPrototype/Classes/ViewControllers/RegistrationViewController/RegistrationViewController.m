@@ -15,14 +15,26 @@
 
 typedef NS_ENUM(NSInteger, RegistrationTableSection)
 {
-    RegistrationTableSectionUsername,
+    RegistrationTableSectionUsername = 0,
     RegistrationTableSectionPassword,
     RegistrationTableSectionUserInfo,
     RegistrationTableSectionButtons,
     RegistrationTableSectionCount,
 };
 
+typedef NS_ENUM(NSInteger, RegistrationInputTag)
+{
+    RegistrationInputTagUsername = 0,
+    RegistrationInputTagPassword,
+    RegistrationInputTagPasswordConfirmation,
+    RegistrationInputTagFirstName,
+    RegistrationInputTagLastName,
+    RegistrationInputTagCount,
+};
+
 @interface RegistrationViewController ()
+
+@property NSMutableArray* inputData;
 
 @end
 
@@ -37,6 +49,8 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
     self.tableView.sectionHeaderHeight = 48.0f;
     self.tableView.sectionFooterHeight = 0.0f;
     self.tableView.rowHeight = 48.0f;
+    
+    self.inputData = [[NSMutableArray alloc] initWithCapacity:RegistrationInputTagCount];
     
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     [self.view addGestureRecognizer:tap];
@@ -103,6 +117,7 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
                [tableView registerNib:[UINib nibWithNibName:@"RegistrationInputCell" bundle:nil] forCellReuseIdentifier:@"RegistrationInputCell"];
                cell = [self.tableView dequeueReusableCellWithIdentifier:@"RegistrationInputCell"];
            }
+            cell.inputText.delegate = self;
             return cell;
         }
         case RegistrationTableSectionButtons:{
@@ -135,6 +150,7 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
             ((RegistrationInputCell*)cell).inputText.placeholder = @"Username";
             ((RegistrationInputCell*)cell).selectionStyle = UITableViewCellSelectionStyleNone;
             ((RegistrationInputCell*)cell).inputText.secureTextEntry = NO;
+            ((RegistrationInputCell*)cell).inputText.tag = RegistrationInputTagUsername;
             break;
         case RegistrationTableSectionPassword:{
             ((RegistrationInputCell*)cell).selectionStyle = UITableViewCellSelectionStyleNone;
@@ -142,9 +158,11 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
             switch (indexPath.row) {
                 case 0:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"Password";
+                    ((RegistrationInputCell*)cell).inputText.tag = RegistrationInputTagPassword;
                     break;
                 case 1:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"Confirm password";
+                    ((RegistrationInputCell*)cell).inputText.tag = RegistrationInputTagPasswordConfirmation;
                     break;
                 default:
                     break;
@@ -157,9 +175,11 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
             switch (indexPath.row) {
                 case 0:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"First name";
+                    ((RegistrationInputCell*)cell).inputText.tag = RegistrationInputTagFirstName;
                     break;
                 case 1:
                     ((RegistrationInputCell*)cell).inputText.placeholder = @"Last name";
+                    ((RegistrationInputCell*)cell).inputText.tag = RegistrationInputTagLastName;
                     break;
                 default:
                     break;
@@ -278,61 +298,50 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
  */
 - (User*) validateInputInTableView:(UITableView*)tableView
 {
-    NSString* username;
-    NSString* password;
-    NSString* firstName;
-    NSString* lastName;
     //Username
-    RegistrationInputCell* cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
-                                                                                                              inSection:RegistrationTableSectionUsername]];
-    if ([self textFieldIsEmpty:cell.inputText]){
+    NSString* username = self.inputData[RegistrationInputTagUsername];
+    if ([self textIsEmpty:username]){
         [self showAlertWithMessage:@"Username is empty"];
         return nil;
     }
-    username = cell.inputText.text;
     
     //Password
-    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
-                                                                                        inSection:RegistrationTableSectionPassword]];
-    RegistrationInputCell* confirmationCell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1
-                                                                                                                          inSection:RegistrationTableSectionPassword]];
-    if ([self textFieldIsEmpty:cell.inputText]){
+    NSString* password = self.inputData[RegistrationInputTagPassword];
+    NSString* passwordConfirmation = self.inputData[RegistrationInputTagPasswordConfirmation];
+    if ([self textIsEmpty:password]){
         [self showAlertWithMessage:@"Password is empty"];
         return nil;
     }
-    if ([self textFieldIsEmpty:confirmationCell.inputText]){
+    if ([self textIsEmpty:passwordConfirmation]){
         [self showAlertWithMessage:@"Confirmation password is empty"];
         return nil;
     }
-    if (! [cell.inputText.text isEqualToString:confirmationCell.inputText.text]){
+    if (! [password isEqualToString:passwordConfirmation]){
         [self showAlertWithMessage:@"Passwords are not equal"];
         return nil;
     }
-    password = cell.inputText.text;
     
     //First name
-    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0
-                                                                                       inSection:RegistrationTableSectionUserInfo]];
-    if ([self textFieldIsEmpty:cell.inputText]){
+    NSString* firstName = self.inputData[RegistrationInputTagFirstName];
+    if ([self textIsEmpty:firstName]){
         [self showAlertWithMessage:@"First name is empty"];
         return nil;
     }
-    firstName = cell.inputText.text;
     
     //Last name
-    cell = (RegistrationInputCell*)[tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:1
-                                                                                       inSection:RegistrationTableSectionUserInfo]];
-    if ([self textFieldIsEmpty:cell.inputText]){
+    NSString* lastName = self.inputData[RegistrationInputTagLastName];
+    if ([self textIsEmpty:lastName]){
         [self showAlertWithMessage:@"Last name is empty"];
         return nil;
     }
-    lastName = cell.inputText.text;
+
     
     User* user = [[User alloc] initWithFirstName:firstName lastName:lastName userId:nil];
     user.username = username;
     user.password = password;
     return user;
 }
+
 
 /**
  *  Checks if given UITextField object's text is empty or contains only spaces.
@@ -341,9 +350,9 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
  *
  *  @return YES if given object is null, or objects's text is null, or text is empty or contains only spaces. NO in other cases.
  */
-- (BOOL) textFieldIsEmpty:(UITextField*)textField
+- (BOOL) textIsEmpty:(NSString*)text
 {
-    if (!textField || !textField.text || ([textField.text stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].length == 0)) {
+    if (!text || ([text stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].length == 0)) {
         return YES;
     }
     return NO;
@@ -365,5 +374,11 @@ typedef NS_ENUM(NSInteger, RegistrationTableSection)
 }
 
 
+#pragma mark - UITextFieldDelegate
+
+- (void) textFieldDidEndEditing:(UITextField *)textField
+{
+    self.inputData[textField.tag] = textField.text;
+}
 
 @end

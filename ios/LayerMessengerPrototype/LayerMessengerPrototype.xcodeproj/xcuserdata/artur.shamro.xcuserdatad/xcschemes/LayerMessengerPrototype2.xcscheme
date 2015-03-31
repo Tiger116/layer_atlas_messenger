@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0610"
+   LastUpgradeVersion = "0620"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -20,20 +20,6 @@
                ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "35BB42771A975AF2006248F8"
-               BuildableName = "LayerMessengerPrototypeTests.xctest"
-               BlueprintName = "LayerMessengerPrototypeTests"
-               ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -42,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "35BB42771A975AF2006248F8"
-               BuildableName = "LayerMessengerPrototypeTests.xctest"
-               BlueprintName = "LayerMessengerPrototypeTests"
-               ReferencedContainer = "container:LayerMessengerPrototype.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
