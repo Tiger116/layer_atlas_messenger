@@ -110,8 +110,23 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
         {
             LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
             query.predicate = [LYRPredicate predicateWithProperty:@"identifier" operator:LYRPredicateOperatorIsEqualTo value:userInfo[@"layer"][@"conversation_identifier"]];
-            LYRConversation *conversation = [[self.layerClient executeQuery:query error:nil] firstObject];
-            [self.conversationsViewController presentControllerWithConversation:conversation];
+            NSError *error;
+            LYRConversation *conversation = [[self.layerClient executeQuery:query error:&error] firstObject];
+            if (!error)
+            {
+                if (conversation)
+                {
+                    [self.conversationsViewController presentControllerWithConversation:conversation];
+                } else
+                {
+                    [self.navController popToViewController:self.conversationsViewController animated:YES];
+                }
+                
+            } else
+            {
+                NSLog(@"Error querying conversation from notification: %@", error);
+            }
+            
         }
     }
 }

@@ -471,6 +471,7 @@
         [self.navigationController popViewControllerAnimated:YES];
         return;
     }
+    [self configureTitle];
 }
 
 /**
