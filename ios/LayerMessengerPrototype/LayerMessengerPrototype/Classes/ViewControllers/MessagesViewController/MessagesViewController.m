@@ -13,10 +13,15 @@
 #import "LoadingHUD.h"
 #import "AppDelegate.h"
 #import <EventKitUI/EventKitUI.h>
+#import "MapViewController.h"
+#import <ATLLocationManager.h>
 
-@interface MessagesViewController () <DetailsViewControllerDelegate, EKEventEditViewDelegate>
+@interface MessagesViewController () <DetailsViewControllerDelegate, EKEventEditViewDelegate, CLLocationManagerDelegate, MapViewControllerDelegate>
 
 @property (nonatomic, strong) UIBarButtonItem* detailsButton;
+@property (nonatomic) BOOL shouldShareLocation;
+@property (nonatomic) ATLLocationManager *locationManager;
+@property (nonatomic) MapViewController* mapViewController;
 
 @end
 
@@ -72,6 +77,12 @@
 {
     [super viewWillAppear:animated];
     [self configureTitle];
+}
+
+- (void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self.view becomeFirstResponder];
 }
 
 /**
@@ -189,6 +200,80 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
+#pragma mark - Map Related
+
+/**
+ *  Method is called when user presses a button with arrow to send a location.
+ */
+- (void)sendLocationMessage
+{
+    self.shouldShareLocation = YES;
+    
+    if ([self.locationManager locationServicesEnabled])
+    {
+        [self.locationManager startUpdatingLocation];
+    } else
+    {
+        [self presentMapWithLocationToDisplay:nil andWithMarkedLocation:nil];
+    }
+
+}
+
+/**
+ *  Tells the delegate that new location data is available.
+ *
+ *  It presents (MapViewController *) view controller with map.
+ *
+ *  @param manager   The location manager object that generated the update event.
+ *  @param locations An array of CLLocation objects containing the location data.
+ */
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    [self.locationManager stopUpdatingLocation];
+    if (!self.shouldShareLocation) return;
+    if (locations.firstObject)
+    {
+        self.shouldShareLocation = NO;
+        [self presentMapWithLocationToDisplay:locations.firstObject andWithMarkedLocation:nil];
+    }
+}
+
+/**
+ *  Tells the delegate that the location manager was unable to retrieve a location value.
+ *
+ *  Still presents (MapViewController *) view controller with map.
+ *
+ *  @param manager The location manager object that was unable to retrieve the location.
+ *  @param error   The error object containing the reason the location or heading could not be retrieved.
+ */
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"Error updating location: %@",error);
+    [self presentMapWithLocationToDisplay:nil andWithMarkedLocation:nil];
+}
+
+/**
+ *  Method is using to present map to user.
+ *
+ *  @param locationToDisplay Location which will be presented after map appears. (Can be 'nil').
+ *  @param markedLocation    Location of pin in the map. (Can be 'nil').
+ */
+- (void) presentMapWithLocationToDisplay:(CLLocation*)locationToDisplay andWithMarkedLocation:(CLLocation*)markedLocation
+{
+    MapViewController* mapViewController = [[MapViewController alloc] initWithNibName:@"MapViewController" bundle:nil];
+    mapViewController.delegate = self;
+    mapViewController.locationToDisplay = locationToDisplay;
+    mapViewController.markedLocation = markedLocation;
+    [self presentViewController:mapViewController animated:YES completion:nil];
+}
+
+#pragma mark - MapViewControllerDelegate
+
+- (void)sendLocation:(CLLocation *)location
+{
+    [self sendMessageWithLocation:location];
+}
+
 #pragma mark - ATLConversationViewControllerDataSource
 
 /**
@@ -266,7 +351,6 @@
                     delivered = YES;
                     break;
                 case LYRRecipientStatusRead:
-                    NSLog(@"Read");
                     readCount += 1;
                     break;
             }
@@ -353,6 +437,33 @@
      }];
 }
 
+/**
+ *  Informs the delegate that a message was selected.
+ */
+- (void)conversationViewController:(ATLConversationViewController *)viewController didSelectMessage:(LYRMessage *)message
+{
+//    LYRMessagePart *JPEGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImageJPEG);
+//    if (JPEGMessagePart) {
+//        [self presentImageViewControllerWithMessage:message];
+//        return;
+//    }
+//    LYRMessagePart *PNGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImagePNG);
+//    if (PNGMessagePart) {
+//        [self presentImageViewControllerWithMessage:message];
+//    }
+    LYRMessagePart *locationMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeLocation);
+    if (locationMessagePart)
+    {
+        NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:locationMessagePart.data
+                                                                   options:NSJSONReadingAllowFragments
+                                                                     error:nil];
+        double latitude = [dictionary[ATLLocationLatitudeKey] doubleValue];
+        double longitude = [dictionary[ATLLocationLongitudeKey] doubleValue];
+        CLLocation *location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
+        [self presentMapWithLocationToDisplay:nil andWithMarkedLocation:location];
+    }
+}
+
 #pragma mark - ATLAddressBarControllerDelegate
 
 /**
@@ -411,12 +522,6 @@
     [self configureTitle];
 }
 
-//-(void) conservationDidChange:(LYRConversation*)conversation
-//{
-//    self.conversation = conversation;
-//    [self configureTitle];
-//}
-
 #pragma mark - EKEventEditViewDelegate
 
 - (void)eventEditViewController:(EKEventEditViewController *)controller didCompleteWithAction:(EKEventEditViewAction)action
@@ -430,6 +535,20 @@
 {
     [super setConversation:conversation];
     [self configureTitle];
+}
+
+- (CLLocationManager *) locationManager
+{
+    if (!_locationManager)
+    {
+        _locationManager = [[ATLLocationManager alloc] init];
+        _locationManager.delegate = self;
+        if ([_locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)])
+        {
+            [_locationManager requestWhenInUseAuthorization];
+        }
+    }
+    return _locationManager;
 }
 
 #pragma mark - Notifications
