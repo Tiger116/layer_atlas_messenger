@@ -14,7 +14,7 @@ public class LayerPushReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         //Don't show a notification on boot
-        if(intent.getAction() == Intent.ACTION_BOOT_COMPLETED)
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED))
             return;
 
         // Get notification content
@@ -40,7 +40,8 @@ public class LayerPushReceiver extends BroadcastReceiver {
         // Set the action to take when a user taps the notification
         Intent resultIntent = new Intent(context, MessengerActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        resultIntent.putExtra(context.getString(R.string.conversation_id_key), conversationId.toString());
+        if (conversationId != null)
+            resultIntent.putExtra(context.getString(R.string.conversation_id_key), conversationId.toString());
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 

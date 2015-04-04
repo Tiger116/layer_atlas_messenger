@@ -12,11 +12,11 @@ import android.widget.TextView;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
-import com.parse.ParseUser;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
@@ -25,35 +25,29 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
  */
 public class MessageView {
 
-    //The parent object (in this case, a LinearLayout object with a ScrollView parent)
-    private LinearLayout layout;
-    private LinearLayout messageLayout;
-
     //The sender and message views
     private ImageView senderPhoto;
     private TextView senderTV;
     private TextView sendTime;
     private TextView messageTV;
-    private String conversation;
     private ImageView statusImage;
 
     private Context context;
+    private Conversation conversation;
 
     //Takes the Layout parent object and message
-    public MessageView(LinearLayout parent, String conversationId, LinearLayout meLayout, Message msg) {
-        this.conversation = conversationId;
-        this.layout = parent;
+    public MessageView(LinearLayout parent, LinearLayout meLayout, Message msg) {
         this.context = LayerApplication.getContext();
-        this.messageLayout = meLayout;
-        senderPhoto = (ImageView) messageLayout.findViewById(R.id.message_user_photo);
-        senderTV = (TextView) messageLayout.findViewById(R.id.message_username);
-        sendTime = (TextView) messageLayout.findViewById(R.id.message_time);
-        statusImage = (ImageView) messageLayout.findViewById(R.id.message_status);
+        this.conversation = msg.getConversation();
+        senderPhoto = (ImageView) meLayout.findViewById(R.id.message_user_photo);
+        senderTV = (TextView) meLayout.findViewById(R.id.message_username);
+        sendTime = (TextView) meLayout.findViewById(R.id.message_time);
+        statusImage = (ImageView) meLayout.findViewById(R.id.message_status);
         createStatusImage(msg);
-        messageTV = (TextView) messageLayout.findViewById(R.id.message_text);
+        messageTV = (TextView) meLayout.findViewById(R.id.message_text);
         //Populates the text views
         craftMessage(msg);
-        layout.addView(messageLayout);
+        parent.addView(meLayout);
     }
 
     private void craftMessage(Message msg) {
@@ -68,7 +62,7 @@ public class MessageView {
             params.gravity = Gravity.END;
             messageTV.setLayoutParams(params);
         } else {
-            if (MainActivity.getCurrentParticipants().size() <= 2)
+            if (conversation.getParticipants().size() <= 2)
                 senderTxt = "";
             background = context.getResources().getDrawable(R.drawable.bubble_yellow);
         }
@@ -105,6 +99,7 @@ public class MessageView {
                 try {
                     msgText += new String(parts.get(i).getData(), "UTF-8") + "\n";
                 } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -115,8 +110,7 @@ public class MessageView {
     private Message.RecipientStatus getMessageStatus(Message msg) {
 
         //If we didn't send the message, we already know the status - we have read it
-        if (!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId())
-                && msg.getConversation().getId().toString().equals(conversation))
+        if (!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
             return Message.RecipientStatus.READ;
 
         //Assume the message has been sent
@@ -124,11 +118,11 @@ public class MessageView {
 
         //Go through each user to check the status, in this case we check each user and prioritize so
         // that we return the highest status: Sent -> Delivered -> Read
-        for (int i = 0; i < MainActivity.getCurrentParticipants().size(); i++) {
+        for (int i = 0; i < conversation.getParticipants().size(); i++) {
 
             //Don't check the status of the current user
-            String participant = MainActivity.getCurrentParticipants().get(i);
-            if (participant.equalsIgnoreCase(ParseUser.getCurrentUser().getUsername()))
+            String participant = conversation.getParticipants().get(i);
+            if (participant.equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
                 continue;
 
             if (status == Message.RecipientStatus.SENT) {
@@ -166,7 +160,8 @@ public class MessageView {
                 break;
         }
 
-        //Have the icon fill the space vertically
-        statusImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+//        //Have the icon fill the space vertically
+//        statusImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
     }
+
 }

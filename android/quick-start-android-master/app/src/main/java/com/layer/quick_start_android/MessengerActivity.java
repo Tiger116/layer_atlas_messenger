@@ -17,52 +17,85 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.layer.sdk.LayerClient;
+import com.layer.sdk.listeners.LayerTypingIndicatorListener;
+import com.layer.sdk.messaging.Conversation;
+import com.layer.sdk.messaging.Message;
+import com.layer.sdk.messaging.MessagePart;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
+import static com.layer.quick_start_android.LayerApplication.conversationView;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
-public class MessengerActivity extends ActionBarActivity {
-    private ConversationViewController conversationView;
+public class MessengerActivity extends ActionBarActivity implements View.OnClickListener, TextWatcher, LayerTypingIndicatorListener {
+    //    private ConversationViewController conversationView;
+
+    //List of all users currently typing
+    private ArrayList<String> typingUsers;
+    //GUI elements
+    private Button sendButton;
+    //    private EditText userInput;
+    private ScrollView conversationScroll;
+    private LinearLayout conversationLayout;
+    private TextView typingIndicator;
     private MyAutoCompleteTextView usersView;
     private EditText userInput;
     private ArrayAdapter<String> myAutoCompleteAdapter;
     private ArrayList<String> availableUsers;
+    private String parameter = null;
+    //All messages
+    private Hashtable<String, MessageView> allMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messenger);
 
-        String conversationId = getIntent().getExtras().getString(getString(R.string.conversation_id_key));
-        if (conversationView == null) {
-            conversationView = new ConversationViewController(this, conversationId);
-            if (layerClient != null) {
-                layerClient.registerTypingIndicator(conversationView);
-            }
+        LayerApplication.setCurrentActivity(this);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle.getString(getString(R.string.conversation_id_key)) != null)
+            parameter = bundle.getString(getString(R.string.conversation_id_key));
+        else if (bundle.getString(getString(R.string.participant_key)) != null)
+            parameter = bundle.getString(getString(R.string.participant_key));
+        if (conversationView == null)
+            conversationView = new ConversationViewController(parameter);
+        else
+            conversationView.setConversation(parameter);
+        if (layerClient != null) {
+            layerClient.registerTypingIndicator(this);
         }
-        String title = "";
-        if (getIntent().getExtras().containsKey(getString(R.string.title_label)))
-            title = getIntent().getExtras().getString(getString(R.string.title_label));
-        else if (conversationView.getConversation() != null)
-            if (conversationView.getConversation().getMetadata() != null) {
-                if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
-                    title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
-            }
 
-        setTitle(title);
-
-
+        //Cache off gui objects
+        sendButton = (Button) findViewById(R.id.send);
         userInput = (EditText) findViewById(R.id.input);
+        conversationScroll = (ScrollView) findViewById(R.id.scrollView);
+        conversationLayout = (LinearLayout) findViewById(R.id.conversation);
+        typingIndicator = (TextView) findViewById(R.id.typingIndicator);
+
+        //List of users that are typing which is used with LayerTypingIndicatorListener
+        typingUsers = new ArrayList<>();
+
+        //Capture user input
+        sendButton.setOnClickListener(this);
+        userInput.setText("");
+        userInput.addTextChangedListener(this);
+
         usersView = (MyAutoCompleteTextView) findViewById(R.id.participants_text);
-        availableUsers = getAvailableUsers();
         usersView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,12 +103,19 @@ public class MessengerActivity extends ActionBarActivity {
                 addUser(c.getText().toString());
             }
         });
+        availableUsers = getAvailableUsers();
         myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUsers);
         usersView.setTokenizer(new MyAutoCompleteTextView.CommaTokenizer());
         usersView.setAdapter(myAutoCompleteAdapter);
         usersView.addTextChangedListener(new TextWatcher() {
+            private String firstUser;
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (!s.toString().isEmpty() && conversationView.getConversation().getParticipants().contains(s.toString()))
+                    firstUser = Arrays.asList(s.toString().split(", ")).get(0);
+                else
+                    firstUser = null;
             }
 
             @Override
@@ -83,40 +123,145 @@ public class MessengerActivity extends ActionBarActivity {
                 List<String> textUsers = new ArrayList<>(Arrays.asList(s.toString().split(", ")));
                 if (textUsers.contains(""))
                     textUsers.removeAll(Collections.singleton(""));
-                if (count == 0) {
-                    if ((MainActivity.getCurrentParticipants().size() - 1) > textUsers.size()) {
-                        for (String participant : MainActivity.getCurrentParticipants()) {
+                if (!s.toString().isEmpty() && count == 0) {
+                    if ((conversationView.getConversation().getParticipants().size() - 1) > textUsers.size()) {
+                        for (String participant : conversationView.getConversation().getParticipants()) {
                             if (!textUsers.contains(participant) && !participant.equals(layerClient.getAuthenticatedUserId())) {
                                 conversationView.getConversation().removeParticipants(Arrays.asList(participant));
                                 availableUsers.add(participant);
                                 myAutoCompleteAdapter.add(participant);
-                                MainActivity.removeParticipant(participant);
-                                if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) == null)
-                                    setTitle(String.format("[%s, %s", layerClient.getAuthenticatedUserId(), textUsers.toString().replace("[", "")));
+                                conversationView.getConversation().removeParticipants(participant);
                             }
                         }
                     }
-                }
+                } else if (firstUser != null)
+                    addBubble(firstUser);
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                usersView.requestFocus();
             }
         });
 
-        for (String userName : MainActivity.getCurrentParticipants()) {
-            if (!userName.equals(layerClient.getAuthenticatedUserId())) {
-                addBubble(userName);
-            }
+        //If there is an active conversation, draw it
+        drawConversation();
+    }
+
+    //Create a new message and send it
+    private void sendButtonClicked() {
+
+        //Check to see if there is an active conversation between the pre-defined participants
+        if (conversationView.getConversation() == null) {
+            conversationView.setConversation(parameter);
         }
-        userInput.requestFocus();
+        sendMessage(userInput.getText().toString());
+
+        //Clears the text input field
+        userInput.setText("");
+    }
+
+    private void sendMessage(String text) {
+
+        //Put the user's text into a message part, which has a MIME type of "text/plain" by default
+        MessagePart messagePart = layerClient.newMessagePart(text);
+
+        //Creates and returns a new message object with the given conversation and array of message parts
+        Message message = layerClient.newMessage(Arrays.asList(messagePart));
+
+        //Formats the push notification that the other participants will receive
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("layer-push-message", layerClient.getAuthenticatedUserId() + ": " + text);
+        message.setMetadata(metadata);
+
+        //Sends the message
+        if (conversationView.getConversation() != null)
+            conversationView.getConversation().send(message);
+    }
+
+    //Redraws the conversation window in the GUI
+    public void drawConversation() {
+        //Only proceed if there is a valid conversation
+        if (conversationView.getConversation() != null) {
+            List<String> participants = conversationView.getConversation().getParticipants();
+
+            String title = "";
+            if (conversationView.getConversation().getMetadata() != null) {
+                if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
+                    title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
+            } else if (participants != null)
+                title = participants.toString();
+            setTitle(title);
+
+            //Clear the GUI first and empty the list of stored messages
+            conversationLayout.removeAllViews();
+            allMessages = new Hashtable<>();
+
+            //Grab all the messages from the conversation and add them to the GUI
+            List<Message> allMsgs = layerClient.getMessages(conversationView.getConversation());
+            for (int i = 0; i < allMsgs.size(); i++) {
+                addMessageToView(allMsgs.get(i));
+            }
+
+            //After redrawing, force the scroll view to the bottom (most recent message)
+            conversationScroll.post(new Runnable() {
+                @Override
+                public void run() {
+                    conversationScroll.fullScroll(View.FOCUS_DOWN);
+                }
+            });
+
+            for (String userName : participants) {
+                if (!userName.equals(layerClient.getAuthenticatedUserId())) {
+                    addBubble(userName);
+                }
+            }
+            userInput.requestFocus();
+        }
+        else
+            finish();
+    }
+
+    //Creates a GUI element (header and body) for each Message
+    private void addMessageToView(Message msg) {
+        usersView.setText("");
+        //Make sure the message is valid
+        if (msg == null)
+            return;
+
+        //Once the message has been displayed, we mark it as read
+        //NOTE: the sender of a message CANNOT mark their own message as read
+//        if (ma.hasWindowFocus())
+        if (!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
+            msg.markAsRead();
+
+        //Grab the message id
+        String msgId = msg.getId().toString();
+
+        //If we have already added this message to the GUI, skip it
+        if (!allMessages.contains(msgId)) {
+            //Build the GUI element and save it
+            LinearLayout messageLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.message, conversationLayout, false);
+            MessageView msgView = new MessageView(conversationLayout, messageLayout, msg);
+            allMessages.put(msgId, msgView);
+        }
+    }
+
+    //================================================================================
+    // View.OnClickListener methods
+    //================================================================================
+
+    public void onClick(View v) {
+        //When the "send" button is clicked, grab the ongoing conversation (or create it) and send the message
+        if (v == sendButton) {
+            sendButtonClicked();
+        }
     }
 
     private void addUser(String userName) {
         conversationView.getConversation().addParticipants(Arrays.asList(userName));
         availableUsers.remove(userName);
-        MainActivity.addParticipant(userName);
+        conversationView.getConversation().addParticipants(userName);
         myAutoCompleteAdapter.clear();
         myAutoCompleteAdapter.addAll(availableUsers);
         addBubble(userName);
@@ -127,27 +272,29 @@ public class MessengerActivity extends ActionBarActivity {
         List<ParseObject> results = UsersActivity.getParseUsers();
         if (results != null) {
             for (ParseObject obj : results) {
-                if (!MainActivity.getCurrentParticipants().contains(obj.getString("username")))
-                    users.add(obj.getString("username"));
+                if (conversationView.getConversation() != null)
+                    if (!conversationView.getConversation().getParticipants().contains(obj.getString("username")))
+                        users.add(obj.getString("username"));
             }
         }
         return users;
     }
 
     private void addBubble(String userName) {
-        SpannableStringBuilder sb = new SpannableStringBuilder();
-        TextView tv = createContactTextView(userName);
-        BitmapDrawable bd = (BitmapDrawable) convertViewToDrawable(tv);
+        if (!usersView.getText().toString().contains(userName)) {
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            TextView tv = createContactTextView(userName);
+            BitmapDrawable bd = (BitmapDrawable) convertViewToDrawable(tv);
 
-        bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
+            bd.setBounds(0, 0, bd.getIntrinsicWidth(), bd.getIntrinsicHeight());
+            sb.append(userName);
+            sb.setSpan(new ImageSpan(bd), 0, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append(", ");
 
-        sb.append(userName);
-        sb.setSpan(new ImageSpan(bd), 0, sb.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.append(", ");
-
-        usersView.setMovementMethod(LinkMovementMethod.getInstance());
-        usersView.append(sb);
-        usersView.requestFocus();
+            usersView.setMovementMethod(LinkMovementMethod.getInstance());
+            usersView.append(sb);
+            usersView.requestFocus();
+        }
     }
 
     public TextView createContactTextView(String text) {
@@ -179,18 +326,22 @@ public class MessengerActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
+        LayerApplication.setCurrentActivity(this);
+
         //Every time the app is brought to the foreground, register the typing indicator
         if (layerClient != null && conversationView != null)
-            layerClient.registerTypingIndicator(conversationView);
+            layerClient.registerTypingIndicator(this);
     }
 
     //onPause is called when the app is sent to the background
     protected void onPause() {
         super.onPause();
 
+        LayerApplication.setCurrentActivity(null);
+
         //When the app is moved to the background, unregister the typing indicator
         if (layerClient != null && conversationView != null)
-            layerClient.unregisterTypingIndicator(conversationView);
+            layerClient.unregisterTypingIndicator(this);
     }
 
     @Override
@@ -205,14 +356,35 @@ public class MessengerActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
         switch (item.getItemId()) {
+            case android.R.id.home:
+                setResult(RESULT_OK);
+                finish();
+                return true;
             case R.id.action_add_user:
                 Intent intentAdd = new Intent(MessengerActivity.this, UsersActivity.class);
                 startActivityForResult(intentAdd, MainActivity.requestCodeUsers);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //================================================================================
+    // TextWatcher methods
+    //================================================================================
+
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    public void afterTextChanged(Editable s) {
+        //After the user has changed some text, we notify other participants that they are typing
+        if (conversationView.getConversation() != null)
+            conversationView.getConversation().send(LayerTypingIndicatorListener.TypingIndicator.STARTED);
     }
 
     @Override
@@ -226,6 +398,52 @@ public class MessengerActivity extends ActionBarActivity {
                     }
                 }
                 break;
+        }
+    }
+
+    //================================================================================
+    // LayerTypingIndicatorListener methods
+    //================================================================================
+
+    @Override
+    public void onTypingIndicator(LayerClient layerClient, Conversation conversation, String userID, LayerTypingIndicatorListener.TypingIndicator indicator) {
+        switch (indicator) {
+            case STARTED:
+                // This user started typing, so add them to the typing list if they are not already on it.
+                if (!typingUsers.contains(userID) && !userID.equals(layerClient.getAuthenticatedUserId()))
+                    typingUsers.add(userID);
+                break;
+
+            case FINISHED:
+                // This user isn't typing anymore, so remove them from the list.
+                typingUsers.remove(userID);
+                break;
+        }
+
+
+        if (typingUsers.size() == 0) {
+
+            //No one is typing
+            typingIndicator.setText("");
+            typingIndicator.setVisibility(View.GONE);
+
+        } else if (typingUsers.size() == 1) {
+
+            //Name the one user that is typing (and make sure the text is grammatically correct)
+            typingIndicator.setVisibility(View.VISIBLE);
+            typingIndicator.setText(typingUsers.get(0) + " is typing");
+
+        } else if (typingUsers.size() > 1) {
+
+            //Name all the users that are typing (and make sure the text is grammatically correct)
+            String users = "";
+            for (int i = 0; i < typingUsers.size(); i++) {
+                users += typingUsers.get(i);
+                if (i < typingUsers.size() - 1)
+                    users += ", ";
+            }
+
+            typingIndicator.setText(users + " are typing");
         }
     }
 }

@@ -39,6 +39,8 @@ public class RegisterActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        LayerApplication.setCurrentActivity(this);
+
         nameTextView = (TextView) findViewById(R.id.log_in_name);
         passwordTextView = (TextView) findViewById(R.id.password);
         confirmPasswordTextView = (TextView) findViewById(R.id.password_confirm);
@@ -104,6 +106,20 @@ public class RegisterActivity extends ActionBarActivity {
                 nameTextView.setError("This nickname is already used!");
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LayerApplication.setCurrentActivity(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LayerApplication.setCurrentActivity(this);
     }
 
     private boolean isValidPassword() {

@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.layer.quick_start_android.LayerApplication.layerClient;
+
 
 public class UsersActivity extends ActionBarActivity {
     private ContactsAdapter adapter;
@@ -39,6 +41,9 @@ public class UsersActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_users);
+
+        LayerApplication.setCurrentActivity(this);
+
         final PinnedHeaderListView lvUsers = (PinnedHeaderListView) findViewById(R.id.list);
         users = new ArrayList<>(getUsers());
         Collections.sort(users, new Comparator<Contact>() {
@@ -106,21 +111,36 @@ public class UsersActivity extends ActionBarActivity {
         return parseUsers;
     }
 
-    private static List<Contact> getUsers() {
+    private List<Contact> getUsers() {
         List<Contact> users = new ArrayList<>();
         List<ParseObject> results = getParseUsers();
         if (results != null) {
             for (ParseObject obj : results) {
-                Contact contact = new Contact();
-                contact.setContactId(obj.getObjectId());
-                contact.setDisplayName(obj.getString("username"));
+                if (!obj.getString(getString(R.string.userName_label)).equals(layerClient.getAuthenticatedUserId())) {
+                    Contact contact = new Contact();
+                    contact.setContactId(obj.getObjectId());
+                    contact.setDisplayName(obj.getString(getString(R.string.userName_label)));
 //                contact.photoId = cursor.getString(ContactsQuery.PHOTO_THUMBNAIL_DATA);
-                users.add(contact);
+                    users.add(contact);
+                }
             }
         }
         return users;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LayerApplication.setCurrentActivity(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LayerApplication.setCurrentActivity(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

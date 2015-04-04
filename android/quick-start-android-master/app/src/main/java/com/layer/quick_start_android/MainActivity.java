@@ -7,43 +7,39 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.layer.sdk.LayerClient;
-import com.layer.sdk.changes.LayerChangeEvent;
-import com.layer.sdk.listeners.LayerChangeEventListener;
 import com.layer.sdk.messaging.Conversation;
+import com.layer.sdk.query.Query;
+import com.layer.sdk.query.SortDescriptor;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
-public class MainActivity extends ActionBarActivity implements LayerChangeEventListener.BackgroundThread {
+public class MainActivity extends ActionBarActivity {       //} implements LayerChangeEventListener.MainThread, LayerChangeEventListener.BackgroundThread {
 
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
 
-
     public static final int requestCodeLogin = 0;
     public static final int requestCodeUsers = 1;
 
     private ProgressDialog dialog;
-    private ArrayAdapter<String> adapter;
+    private MyArrayAdapter myAdapter;
+    private ArrayList<String> conversationList;
     private List<Conversation> conversations;
-    private ArrayList<String> conversNames = new ArrayList<>();
-    private static ArrayList<String> participants;
+    private ListView lvMain;
 
     private int count = 0;
 
@@ -52,26 +48,29 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        LayerApplication.setCurrentActivity(this);
+
         if (connectionListener == null)
             connectionListener = new MyConnectionListener(this);
 
         if (authenticationListener == null)
             authenticationListener = new MyAuthenticationListener(this);
 
-        ListView lvMain = (ListView) findViewById(R.id.list_view);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, conversNames);
-        layerClient.registerEventListener(this);
+        lvMain = (ListView) findViewById(R.id.list_view);
+
+
+        conversationList = new ArrayList<>();
         conversations = new ArrayList<>();
-        lvMain.setAdapter(adapter);
+        myAdapter = new MyArrayAdapter(MainActivity.this, conversationList, conversations);
+        lvMain.setAdapter(myAdapter);
+        dataChange();
+        //layerClient.registerEventListener(this);
+
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Conversation conversation = conversations.get(position);
-                participants = new ArrayList<>(conversation.getParticipants());
                 Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
-                conversation.putMetadataAtKeyPath(getString(R.string.title_label),conversNames.get(position));
-                intent.putExtra(getString(R.string.title_label), conversNames.get(position));
-                intent.putExtra(getString(R.string.conversation_id_key), conversation.getId().toString());
+                intent.putExtra(getString(R.string.conversation_id_key), conversations.get(position).getId().toString());
                 startActivity(intent);
             }
         });
@@ -79,40 +78,45 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
     }
 
     public void dataChange() {
-        if (dialog == null)
-            showProgressDialog();
-        if (!dialog.isShowing())
-            dialog.show();
-        conversations.clear();
         if (layerClient.isAuthenticated()) {
-            conversations = layerClient.getConversations();
+            Query query = Query.builder(Conversation.class)
+                    .sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_RECEIVED_AT, SortDescriptor.Order.DESCENDING))
+                    .build();
+//            List<Conversation> conversations;
+            conversations = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
+//            List<Conversation> conversationList = layerClient.getConversations();
             if (!conversations.isEmpty()) {
-                conversNames.clear();
+
+//                conversationList = null;
+//                conversationList = new ArrayList<>();
+                conversationList.clear();
                 for (Conversation conversation : conversations) {
-                    String s;
-                    if (conversation.getMetadata().get(getString(R.string.title_label)) == null)
-                        s = conversation.getParticipants().toString();
-                    else
-                        s = conversation.getMetadata().get(getString(R.string.title_label)).toString();
-                    conversNames.add(s);
+                    if (conversation.getMetadata().get(getString(R.string.title_label)) != null)
+                        conversationList.add(conversation.getMetadata().get(getString(R.string.title_label)).toString());
                 }
-                adapter.notifyDataSetChanged();
+//                myAdapter.clear();
+//                myAdapter.addAll(conversationList);
+//                myAdapter.setList(conversations);
+//                myAdapter.notifyDataSetChanged();
+//                myAdapter = null;
+                myAdapter = new MyArrayAdapter(MainActivity.this, conversationList, conversations);
+                lvMain.setAdapter(myAdapter);
+
                 if (dialog != null)
-                    dialog.dismiss();
+                    dialog.cancel();
             } else {
                 if (count < 6) {
                     Handler handler = new Handler();
-                    handler.postDelayed(r, 500);
+                    handler.postDelayed(run, 500);
                 } else {
                     if (dialog != null)
-                        dialog.dismiss();
-//                    count = 0;
-                }       // Toast.makeText(MainActivity.this,"Error sync with server! Please try later", Toast.LENGTH_LONG).show();
+                        dialog.cancel();
+                }
             }
         }
     }
 
-    private Runnable r = new Runnable() {
+    private Runnable run = new Runnable() {
         @Override
         public void run() {
             count++;
@@ -124,31 +128,26 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
     protected void onResume() {
         super.onResume();
 
+        LayerApplication.setCurrentActivity(this);
+
+        //if ((myAdapter!=null)&&(!myAdapter.observerRegistered))
+        //    myAdapter.registerDataSetObserver(myAdapter.observer);
+
         //Connect to Layer and Authenticate a user
         loadLayerClient();
     }
 
-    public static List<String> getCurrentParticipants() {
-        if (participants != null) {
-            return participants;
-        }
-        return new ArrayList<>();
-    }
-
-    public static void setParticipants(ArrayList<String> participants) {
-        MainActivity.participants = participants;
-    }
-
-    public static void addParticipant(String participant) {
-        MainActivity.participants.add(participant);
-    }
-
-    public static void removeParticipant(String participant) {
-        MainActivity.participants.remove(participant);
-    }
-
     //Checks to see if the SDK is connected to Layer and whether a user is authenticated
     //The respective callbacks are executed in MyConnectionListener and MyAuthenticationListener
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LayerApplication.setCurrentActivity(null);
+    }
+
     private void loadLayerClient() {
 
         if (layerClient != null) {
@@ -157,7 +156,9 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
             if (ParseUser.getCurrentUser() != null) {
                 if (!layerClient.isAuthenticated()) layerClient.authenticate();
                 else if (!layerClient.isConnected()) layerClient.connect();
-                else dataChange();
+                else {
+                    dataChange();
+                }
             } else {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, requestCodeLogin);
@@ -174,7 +175,6 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -203,8 +203,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
     private void logOut() {
         ParseUser.logOut();
         layerClient.deauthenticate();
-        conversNames.clear();
-        adapter.notifyDataSetChanged();
+        dataChange();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, requestCodeLogin);
     }
@@ -222,8 +221,7 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        final Conversation conversation = conversations.get(info.position);
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         String menuItemText = String.valueOf(item.getTitle());
         switch (menuItemText) {
             case "Delete":
@@ -237,7 +235,8 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
 
                 final EditText input = new EditText(dialog.getContext());
                 input.setSingleLine(true);
-                input.setText(conversNames.get(info.position));
+                input.setSelectAllOnFocus(true);
+                input.setText(conversationList.get(info.position));
                 input.setSelection(input.getText().length());
                 dialog.setView(input);
 
@@ -245,8 +244,9 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getEditableText().toString();
                         if (title.isEmpty())
-                            title = conversation.getParticipants().toString();
-                        conversation.putMetadataAtKeyPath(getString(R.string.title_label), title);
+                            title = conversations.get(info.position).getParticipants().toString();
+                        conversations.get(info.position).putMetadataAtKeyPath(getString(R.string.title_label), title);
+                        conversationList.set(info.position, title);
                         dataChange();
                     }
                 });
@@ -276,9 +276,18 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
                 if (resultCode == RESULT_OK) {
                     String participantName = data.getExtras().getString(getString(R.string.participants));
                     if (!participantName.equals(layerClient.getAuthenticatedUserId())) {
-                        participants = new ArrayList<>(Arrays.asList(layerClient.getAuthenticatedUserId(), participantName));
+//                        Conversation conversation = layerClient.newConversation(layerClient.getAuthenticatedUserId(), participantName);
+//                        MessagePart messagePart = layerClient.newMessagePart("text/plain", "Hi, how are you?".getBytes());
+//
+//// Creates and returns a new message object with the given conversation and array of message parts
+//                        Message message = layerClient.newMessage(Arrays.asList(messagePart));
+//
+////Sends the specified message to the conversation
+//                        conversation.send(message);
                         Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
-                        intent.putExtra(getString(R.string.title_label), getCurrentParticipants().toString());
+//                        String s = conversation.getId().toString();
+//                        myAdapter.notifyDataSetChanged();
+                        intent.putExtra(getString(R.string.participant_key), participantName);
                         startActivity(intent);
                     }
                 }
@@ -291,9 +300,19 @@ public class MainActivity extends ActionBarActivity implements LayerChangeEventL
         finish();
     }
 
-    @Override
-    public void onEventAsync(LayerChangeEvent layerChangeEvent) {
-        Log.d(MainActivity.class.toString(), "Data changed");
-        dataChange();
-    }
+//    @Override
+//    public void onEventAsync(LayerChangeEvent layerChangeEvent) {
+//        if (this.hasWindowFocus()) {
+//            dataChange();
+//            Log.d(MainActivity.class.toString(), "Data changed");
+//        }
+//    }
+//
+//    @Override
+//    public void onEventMainThread(LayerChangeEvent layerChangeEvent) {
+//        if (this.hasWindowFocus()) {
+//            dataChange();
+//            Log.d(MainActivity.class.toString(), "Main Thread Data changed ");
+//        }
+//    }
 }

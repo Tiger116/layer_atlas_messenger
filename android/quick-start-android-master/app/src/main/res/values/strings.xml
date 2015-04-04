@@ -16,9 +16,9 @@
     <string name="title_activity_dialog_chooser">DialogChooserActivity</string>
     <string name="title_activity_messenger">MessengerActivity</string>
     <string name="title_activity_users">Add User</string>
-    <string name="title_activity_participants">ParticipantsActivity</string>
+    <string name="participant_key">ParticipantsActivity</string>
     <string name="add_user">Add User</string>
-    <string name="userName_label">UserName</string>
+    <string name="userName_label">username</string>
     <string name="options_label">Options</string>
     <string name="title_label">Title</string>
     <string name="send_button_text">Send</string>

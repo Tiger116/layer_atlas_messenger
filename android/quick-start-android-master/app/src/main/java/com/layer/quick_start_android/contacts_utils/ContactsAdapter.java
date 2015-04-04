@@ -60,7 +60,7 @@ public class ContactsAdapter extends SearchablePinnedHeaderListViewAdapter<Conta
         if (convertView == null) {
             holder = new ViewHolder();
             LayoutInflater mInflater = LayoutInflater.from(context);
-            rootView = mInflater.inflate(R.layout.listview_item, parent, false);
+            rootView = mInflater.inflate(R.layout.users_item, parent, false);
             holder.friendProfileCircularContactView = (CircularContactView) rootView
                     .findViewById(R.id.listview_item__friendPhotoImageView);
             holder.friendProfileCircularContactView.getTextView().setTextColor(0xFFffffff);

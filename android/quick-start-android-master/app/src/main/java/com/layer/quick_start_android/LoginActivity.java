@@ -23,6 +23,9 @@ public class LoginActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        LayerApplication.setCurrentActivity(this);
+
         userNameText = (EditText) findViewById(R.id.userName);
         passwordText = (EditText) findViewById(R.id.password);
         Button button = (Button) findViewById(R.id.btnSingIn);
@@ -59,6 +62,20 @@ public class LoginActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LayerApplication.setCurrentActivity(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LayerApplication.setCurrentActivity(this);
     }
 
     @Override

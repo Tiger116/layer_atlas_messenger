@@ -1,5 +1,6 @@
 package com.layer.quick_start_android;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
@@ -20,13 +21,15 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
     //Global variables used to manage the Layer Client and the conversations in this app
     public static LayerClient layerClient;
-
+    public static ConversationViewController conversationView;
     private static Context mContext;
+    private static Activity mCurrentActivity;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = this;
+        mCurrentActivity = null;
         // Enable Local Datastore
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8", "XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx");
@@ -34,8 +37,19 @@ public class LayerApplication extends Application implements LayerChangeEventLis
         UUID appID = UUID.fromString(Layer_App_ID);
         layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
         LayerClient.setLogLevel(LayerClient.LogLevel.DETAILED);
+
+        conversationView = new ConversationViewController(null);
     }
-    public static Context getContext(){
+
+    public static Activity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+
+    public static void setCurrentActivity(Activity currentActivity){
+        mCurrentActivity = currentActivity;
+    }
+
+    public static Context getContext() {
         return mContext;
     }
 }

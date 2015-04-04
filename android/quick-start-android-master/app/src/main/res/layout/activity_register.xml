@@ -70,6 +70,7 @@
                 android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:selectAllOnFocus="true"
                 android:padding="10dp"
                 android:hint="@string/password_hint"
                 android:background="@drawable/abc_edit_text_material"
