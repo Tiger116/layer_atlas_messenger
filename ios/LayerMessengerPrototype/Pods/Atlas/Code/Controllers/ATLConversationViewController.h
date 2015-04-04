@@ -223,4 +223,6 @@
  */
 @property (nonatomic) BOOL marksMessagesAsRead;
 
+- (void)sendMessageWithLocation:(CLLocation *)location;
+
 @end

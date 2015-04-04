@@ -123,16 +123,30 @@
                 query.predicate = [LYRPredicate predicateWithProperty:@"identifier"
                                                              operator:LYRPredicateOperatorIsEqualTo
                                                                 value:self.appDelegate.launchOptions[launchOptionsKeyForRemoteNotifications][@"layer"][@"conversation_identifier"]];
-                LYRConversation *conversation = [[self.appDelegate.layerClient executeQuery:query error:nil] firstObject];
+                NSError *error;
+                LYRConversation *conversation = [[self.appDelegate.layerClient executeQuery:query error:&error] firstObject];
                 self.appDelegate.launchOptions = nil;
-        
-                self.appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.appDelegate.layerClient andConversation:conversation];
                 
-                NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
-                NSUInteger listViewControllerIndex = [self.navigationController.viewControllers indexOfObject:self];
-                NSRange replacementRange = NSMakeRange(listViewControllerIndex + 1, viewControllers.count - listViewControllerIndex - 1);
-                [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[self.appDelegate.conversationsViewController, self.appDelegate.messagesViewController]];
-                [self.navigationController setViewControllers:viewControllers animated:YES];
+                if (!error)
+                {
+                    if (conversation)
+                    {
+                        self.appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.appDelegate.layerClient andConversation:conversation];
+                        
+                        NSMutableArray *viewControllers = [self.navigationController.viewControllers mutableCopy];
+                        NSUInteger listViewControllerIndex = [self.navigationController.viewControllers indexOfObject:self];
+                        NSRange replacementRange = NSMakeRange(listViewControllerIndex + 1, viewControllers.count - listViewControllerIndex - 1);
+                        [viewControllers replaceObjectsInRange:replacementRange withObjectsFromArray:@[self.appDelegate.conversationsViewController, self.appDelegate.messagesViewController]];
+                        [self.navigationController setViewControllers:viewControllers animated:YES];
+                    } else
+                    {
+                        [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
+                    }
+                } else
+                {
+                    NSLog(@"Error querying conversation from notification: %@", error);
+                }
+                
 
                 
             }else
