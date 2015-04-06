@@ -54,6 +54,7 @@
 		35D5B6EF1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6ED1AA9D1D50039AF46 /* DetailsConversationTitleCell.xib */; };
 		35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D5B6F11AA9D1F70039AF46 /* DetailsLeaveConversationCell.m */; };
 		35D5B6F41AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */; };
+		35DCF3191AD2A475001D159C /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35DCF3171AD2A475001D159C /* ImageViewController.m */; };
 		35DFFABE1AAEE981009DA14B /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35DFFABD1AAEE981009DA14B /* libPods.a */; };
 		35EEC53B1ACD29DE00D2AF47 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35EEC53A1ACD29DE00D2AF47 /* MapKit.framework */; };
 		35EEC5401ACD2A9500D2AF47 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35EEC53E1ACD2A9500D2AF47 /* MapViewController.m */; };
@@ -140,6 +141,8 @@
 		35D5B6F01AA9D1F70039AF46 /* DetailsLeaveConversationCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailsLeaveConversationCell.h; sourceTree = "<group>"; };
 		35D5B6F11AA9D1F70039AF46 /* DetailsLeaveConversationCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailsLeaveConversationCell.m; sourceTree = "<group>"; };
 		35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DetailsLeaveConversationCell.xib; sourceTree = "<group>"; };
+		35DCF3161AD2A475001D159C /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
+		35DCF3171AD2A475001D159C /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
 		35DFFABD1AAEE981009DA14B /* libPods.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPods.a; path = "Pods/../build/Debug-iphoneos/libPods.a"; sourceTree = "<group>"; };
 		35EEC53A1ACD29DE00D2AF47 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		35EEC53D1ACD2A9500D2AF47 /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
@@ -289,6 +292,7 @@
 				35BB428E1A975BBB006248F8 /* MessagesViewController */,
 				35D5B6D11AA9BAC50039AF46 /* DetailsViewController */,
 				35EEC53C1ACD2A7000D2AF47 /* MapViewController */,
+				35DCF3151AD2A44F001D159C /* ImageViewController */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -429,6 +433,15 @@
 				35D5B6F21AA9D1F70039AF46 /* DetailsLeaveConversationCell.xib */,
 			);
 			path = DetailsLeaveConversationCell;
+			sourceTree = "<group>";
+		};
+		35DCF3151AD2A44F001D159C /* ImageViewController */ = {
+			isa = PBXGroup;
+			children = (
+				35DCF3161AD2A475001D159C /* ImageViewController.h */,
+				35DCF3171AD2A475001D159C /* ImageViewController.m */,
+			);
+			path = ImageViewController;
 			sourceTree = "<group>";
 		};
 		35EEC53C1ACD2A7000D2AF47 /* MapViewController */ = {
@@ -647,6 +660,7 @@
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
 				35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */,
 				35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */,
+				35DCF3191AD2A475001D159C /* ImageViewController.m in Sources */,
 				35BF373D1AA5F1490014ED96 /* User.m in Sources */,
 				35BB42981A975D78006248F8 /* MessagesViewController.m in Sources */,
 				35D5B6F31AA9D1F70039AF46 /* DetailsLeaveConversationCell.m in Sources */,

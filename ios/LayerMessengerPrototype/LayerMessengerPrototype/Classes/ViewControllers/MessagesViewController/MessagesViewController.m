@@ -15,6 +15,7 @@
 #import <EventKitUI/EventKitUI.h>
 #import "MapViewController.h"
 #import <ATLLocationManager.h>
+#import "ImageViewController.h"
 
 @interface MessagesViewController () <DetailsViewControllerDelegate, EKEventEditViewDelegate, CLLocationManagerDelegate, MapViewControllerDelegate>
 
@@ -198,6 +199,13 @@
     controller.editViewDelegate = self;
     
     [self presentViewController:controller animated:YES completion:nil];
+}
+
+- (void)presentImageViewControllerWithMessage:(LYRMessage *)message
+{
+    ImageViewController *imageViewController = [[ImageViewController alloc] initWithMessage:message];
+    UINavigationController *controller = [[UINavigationController alloc] initWithRootViewController:imageViewController];
+    [self.navigationController presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark - Map Related
@@ -442,15 +450,17 @@
  */
 - (void)conversationViewController:(ATLConversationViewController *)viewController didSelectMessage:(LYRMessage *)message
 {
-//    LYRMessagePart *JPEGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImageJPEG);
-//    if (JPEGMessagePart) {
-//        [self presentImageViewControllerWithMessage:message];
-//        return;
-//    }
-//    LYRMessagePart *PNGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImagePNG);
-//    if (PNGMessagePart) {
-//        [self presentImageViewControllerWithMessage:message];
-//    }
+    LYRMessagePart *JPEGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImageJPEG);
+    if (JPEGMessagePart) {
+        [self presentImageViewControllerWithMessage:message];
+        return;
+    }
+    
+    LYRMessagePart *PNGMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeImagePNG);
+    if (PNGMessagePart) {
+        [self presentImageViewControllerWithMessage:message];
+    }
+    
     LYRMessagePart *locationMessagePart = ATLMessagePartForMIMEType(message, ATLMIMETypeLocation);
     if (locationMessagePart)
     {
