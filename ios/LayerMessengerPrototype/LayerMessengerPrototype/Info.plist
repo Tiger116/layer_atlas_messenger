@@ -45,5 +45,7 @@
 	<string>91dfed4e-7c95-11e4-92a1-22000ac44c54</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location is required to find out where you are</string>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 </dict>
 </plist>

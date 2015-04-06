@@ -29,6 +29,7 @@
     
     self.sendButton.hidden = YES;
     
+    
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     lpgr.minimumPressDuration = 0.5;
     [self.mapView addGestureRecognizer:lpgr];
@@ -140,7 +141,19 @@
             self.mapView.mapType = MKMapTypeSatellite;
             break;
     }
+    [self setNeedsStatusBarAppearanceUpdate];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    switch (self.mapView.mapType) {
+        case MKMapTypeHybrid:
+        case MKMapTypeSatellite:
+            return UIStatusBarStyleLightContent;
+            
+        default:
+            return UIStatusBarStyleDefault;
+    }
+}
 
 @end

@@ -21,31 +21,46 @@
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                 </mapView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IFA-jw-kwY">
-                    <rect key="frame" x="8" y="16" width="46" height="30"/>
+                    <rect key="frame" x="8" y="22" width="46" height="30"/>
+                    <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="46" id="UwS-jQ-DJb"/>
                     </constraints>
                     <state key="normal" title="Close">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="closeButtonDidTapped:" destination="-1" eventType="touchUpInside" id="KrC-4I-Dj6"/>
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhc-aI-32Q">
                     <rect key="frame" x="546" y="562" width="46" height="30"/>
+                    <color key="backgroundColor" red="0.90196079015731812" green="0.90196079015731812" blue="0.90196079015731812" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="46" id="jbz-YY-0Aj"/>
                     </constraints>
                     <state key="normal" title="Send">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="sendButtonDidTapped:" destination="-1" eventType="touchUpInside" id="yTg-Tq-OD5"/>
                     </connections>
                 </button>
                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="Iab-MZ-KEw">
                     <rect key="frame" x="209" y="563" width="183" height="29"/>
+                    <color key="backgroundColor" red="0.90196079015731812" green="0.90196079015731812" blue="0.90196079015731812" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="183" id="NXR-M3-oXp"/>
                     </constraints>
@@ -54,6 +69,12 @@
                         <segment title="Hybrid"/>
                         <segment title="Satellite"/>
                     </segments>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="5"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                     <connections>
                         <action selector="mapTypeDidChanged:" destination="-1" eventType="valueChanged" id="rKr-59-rSM"/>
                     </connections>
@@ -64,7 +85,7 @@
                 <constraint firstAttribute="bottom" secondItem="osP-hT-Hbh" secondAttribute="bottom" id="2xh-4H-1Uc"/>
                 <constraint firstAttribute="trailing" secondItem="osP-hT-Hbh" secondAttribute="trailing" id="6iH-Po-X9D"/>
                 <constraint firstAttribute="trailing" secondItem="mhc-aI-32Q" secondAttribute="trailing" constant="8" id="Hrh-TH-fxz"/>
-                <constraint firstItem="IFA-jw-kwY" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="16" id="KYj-vD-hVW"/>
+                <constraint firstItem="IFA-jw-kwY" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="22" id="KYj-vD-hVW"/>
                 <constraint firstAttribute="bottom" secondItem="Iab-MZ-KEw" secondAttribute="bottom" constant="9" id="MDd-BQ-RLU"/>
                 <constraint firstAttribute="centerX" secondItem="Iab-MZ-KEw" secondAttribute="centerX" id="TUf-nQ-Now"/>
                 <constraint firstItem="osP-hT-Hbh" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="WlH-gO-aic"/>
