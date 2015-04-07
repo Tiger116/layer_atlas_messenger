@@ -83,7 +83,9 @@
 - (void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self.view becomeFirstResponder];
+    if (self.conversation) {
+        [self.view becomeFirstResponder];
+    }
 }
 
 /**

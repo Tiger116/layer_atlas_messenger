@@ -80,19 +80,24 @@
     [super viewDidAppear:animated];
     self.contentOffsetForTableOnly = self.tableView.contentOffset;
     
+    NSLog(@"3) viewDidAppear started");
     if (!self.synchronizationIsFinished)
     {
         [self.refreshControl beginRefreshing];
+        NSLog(@"4) viewDidAppear will move view");
         [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
                                                      self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
                                                      - self.searchDisplayController.searchBar.frame.size.height)
                                 animated:YES];
+        NSLog(@"5) viewDidAppear moved view");
         if (self.synchronizationIsFinished)
         {
+            NSLog(@"6) viewDidAppear will restore view");
             [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
                                                          self.contentOffsetForTableOnly.y)
                                     animated:YES];
             [self.refreshControl endRefreshing];
+            NSLog(@"7) viewDidAppear restored view");
         }
     }
 }
@@ -284,11 +289,13 @@
  */
 - (void) synchronizationDidFinished:(NSNotification*) notification
 {
+    NSLog(@"1) Sync didFinish started");
     if (!self.synchronizationIsFinished)
     {
         self.synchronizationIsFinished = YES;
         [self.refreshControl endRefreshing];
     }
+    NSLog(@"2) Sync didFinish ended");
 }
 
 @end

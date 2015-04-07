@@ -558,6 +558,9 @@
 						CreatedOnToolsVersion = 6.1.1;
 						DevelopmentTeam = UW8Z95Z285;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.InAppPurchase = {
 								enabled = 0;
 							};

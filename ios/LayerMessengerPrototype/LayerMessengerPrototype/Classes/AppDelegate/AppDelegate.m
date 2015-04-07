@@ -93,42 +93,73 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 }
 
 /**
- *  Tells the delegate that the running app received a remote notification.
+ *  Tells the delegate that the app received a remote notification.
  *
- *  If application wasn't in foreground method will present view controller with conversation where message in notification comes from.
+ *  It will present view controller with conversation where message in notification comes from.
  */
-- (void) application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-    if (application.applicationState == UIApplicationStateInactive)
-    {
-        if (self.messagesViewController
-            && [self.navController.viewControllers containsObject:self.messagesViewController]
-            && [[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:userInfo[@"layer"][@"conversation_identifier"]])
-        {
-            [self.navController popToViewController:self.messagesViewController animated:YES];
-        }else
-        {
-            LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
-            query.predicate = [LYRPredicate predicateWithProperty:@"identifier" operator:LYRPredicateOperatorIsEqualTo value:userInfo[@"layer"][@"conversation_identifier"]];
-            NSError *error;
-            LYRConversation *conversation = [[self.layerClient executeQuery:query error:&error] firstObject];
-            if (!error)
-            {
-                if (conversation)
-                {
-                    [self.conversationsViewController presentControllerWithConversation:conversation];
-                } else
-                {
-                    [self.navController popToViewController:self.conversationsViewController animated:YES];
-                }
-                
-            } else
-            {
-                NSLog(@"Error querying conversation from notification: %@", error);
-            }
-            
-        }
+    BOOL userTappedRemoteNotification = application.applicationState == UIApplicationStateInactive;
+    __block LYRConversation *conversation = [self conversationFromRemoteNotification:userInfo];
+
+    if (userTappedRemoteNotification && conversation) {
+        [self navigateToViewForConversation:conversation];
+    } else if (userTappedRemoteNotification) {
+//        [SVProgressHUD showWithStatus:@"Loading Conversation" maskType:SVProgressHUDMaskTypeBlack];
     }
+    
+    BOOL success = [self.layerClient synchronizeWithRemoteNotification:userInfo completion:^(NSArray *changes, NSError *error)
+    {
+        if (changes.count) {
+            completionHandler(UIBackgroundFetchResultNewData);
+        } else {
+            completionHandler(error ? UIBackgroundFetchResultFailed : UIBackgroundFetchResultNoData);
+        }
+        
+        // Try navigating once the synchronization completed
+        if (userTappedRemoteNotification && !conversation) {
+//            [SVProgressHUD dismiss];
+            conversation = [self conversationFromRemoteNotification:userInfo];
+            [self navigateToViewForConversation:conversation];
+        }
+    }];
+    
+    if (!success) {
+        completionHandler(UIBackgroundFetchResultNoData);
+    }
+}
+
+/**
+ *  Presents view controler with given conversation.
+ *
+ *  @param conversation LYRConverstion to open.
+ */
+- (void) navigateToViewForConversation:(LYRConversation*)conversation
+{
+    if (self.messagesViewController
+        && [self.navController.viewControllers containsObject:self.messagesViewController]
+        && [[self.messagesViewController.conversation.identifier absoluteString] isEqualToString:[conversation.identifier absoluteString]])
+    {
+        [self.navController popToViewController:self.messagesViewController animated:YES];
+    }else
+    {
+        [self.conversationsViewController presentControllerWithConversation:conversation];
+    }
+}
+
+/**
+ *  Queries conversation using notification's info.
+ *
+ *  @param userInfo information about notification.
+ *
+ *  @return Received conversation.
+ */
+- (LYRConversation*) conversationFromRemoteNotification:(NSDictionary*)userInfo
+{
+    LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+    query.predicate = [LYRPredicate predicateWithProperty:@"identifier" operator:LYRPredicateOperatorIsEqualTo value:userInfo[@"layer"][@"conversation_identifier"]];
+    query.limit = 1;
+    return [[self.layerClient executeQuery:query error:nil] firstObject];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -292,6 +323,16 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 - (void)layerClientDidDisconnect:(LYRClient *)client
 {
     NSLog(@"Layer Client did disconnect");
+}
+
+- (void)layerClient:(LYRClient *)client willBeginContentTransfer:(LYRContentTransferType)contentTransferType ofObject:(id)object withProgress:(LYRProgress *)progress
+{
+    NSLog(@"Layer Client will begin content transfer");
+}
+
+- (void)layerClient:(LYRClient *)client didFinishContentTransfer:(LYRContentTransferType)contentTransferType ofObject:(id)object
+{
+    NSLog(@"Layer Client did finish content transfer");
 }
 
 
