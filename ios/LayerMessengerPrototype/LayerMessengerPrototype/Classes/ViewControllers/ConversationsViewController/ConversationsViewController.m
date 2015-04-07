@@ -48,7 +48,6 @@
     self.allowsEditing = YES;
     self.deletionModes = [NSArray new];
     self.synchronizationIsFinished = NO;
-    [self registerNotificationObservers];
     
     // Left navigation item
     UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sing out" style:UIBarButtonItemStylePlain target:self action:@selector(singOutButtonTapped)];
@@ -80,24 +79,19 @@
     [super viewDidAppear:animated];
     self.contentOffsetForTableOnly = self.tableView.contentOffset;
     
-    NSLog(@"3) viewDidAppear started");
     if (!self.synchronizationIsFinished)
     {
         [self.refreshControl beginRefreshing];
-        NSLog(@"4) viewDidAppear will move view");
         [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
                                                      self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
                                                      - self.searchDisplayController.searchBar.frame.size.height)
                                 animated:YES];
-        NSLog(@"5) viewDidAppear moved view");
         if (self.synchronizationIsFinished)
         {
-            NSLog(@"6) viewDidAppear will restore view");
             [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
                                                          self.contentOffsetForTableOnly.y)
                                     animated:YES];
             [self.refreshControl endRefreshing];
-            NSLog(@"7) viewDidAppear restored view");
         }
     }
 }
@@ -110,7 +104,6 @@
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -270,32 +263,17 @@
     return NO;
 }
 
-#pragma mark - Notifications
+#pragma mark - UITableViewDataSource
 
-/**
- *  Adds ('ConversationViewController *')self as observer to different notifications.
- */
-- (void)registerNotificationObservers
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidFinishSynchronizationNotification object:nil];
-}
-
-/**
- *  Handles LayerClientDidFinishSynchronizationNotification.
- *
- *  Hides refreshing spinner.
- *
- *  @param notification received notification.
- */
-- (void) synchronizationDidFinished:(NSNotification*) notification
-{
-    NSLog(@"1) Sync didFinish started");
-    if (!self.synchronizationIsFinished)
+    NSInteger result = [super tableView:tableView numberOfRowsInSection:section];
+    if ((!self.synchronizationIsFinished) && (result > 0))
     {
         self.synchronizationIsFinished = YES;
         [self.refreshControl endRefreshing];
     }
-    NSLog(@"2) Sync didFinish ended");
+    return result;
 }
 
 @end

@@ -18,7 +18,6 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
 NSString *const ConversationParticipantsDidChangeNotification = @"ConversationParticipantsDidChangeNotification";
 NSString *const ConversationDidCreatedNotification = @"ConversationDidCreatedNotification";
-NSString *const LayerClientDidFinishSynchronizationNotification = @"LayerClientDidFinishSynchronizationNotification";
 
 NSString* const metadataTitleKey = @"title";
 NSString* const metadataOwnerIdKey = @"owner";
@@ -297,7 +296,6 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 - (void)layerClient:(LYRClient *)client didFinishSynchronizationWithChanges:(NSArray *)changes
 {
     NSLog(@"Layer Client did finish sychronization");
-    [[NSNotificationCenter defaultCenter] postNotificationName:LayerClientDidFinishSynchronizationNotification object:nil];
 }
 
 - (void)layerClient:(LYRClient *)client didFailSynchronizationWithError:(NSError *)error
