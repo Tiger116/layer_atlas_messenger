@@ -29,10 +29,14 @@
     
     self.sendButton.hidden = YES;
     
+    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:nil];
+    doubleTapRecognizer.numberOfTapsRequired = 2;
+    [self.mapView addGestureRecognizer:doubleTapRecognizer];
     
-    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
-    lpgr.minimumPressDuration = 0.5;
-    [self.mapView addGestureRecognizer:lpgr];
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    [tapRecognizer requireGestureRecognizerToFail:doubleTapRecognizer];
+    [self.mapView addGestureRecognizer:tapRecognizer];
 }
 
 /**
@@ -62,18 +66,14 @@
 }
 
 /**
- *  Handler for long press gesture recognizer. 
+ *  Handler for tap gesture recognizer.
  *
  *  Used to add a pin to a map.
  *
- *  @param gestureRecognizer UIGestureRecognizer object which recognized long press
+ *  @param gestureRecognizer UIGestureRecognizer object which recognized a tap.
  */
-- (void)handleLongPress:(UIGestureRecognizer *)gestureRecognizer
+- (void)handleTap:(UIGestureRecognizer*)gestureRecognizer
 {
-    if (gestureRecognizer.state != UIGestureRecognizerStateBegan)
-    {
-        return;
-    }
     CGPoint touchPoint = [gestureRecognizer locationInView:self.mapView];
     CLLocationCoordinate2D touchMapCoordinate = [self.mapView convertPoint:touchPoint toCoordinateFromView:self.mapView];
     [self placePin:touchMapCoordinate];
