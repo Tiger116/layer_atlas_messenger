@@ -37,7 +37,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
 
     private ProgressDialog dialog;
     private MyArrayAdapter myAdapter;
-    private ArrayList<String> conversationList;
+    //    private ArrayList<String> conversationList;
     private List<Conversation> conversations;
     private ListView lvMain;
 
@@ -58,11 +58,10 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
 
         lvMain = (ListView) findViewById(R.id.list_view);
 
-
-        conversationList = new ArrayList<>();
+//        conversationList = new ArrayList<>();
         conversations = new ArrayList<>();
-        myAdapter = new MyArrayAdapter(MainActivity.this, conversationList, conversations);
-        lvMain.setAdapter(myAdapter);
+//        myAdapter = new MyArrayAdapter(MainActivity.this, conversations);
+//        lvMain.setAdapter(myAdapter);
         dataChange();
         //layerClient.registerEventListener(this);
 
@@ -78,35 +77,48 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     public void dataChange() {
+        Handler handler = new Handler();
         if (layerClient.isAuthenticated()) {
-            Query query = Query.builder(Conversation.class)
-                    .sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_RECEIVED_AT, SortDescriptor.Order.DESCENDING))
-                    .build();
-//            List<Conversation> conversations;
+            Boolean isDeleted = false;
+            Query query = Query.builder(Conversation.class).sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_RECEIVED_AT, SortDescriptor.Order.DESCENDING)).build();
             conversations = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
-//            List<Conversation> conversationList = layerClient.getConversations();
+            List<Conversation> toRemove = new ArrayList<>();
             if (!conversations.isEmpty()) {
-
+                for (Conversation conversation : conversations) {
+                    if (conversation.getParticipants().isEmpty()) {
+//                        conversation.addParticipants(layerClient.getAuthenticatedUserId());
+                        if (!conversation.isDeleted()) {
+                            toRemove.add(conversation);
+                            conversation.delete(LayerClient.DeletionMode.LOCAL);
+//                            isDeleted = true;
+                        }
+                    }
+//                    if (!conversation.getParticipants().contains(layerClient.getAuthenticatedUserId())) {
+//                        conversation.delete(LayerClient.DeletionMode.LOCAL);
+//                    }
+                }
+                if (!toRemove.isEmpty()) {
+                    conversations.removeAll(toRemove);
+                }
 //                conversationList = null;
 //                conversationList = new ArrayList<>();
-                conversationList.clear();
-                for (Conversation conversation : conversations) {
-                    if (conversation.getMetadata().get(getString(R.string.title_label)) != null)
-                        conversationList.add(conversation.getMetadata().get(getString(R.string.title_label)).toString());
-                }
+//                conversationList.clear();
+//                for (Conversation conversation : conversations) {
+//                    if (conversation.getMetadata().get(getString(R.string.title_label)) != null)
+//                        conversationList.add(conversation.getMetadata().get(getString(R.string.title_label)).toString());
+//                }
 //                myAdapter.clear();
 //                myAdapter.addAll(conversationList);
 //                myAdapter.setList(conversations);
 //                myAdapter.notifyDataSetChanged();
 //                myAdapter = null;
-                myAdapter = new MyArrayAdapter(MainActivity.this, conversationList, conversations);
+                myAdapter = new MyArrayAdapter(MainActivity.this, conversations);
                 lvMain.setAdapter(myAdapter);
 
                 if (dialog != null)
                     dialog.cancel();
             } else {
                 if (count < 6) {
-                    Handler handler = new Handler();
                     handler.postDelayed(run, 500);
                 } else {
                     if (dialog != null)
@@ -203,7 +215,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     private void logOut() {
         ParseUser.logOut();
         layerClient.deauthenticate();
-        dataChange();
+        myAdapter.clear();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, requestCodeLogin);
     }
@@ -236,7 +248,12 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 final EditText input = new EditText(dialog.getContext());
                 input.setSingleLine(true);
                 input.setSelectAllOnFocus(true);
-                input.setText(conversationList.get(info.position));
+                String title = "";
+                if (conversations.get(info.position).getMetadata().get(getString(R.string.title_label)) != null)
+                    title = conversations.get(info.position).getMetadata().get(getString(R.string.title_label)).toString();
+                else
+                    title = conversations.get(info.position).getParticipants().toString();
+                input.setText(title);
                 input.setSelection(input.getText().length());
                 dialog.setView(input);
 
@@ -246,7 +263,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                         if (title.isEmpty())
                             title = conversations.get(info.position).getParticipants().toString();
                         conversations.get(info.position).putMetadataAtKeyPath(getString(R.string.title_label), title);
-                        conversationList.set(info.position, title);
+//                        conversationList.set(info.position, title);
                         dataChange();
                     }
                 });
@@ -276,17 +293,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 if (resultCode == RESULT_OK) {
                     String participantName = data.getExtras().getString(getString(R.string.participants));
                     if (!participantName.equals(layerClient.getAuthenticatedUserId())) {
-//                        Conversation conversation = layerClient.newConversation(layerClient.getAuthenticatedUserId(), participantName);
-//                        MessagePart messagePart = layerClient.newMessagePart("text/plain", "Hi, how are you?".getBytes());
-//
-//// Creates and returns a new message object with the given conversation and array of message parts
-//                        Message message = layerClient.newMessage(Arrays.asList(messagePart));
-//
-////Sends the specified message to the conversation
-//                        conversation.send(message);
                         Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
-//                        String s = conversation.getId().toString();
-//                        myAdapter.notifyDataSetChanged();
                         intent.putExtra(getString(R.string.participant_key), participantName);
                         startActivity(intent);
                     }
@@ -299,20 +306,4 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     public void onBackPressed() {
         finish();
     }
-
-//    @Override
-//    public void onEventAsync(LayerChangeEvent layerChangeEvent) {
-//        if (this.hasWindowFocus()) {
-//            dataChange();
-//            Log.d(MainActivity.class.toString(), "Data changed");
-//        }
-//    }
-//
-//    @Override
-//    public void onEventMainThread(LayerChangeEvent layerChangeEvent) {
-//        if (this.hasWindowFocus()) {
-//            dataChange();
-//            Log.d(MainActivity.class.toString(), "Main Thread Data changed ");
-//        }
-//    }
 }

@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.parse.ParseException;
@@ -21,16 +22,22 @@ import com.parse.SignUpCallback;
 
 import java.util.List;
 
-import static android.view.View.*;
+import static android.view.View.GONE;
+import static android.view.View.OnClickListener;
+import static android.view.View.VISIBLE;
 
 
 public class RegisterActivity extends ActionBarActivity {
 
+    private LinearLayout expandLayout;
     private TextView nameTextView;
+    private TextView lastNameTextView;
+    private TextView loginTextView;
     private TextView passwordTextView;
     private TextView confirmPasswordTextView;
     private TextView emailTextView;
-    private Button button;
+    private Button confirmButton;
+    private Button moreButton;
 
     private ProgressDialog dialog;
 
@@ -41,19 +48,42 @@ public class RegisterActivity extends ActionBarActivity {
 
         LayerApplication.setCurrentActivity(this);
 
-        nameTextView = (TextView) findViewById(R.id.log_in_name);
+        expandLayout = (LinearLayout) findViewById((R.id.expanded_layout));
+        loginTextView = (TextView) findViewById(R.id.log_in_name);
+        nameTextView = (TextView) findViewById(R.id.firstname);
+        lastNameTextView = (TextView) findViewById(R.id.lastname);
         passwordTextView = (TextView) findViewById(R.id.password);
         confirmPasswordTextView = (TextView) findViewById(R.id.password_confirm);
         emailTextView = (TextView) findViewById(R.id.email);
-        button = (Button) findViewById(R.id.btn_register);
-        button.setOnClickListener(onClickListener);
+        moreButton = (Button) findViewById(R.id.btn_more);
+        moreButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (expandLayout.getVisibility() == VISIBLE) {
+                    expandLayout.setVisibility(GONE);
+                    moreButton.setText("More...");
+                } else {
+                    moreButton.setText("Hide");
+                    expandLayout.setVisibility(VISIBLE);
+                }
+            }
+        });
+        confirmButton = (Button) findViewById(R.id.btn_register);
+        confirmButton.setOnClickListener(onClickListener);
     }
 
     OnClickListener onClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (isValidEmail() && isValidPassword()) {
-                registerNewUser(nameTextView.getText().toString(), passwordTextView.getText().toString(), emailTextView.getText().toString());
+            if (loginTextView.getText().toString().isEmpty()) {
+                loginTextView.setError("Nickname cannot be empty!");
+                loginTextView.requestFocus();
+            }
+            else if (nameTextView.getText().toString().isEmpty()) {
+                nameTextView.setError("Name cannot be empty!");
+                nameTextView.requestFocus();
+            } else if (isValidEmail() && isValidPassword()) {
+                registerNewUser();
             }
         }
     };
@@ -68,11 +98,16 @@ public class RegisterActivity extends ActionBarActivity {
         dialog.show();
     }
 
-    public void registerNewUser(final String userName, final String password, final String email) {
+    public void registerNewUser() {
+        String userName =  loginTextView.getText().toString();
+        String password = passwordTextView.getText().toString();
+        String email= emailTextView.getText().toString();
+        String firstName = nameTextView.getText().toString();
+        String lastName = lastNameTextView.getText().toString();
         createProgressDialog();
         List<ParseObject> results = null;
         try {
-            results = ParseQuery.getQuery("_User").whereContains(getString(R.string.username_parse_key), userName).find();
+            results = ParseQuery.getQuery("_User").whereContains(getString(R.string.userName_label), userName).find();
         } catch (ParseException e) {
             e.printStackTrace();
         } finally {
@@ -82,7 +117,10 @@ public class RegisterActivity extends ActionBarActivity {
                 newUser.setPassword(password);
                 if (email != null)
                     newUser.setEmail(email);
-
+                if (firstName != null)
+                    newUser.put(getString(R.string.firstname_parse_key),firstName);
+                if (lastName != null)
+                    newUser.put(getString(R.string.lastname_parse_key),lastName);
                 newUser.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(com.parse.ParseException e) {
@@ -102,8 +140,8 @@ public class RegisterActivity extends ActionBarActivity {
                     dialog.dismiss();
                 passwordTextView.setText("");
                 confirmPasswordTextView.setText("");
-                nameTextView.requestFocus();
-                nameTextView.setError("This nickname is already used!");
+                loginTextView.requestFocus();
+                loginTextView.setError("This nickname is already used!");
             }
         }
     }

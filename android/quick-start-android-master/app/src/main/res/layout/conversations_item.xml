@@ -10,12 +10,13 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:textSize="@dimen/abc_text_size_medium_material"/>
+        android:textSize="@dimen/abc_text_size_large_material"/>
 
     <ImageView
         android:id="@+id/new_message_icon"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:scaleType="centerInside"
         android:layout_gravity="end"
         android:visibility="gone"
         tools:ignore="ContentDescription"

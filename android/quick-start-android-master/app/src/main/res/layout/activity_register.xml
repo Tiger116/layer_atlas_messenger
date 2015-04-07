@@ -36,7 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/top_logo">
 
         <LinearLayout
             android:orientation="vertical"
@@ -54,16 +55,15 @@
                 android:textColorHint="#bbbbbb" />
 
             <EditText
-                android:id="@+id/email"
+                android:id="@+id/firstname"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:background="@drawable/abc_edit_text_material"
-                android:hint="@string/email_hint"
-                android:textColorHint="#bbbbbb"
-                android:inputType="textEmailAddress|textEmailSubject" />
+                android:hint="@string/firstname_hint"
+                android:textColorHint="#bbbbbb" />
 
             <EditText
                 android:id="@+id/password"
@@ -89,12 +89,54 @@
                 android:inputType="textPassword" />
 
             <Button
+                android:id="@+id/btn_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="@string/more_button_text" />
+
+            <LinearLayout
+                android:id="@+id/expanded_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/lastname"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:background="@drawable/abc_edit_text_material"
+                    android:hint="@string/lastname_hint"
+                    android:textColorHint="#bbbbbb" />
+
+                <EditText
+                    android:id="@+id/email"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:background="@drawable/abc_edit_text_material"
+                    android:hint="@string/email_hint"
+                    android:textColorHint="#bbbbbb"
+                    android:inputType="textEmailAddress|textEmailSubject" />
+            </LinearLayout>
+
+            <Button
                 android:id="@+id/btn_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:layout_margin="4dp"
                 android:text="@string/btn_register_text" />
+
         </LinearLayout>
+
     </ScrollView>
+
 </RelativeLayout>

@@ -25,12 +25,16 @@
     <string name="search_hint">Search</string>
     <string name="registration_label">Registration</string>
     <string name="title_activity_register">Register new user</string>
-    <string name="username_parse_key">username</string>
+    <string name="firstname_parse_key">firstName</string>
+    <string name="lastname_parse_key">lastName</string>
 
     <string name="name_hint">Nickname</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="btn_register_text">Register</string>
     <string name="email_hint">Email</string>
     <string name="conversation_id_key">layer-conversation-id</string>
+    <string name="firstname_hint">First Name</string>
+    <string name="lastname_hint">Last Name</string>
+    <string name="more_button_text">More...</string>
 
 </resources>

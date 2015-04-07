@@ -63,7 +63,7 @@ public class UsersActivity extends ActionBarActivity {
         lvUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setResult(Activity.RESULT_OK, getIntent().putExtra(getString(R.string.participants), adapter.getItem(position).getDisplayName()));
+                setResult(Activity.RESULT_OK, getIntent().putExtra(getString(R.string.participants), adapter.getItem(position).getContactId()));
                 finish();
             }
         });
@@ -118,8 +118,17 @@ public class UsersActivity extends ActionBarActivity {
             for (ParseObject obj : results) {
                 if (!obj.getString(getString(R.string.userName_label)).equals(layerClient.getAuthenticatedUserId())) {
                     Contact contact = new Contact();
-                    contact.setContactId(obj.getObjectId());
-                    contact.setDisplayName(obj.getString(getString(R.string.userName_label)));
+                    contact.setContactId(obj.getString(getString(R.string.userName_label)));
+                    String firstName = obj.getString(getString(R.string.firstname_parse_key));
+                    String lastName = obj.getString(getString(R.string.lastname_parse_key));
+                    String displayName = "";
+                    if (firstName != null) {
+                        displayName += firstName;
+                        if (lastName != null)
+                            displayName += String.format(" %s", lastName);
+                    } else
+                        displayName = obj.getString(getString(R.string.userName_label));
+                    contact.setDisplayName(displayName);
 //                contact.photoId = cursor.getString(ContactsQuery.PHOTO_THUMBNAIL_DATA);
                     users.add(contact);
                 }
@@ -151,7 +160,6 @@ public class UsersActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (ParseUser.getCurrentUser() != null) {

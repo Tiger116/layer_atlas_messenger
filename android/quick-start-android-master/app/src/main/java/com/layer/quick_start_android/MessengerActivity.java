@@ -108,14 +108,13 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         usersView.setTokenizer(new MyAutoCompleteTextView.CommaTokenizer());
         usersView.setAdapter(myAutoCompleteAdapter);
         usersView.addTextChangedListener(new TextWatcher() {
-            private String firstUser;
+            private String user = null;
+            private String deleteUser = null;
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 if (!s.toString().isEmpty() && conversationView.getConversation().getParticipants().contains(s.toString()))
-                    firstUser = Arrays.asList(s.toString().split(", ")).get(0);
-                else
-                    firstUser = null;
+                    user = Arrays.asList(s.toString().split(", ")).get(0);
             }
 
             @Override
@@ -130,17 +129,22 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                                 conversationView.getConversation().removeParticipants(Arrays.asList(participant));
                                 availableUsers.add(participant);
                                 myAutoCompleteAdapter.add(participant);
-                                conversationView.getConversation().removeParticipants(participant);
+                                deleteUser = participant;
                             }
                         }
                     }
-                } else if (firstUser != null)
-                    addBubble(firstUser);
-
+                } else if (user != null) {
+                    addBubble(user);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (deleteUser != null) {
+                    conversationView.getConversation().removeParticipants(deleteUser);
+                    deleteUser = null;
+                    drawConversation();
+                }
             }
         });
 
@@ -155,7 +159,8 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         if (conversationView.getConversation() == null) {
             conversationView.setConversation(parameter);
         }
-        sendMessage(userInput.getText().toString());
+        if (!userInput.getText().toString().isEmpty())
+            sendMessage(userInput.getText().toString());
 
         //Clears the text input field
         userInput.setText("");
@@ -183,13 +188,17 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
     public void drawConversation() {
         //Only proceed if there is a valid conversation
         if (conversationView.getConversation() != null) {
+            if (conversationView.getConversation().isDeleted())
+                finish();
+
             List<String> participants = conversationView.getConversation().getParticipants();
 
+            if (participants.isEmpty())
+                finish();
             String title = "";
-            if (conversationView.getConversation().getMetadata() != null) {
-                if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
-                    title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
-            } else if (participants != null)
+            if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
+                title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
+            else
                 title = participants.toString();
             setTitle(title);
 
@@ -217,9 +226,9 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 }
             }
             userInput.requestFocus();
-        }
-        else
+        } else
             finish();
+
     }
 
     //Creates a GUI element (header and body) for each Message

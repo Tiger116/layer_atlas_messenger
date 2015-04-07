@@ -30,10 +30,10 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
     private Activity currentActivity;
 
-    private String parameter;
+    private String conversationId;
 
-    public ConversationViewController(String param) {
-        this.parameter = param;
+    public ConversationViewController(String parameter) {
+        this.conversationId = parameter;
 //        this.participant = participant;
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
@@ -52,13 +52,13 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
         if (activeConversation == null) {
             if (layerClient.isAuthenticated()) {
-                if (parameter != null) {
-                    Uri uri = Uri.parse(parameter);
+                if (conversationId != null) {
+                    Uri uri = Uri.parse(conversationId);
                     if (uri.isAbsolute())
                         activeConversation = layerClient.getConversation(uri);
                     else {
-                        activeConversation = layerClient.newConversation(parameter);
-                        activeConversation.putMetadataAtKeyPath(getContext().getString(R.string.title_label), Arrays.asList(layerClient.getAuthenticatedUserId(), parameter).toString());
+                        activeConversation = layerClient.newConversation(conversationId);
+                        activeConversation.putMetadataAtKeyPath(getContext().getString(R.string.title_label), Arrays.asList(layerClient.getAuthenticatedUserId(), conversationId).toString());
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
     public void setConversation(String parameter) {
         if (parameter != null) {
-            this.parameter = parameter;
+            this.conversationId = parameter;
             Uri uri = Uri.parse(parameter);
             if (uri.isAbsolute())
                 activeConversation = layerClient.getConversation(uri);
@@ -106,7 +106,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                         break;
 
                     case DELETE:
-                        parameter = null;
+                        conversationId = null;
                         activeConversation = null;
                         Log.d("Conversation", "DELETE");
                         break;

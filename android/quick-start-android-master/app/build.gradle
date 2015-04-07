@@ -34,5 +34,4 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'com.parse.bolts:bolts-android:1.+'
     compile files('libs/Parse-1.8.2.jar')
-
 }
