@@ -29,7 +29,6 @@
  */
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.navigationController setNavigationBarHidden:YES];
     self.appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     self.usernameField.delegate = self;
     self.passwordField.delegate = self;
@@ -52,6 +51,16 @@
         }
     }];
 
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.navigationController setNavigationBarHidden:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController setNavigationBarHidden:NO];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -153,7 +162,6 @@
             {
                 [self.navigationController pushViewController:self.appDelegate.conversationsViewController animated:YES];
             }
-            [self.navigationController setNavigationBarHidden:NO];
         }
     }];
 }

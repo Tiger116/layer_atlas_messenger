@@ -830,8 +830,8 @@
 			baseConfigurationReference = 5EFA945ED357962BF6694591 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -860,7 +860,7 @@
 					"\"SystemConfiguration\"",
 				);
 				PRODUCT_NAME = ChatMe;
-				PROVISIONING_PROFILE = "2e1c228f-cd87-4f85-8937-c2fa58c0bba4";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

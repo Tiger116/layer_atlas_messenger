@@ -23,12 +23,8 @@
  */
 @property (atomic) BOOL synchronizationIsFinished;
 
-/**
- *  Used to reload data in table.
- */
-@property (nonatomic) LYRQueryController *queryController;
-
 @property (nonatomic) CGPoint contentOffsetForTableOnly;
+@property (nonatomic) LoadingHUD *syncHud;
 
 @end
 
@@ -48,18 +44,16 @@
     self.allowsEditing = YES;
     self.deletionModes = [NSArray new];
     self.synchronizationIsFinished = NO;
+    [self registerNotificationObservers];
     
     // Left navigation item
-    UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sing out" style:UIBarButtonItemStylePlain target:self action:@selector(singOutButtonTapped)];
+    UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sign out" style:UIBarButtonItemStylePlain target:self action:@selector(signOutButtonTapped)];
     [self.navigationItem setLeftBarButtonItem:singOutButton];
     
     // Right navigation item
     UIBarButtonItem *composeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(composeButtonTapped)];
     [self.navigationItem setRightBarButtonItem:composeButton];
     
-    //Pull-to-refresh
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(pulledToRefresh) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -77,23 +71,29 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    self.contentOffsetForTableOnly = self.tableView.contentOffset;
-    
     if (!self.synchronizationIsFinished)
     {
-        [self.refreshControl beginRefreshing];
-        [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
-                                                     self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
-                                                     - self.searchDisplayController.searchBar.frame.size.height)
-                                animated:YES];
-        if (self.synchronizationIsFinished)
-        {
-            [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
-                                                         self.contentOffsetForTableOnly.y)
-                                    animated:YES];
-            [self.refreshControl endRefreshing];
-        }
+        self.syncHud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+        self.syncHud.labelText = @"Synchronisation";
     }
+    
+//    self.contentOffsetForTableOnly = self.tableView.contentOffset;
+//    
+//    if (!self.synchronizationIsFinished)
+//    {
+//        [self.refreshControl beginRefreshing];
+//        [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
+//                                                     self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
+//                                                     - self.searchDisplayController.searchBar.frame.size.height)
+//                                animated:YES];
+//        if (self.synchronizationIsFinished)
+//        {
+//            [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
+//                                                         self.contentOffsetForTableOnly.y)
+//                                    animated:YES];
+//            [self.refreshControl endRefreshing];
+//        }
+//    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -104,21 +104,7 @@
 
 - (void)dealloc
 {
-}
-
-/**
- *  Called when user pulls to refresh. Reloads table data.
- */
-- (void) pulledToRefresh
-{
-    NSError* error;
-    BOOL success = [self.queryController execute:&error];
-    if (!success) NSLog(@"LayerKit failed to execute query with error: %@", error);
-    [self.tableView reloadData];
-    [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
-                                                 self.contentOffsetForTableOnly.y)
-                            animated:YES];
-    [self.refreshControl endRefreshing];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 /**
@@ -132,7 +118,7 @@
 /**
  *  Method will be called if "Sign out" button is tapped. It deauthenticates user and returns to AuthenticationViewController if succes.
  */
-- (void)singOutButtonTapped
+- (void)signOutButtonTapped
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     [self.layerClient deauthenticateWithCompletion:^(BOOL success, NSError *error) {
@@ -246,6 +232,31 @@
 
 }
 
+#pragma mark - Notifications
+/**
+ *  Adds ('ConversationViewController *')self as observer to different notifications.
+ */
+- (void)registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidFinishSynchronizationNotification object:nil];
+}
+
+/**
+ *  Handles LayerClientDidFinishSynchronizationNotification.
+ *
+ *  Hides refreshing spinner.
+ *
+ *  @param notification received notification.
+ */
+- (void) synchronizationDidFinished:(NSNotification*) notification
+{
+    if (!self.synchronizationIsFinished)
+    {
+        self.synchronizationIsFinished = YES;
+        [self.syncHud hide:YES];
+    }
+}
+
 #pragma mark - UITableViewDataSource
 
 /**
@@ -263,15 +274,13 @@
     return NO;
 }
 
-#pragma mark - UITableViewDataSource
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     NSInteger result = [super tableView:tableView numberOfRowsInSection:section];
     if ((!self.synchronizationIsFinished) && (result > 0))
     {
         self.synchronizationIsFinished = YES;
-        [self.refreshControl endRefreshing];
+        [self.syncHud hide:YES];
     }
     return result;
 }
