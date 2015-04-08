@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -78,8 +79,7 @@ public class RegisterActivity extends ActionBarActivity {
             if (loginTextView.getText().toString().isEmpty()) {
                 loginTextView.setError("Nickname cannot be empty!");
                 loginTextView.requestFocus();
-            }
-            else if (nameTextView.getText().toString().isEmpty()) {
+            } else if (nameTextView.getText().toString().isEmpty()) {
                 nameTextView.setError("Name cannot be empty!");
                 nameTextView.requestFocus();
             } else if (isValidEmail() && isValidPassword()) {
@@ -99,9 +99,9 @@ public class RegisterActivity extends ActionBarActivity {
     }
 
     public void registerNewUser() {
-        String userName =  loginTextView.getText().toString();
+        String userName = loginTextView.getText().toString();
         String password = passwordTextView.getText().toString();
-        String email= emailTextView.getText().toString();
+        String email = emailTextView.getText().toString();
         String firstName = nameTextView.getText().toString();
         String lastName = lastNameTextView.getText().toString();
         createProgressDialog();
@@ -114,24 +114,25 @@ public class RegisterActivity extends ActionBarActivity {
             if (results == null || results.isEmpty()) {
                 ParseUser newUser = new ParseUser();
                 newUser.setUsername(userName);
+                newUser.put(getString(R.string.firstname_parse_key), firstName);
                 newUser.setPassword(password);
-                if (email != null)
+                if (!email.isEmpty())
                     newUser.setEmail(email);
-                if (firstName != null)
-                    newUser.put(getString(R.string.firstname_parse_key),firstName);
-                if (lastName != null)
-                    newUser.put(getString(R.string.lastname_parse_key),lastName);
+                if (!lastName.isEmpty())
+                    newUser.put(getString(R.string.lastname_parse_key), lastName);
                 newUser.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(com.parse.ParseException e) {
                         if (dialog != null)
                             dialog.dismiss();
                         if (e == null) {
-                            Log.i(this.toString(), "create new user");
+                            Log.d(this.toString(), "create new user");
+                            LayerApplication.setParseUsers();
                             setResult(RESULT_OK);
                             finish();
                         } else {
                             Log.d("Error Registration", e.toString());
+                            Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_LONG);
                         }
                     }
                 });

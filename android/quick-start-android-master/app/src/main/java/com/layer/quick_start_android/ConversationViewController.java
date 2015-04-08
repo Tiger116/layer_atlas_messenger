@@ -52,15 +52,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
         if (activeConversation == null) {
             if (layerClient.isAuthenticated()) {
-                if (conversationId != null) {
-                    Uri uri = Uri.parse(conversationId);
-                    if (uri.isAbsolute())
-                        activeConversation = layerClient.getConversation(uri);
-                    else {
-                        activeConversation = layerClient.newConversation(conversationId);
-                        activeConversation.putMetadataAtKeyPath(getContext().getString(R.string.title_label), Arrays.asList(layerClient.getAuthenticatedUserId(), conversationId).toString());
-                    }
-                }
+                setConversation(conversationId);
             }
         }
         //Returns the active conversation (which is null by default)
@@ -75,7 +67,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                 activeConversation = layerClient.getConversation(uri);
             else {
                 activeConversation = layerClient.newConversation(parameter);
-                activeConversation.putMetadataAtKeyPath(getContext().getString(R.string.title_label), Arrays.asList(layerClient.getAuthenticatedUserId(), parameter).toString());
+//                activeConversation.putMetadataAtKeyPath(getContext().getString(R.string.title_label), Arrays.asList(layerClient.getAuthenticatedUserId(), parameter).toString());
             }
         }
     }
@@ -147,11 +139,5 @@ public class ConversationViewController implements LayerChangeEventListener.Main
     @Override
     public void onEventAsync(LayerChangeEvent layerChangeEvent) {
         Log.d("Conversation", "Async Thread");
-//        currentActivity = getCurrentActivity();
-//        if (currentActivity.getClass().toString().equals(MainActivity.class.toString())) {
-//            ((MainActivity) currentActivity).dataChange();
-//        } else if (currentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
-//            ((MessengerActivity) currentActivity).drawConversation();
-//        }
     }
 }

@@ -10,13 +10,12 @@
     <string name="button_text">Sign in</string>
     <string name="logout_menu_text">Log out</string>
     <string name="send_text">Send</string>
-    <string name="participants">Participant</string>
     <string name="add_dialog_title">Add Dialog</string>
     <string name="logout_title">Log out</string>
     <string name="title_activity_dialog_chooser">DialogChooserActivity</string>
     <string name="title_activity_messenger">MessengerActivity</string>
     <string name="title_activity_users">Add User</string>
-    <string name="participant_key">ParticipantsActivity</string>
+    <string name="participant_key">Participant</string>
     <string name="add_user">Add User</string>
     <string name="userName_label">username</string>
     <string name="options_label">Options</string>

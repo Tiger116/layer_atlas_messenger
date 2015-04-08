@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
             List<Conversation> toRemove = new ArrayList<>();
             if (!conversations.isEmpty()) {
                 for (Conversation conversation : conversations) {
-                    if (conversation.getParticipants().isEmpty()) {
+                    if (conversation.getParticipants().isEmpty() || conversation.getParticipants().size() == 1) {
 //                        conversation.addParticipants(layerClient.getAuthenticatedUserId());
                         if (!conversation.isDeleted()) {
                             toRemove.add(conversation);
@@ -251,8 +251,6 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 String title = "";
                 if (conversations.get(info.position).getMetadata().get(getString(R.string.title_label)) != null)
                     title = conversations.get(info.position).getMetadata().get(getString(R.string.title_label)).toString();
-                else
-                    title = conversations.get(info.position).getParticipants().toString();
                 input.setText(title);
                 input.setSelection(input.getText().length());
                 dialog.setView(input);
@@ -260,9 +258,11 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getEditableText().toString();
-                        if (title.isEmpty())
-                            title = conversations.get(info.position).getParticipants().toString();
-                        conversations.get(info.position).putMetadataAtKeyPath(getString(R.string.title_label), title);
+                        if (!title.isEmpty())
+//                            title = conversations.get(info.position).getParticipants().toString();
+                            conversations.get(info.position).putMetadataAtKeyPath(getString(R.string.title_label), title);
+                        else
+                            conversations.get(info.position).removeMetadataAtKeyPath(getString(R.string.title_label));
 //                        conversationList.set(info.position, title);
                         dataChange();
                     }
@@ -291,10 +291,10 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 break;
             case requestCodeUsers:
                 if (resultCode == RESULT_OK) {
-                    String participantName = data.getExtras().getString(getString(R.string.participants));
-                    if (!participantName.equals(layerClient.getAuthenticatedUserId())) {
+                    String participantId = data.getExtras().getString(getString(R.string.participant_key));
+                    if (!participantId.equals(layerClient.getAuthenticatedUserId())) {
                         Intent intent = new Intent(MainActivity.this, MessengerActivity.class);
-                        intent.putExtra(getString(R.string.participant_key), participantName);
+                        intent.putExtra(getString(R.string.participant_key), participantId);
                         startActivity(intent);
                     }
                 }

@@ -33,7 +33,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
 
         String userID = null;
         if (user != null)
-            userID = user.getUsername();
+            userID = user.getObjectId();
 
         //Note: This Layer Authentication Service is for TESTING PURPOSES ONLY
         //When going into production, you will need to create your own web service

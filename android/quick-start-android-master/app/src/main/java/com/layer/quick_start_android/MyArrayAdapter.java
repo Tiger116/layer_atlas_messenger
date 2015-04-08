@@ -2,7 +2,6 @@ package com.layer.quick_start_android;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,10 @@ import com.layer.sdk.query.CompoundPredicate;
 import com.layer.sdk.query.Predicate;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
@@ -64,11 +66,22 @@ public class MyArrayAdapter extends ArrayAdapter {
             Conversation conversation = conversations.get(position);
             if (conversation != null) {
                 String title = "";
+                List<String> participants = new ArrayList<>();
                 if (conversation.getMetadata() != null)
                     if (conversation.getMetadata().get(context.getString(R.string.title_label)) != null)
                         title = conversation.getMetadata().get(context.getString(R.string.title_label)).toString();
-                    else
-                        title = conversation.getParticipants().toString();
+                    else {
+                        for (String participantId : conversation.getParticipants()) {
+                            String name = LayerApplication.getUserNameById(participantId);
+                            if (name != null)
+                                participants.add(name);
+                            else
+                                participants.add(participantId);
+                        }
+                        title = participants.toString();
+//                        conversation.putMetadataAtKeyPath(context.getString(R.string.title_label),title);
+                    }
+//                        title = .toString();
                 holder.conversationName.setText(title);
 
                 Query query = Query.builder(Message.class)

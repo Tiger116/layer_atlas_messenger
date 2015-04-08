@@ -16,7 +16,6 @@ import com.layer.sdk.messaging.MessagePart;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
@@ -52,19 +51,17 @@ public class MessageView {
 
     private void craftMessage(Message msg) {
 
-        //The User ID
-        String senderTxt = msg.getSentByUserId();
+        String senderTxt = "";
         Drawable background;
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        if (layerClient.getAuthenticatedUserId().equals(senderTxt)) {
-            senderTxt = "";
+        if (!layerClient.getAuthenticatedUserId().equals(msg.getSentByUserId())) {
+            if (conversation.getParticipants().size() > 2)
+                senderTxt = LayerApplication.getUserNameById(msg.getSentByUserId());
+            background = context.getResources().getDrawable(R.drawable.bubble_yellow);
+        } else {
             background = context.getResources().getDrawable(R.drawable.bubble_green);
             params.gravity = Gravity.END;
             messageTV.setLayoutParams(params);
-        } else {
-            if (conversation.getParticipants().size() <= 2)
-                senderTxt = "";
-            background = context.getResources().getDrawable(R.drawable.bubble_yellow);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             messageTV.setBackground(background);

@@ -6,8 +6,15 @@ import android.content.Context;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerChangeEventListener;
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class LayerApplication extends Application implements LayerChangeEventListener {
@@ -24,6 +31,7 @@ public class LayerApplication extends Application implements LayerChangeEventLis
     public static ConversationViewController conversationView;
     private static Context mContext;
     private static Activity mCurrentActivity;
+    private static List<ParseObject> parseUsers;
 
     @Override
     public void onCreate() {
@@ -36,20 +44,63 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
         UUID appID = UUID.fromString(Layer_App_ID);
         layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
-        LayerClient.setLogLevel(LayerClient.LogLevel.DETAILED);
+        LayerClient.enableLogging();
+        setParseUsers();
 
         conversationView = new ConversationViewController(null);
     }
 
-    public static Activity getCurrentActivity(){
+    public static Activity getCurrentActivity() {
         return mCurrentActivity;
     }
 
-    public static void setCurrentActivity(Activity currentActivity){
+    public static void setCurrentActivity(Activity currentActivity) {
         mCurrentActivity = currentActivity;
     }
 
     public static Context getContext() {
         return mContext;
+    }
+
+    public static List<ParseObject> getParseUsers() {
+        if (parseUsers == null)
+            setParseUsers();
+        return parseUsers;
+    }
+
+    public static void setParseUsers() {
+        parseUsers = new ArrayList<>();
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+//        query.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> parseObjects, ParseException e) {
+//                if (e == null)
+//                    parseUsers.addAll(parseObjects);
+//                else
+//                    e.printStackTrace();
+//            }
+//        });
+        try {
+            parseUsers = query.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getUserNameById(String userId) {
+        for (ParseObject object : parseUsers) {
+            if (object.getObjectId().equals(userId)) {
+                return ((ParseUser) object).getUsername();
+            }
+        }
+        return null;
+    }
+    public static String getUserIdByName(String userName) {
+        for (ParseObject object : parseUsers) {
+            if (((ParseUser)object).getUsername().equals(userName)) {
+                return object.getObjectId();
+            }
+        }
+        return null;
     }
 }

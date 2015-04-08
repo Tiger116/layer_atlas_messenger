@@ -17,17 +17,13 @@ import android.widget.EditText;
 import com.layer.quick_start_android.contacts_utils.Contact;
 import com.layer.quick_start_android.contacts_utils.ContactsAdapter;
 import com.layer.quick_start_android.contacts_utils.pinned_header_utils.PinnedHeaderListView;
-import com.parse.ParseException;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 
 public class UsersActivity extends ActionBarActivity {
@@ -43,6 +39,7 @@ public class UsersActivity extends ActionBarActivity {
         setContentView(R.layout.activity_users);
 
         LayerApplication.setCurrentActivity(this);
+        LayerApplication.setParseUsers();
 
         final PinnedHeaderListView lvUsers = (PinnedHeaderListView) findViewById(R.id.list);
         users = new ArrayList<>(getUsers());
@@ -63,7 +60,7 @@ public class UsersActivity extends ActionBarActivity {
         lvUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setResult(Activity.RESULT_OK, getIntent().putExtra(getString(R.string.participants), adapter.getItem(position).getContactId()));
+                setResult(Activity.RESULT_OK, getIntent().putExtra(getString(R.string.participant_key), adapter.getItem(position).getContactId()));
                 finish();
             }
         });
@@ -100,25 +97,14 @@ public class UsersActivity extends ActionBarActivity {
         });
     }
 
-    public static List<ParseObject> getParseUsers() {
-        List<ParseObject> parseUsers = new ArrayList<>();
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-        try {
-            parseUsers = query.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return parseUsers;
-    }
-
     private List<Contact> getUsers() {
         List<Contact> users = new ArrayList<>();
-        List<ParseObject> results = getParseUsers();
+        List<ParseObject> results = LayerApplication.getParseUsers();
         if (results != null) {
             for (ParseObject obj : results) {
-                if (!obj.getString(getString(R.string.userName_label)).equals(layerClient.getAuthenticatedUserId())) {
+                if (!obj.getString(getString(R.string.userName_label)).equals(ParseUser.getCurrentUser().getUsername())) {
                     Contact contact = new Contact();
-                    contact.setContactId(obj.getString(getString(R.string.userName_label)));
+                    contact.setContactId(obj.getObjectId());
                     String firstName = obj.getString(getString(R.string.firstname_parse_key));
                     String lastName = obj.getString(getString(R.string.lastname_parse_key));
                     String displayName = "";
@@ -140,14 +126,12 @@ public class UsersActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
         LayerApplication.setCurrentActivity(null);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         LayerApplication.setCurrentActivity(this);
     }
 

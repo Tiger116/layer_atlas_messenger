@@ -51,7 +51,7 @@ public class LoginActivity extends ActionBarActivity {
                     userNameText.setText("");
                     passwordText.setText("");
                     userNameText.requestFocus();
-                    userNameText.setError(e.toString());//"Wrong user name or password!");
+                    userNameText.setError("Wrong user name or password!");
                 }
             }
         });

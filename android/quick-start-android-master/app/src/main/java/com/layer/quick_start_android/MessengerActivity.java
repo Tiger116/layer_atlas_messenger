@@ -29,6 +29,7 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.layer.quick_start_android.LayerApplication.conversationView;
+import static com.layer.quick_start_android.LayerApplication.getUserIdByName;
+import static com.layer.quick_start_android.LayerApplication.getUserNameById;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 public class MessengerActivity extends ActionBarActivity implements View.OnClickListener, TextWatcher, LayerTypingIndicatorListener {
@@ -55,7 +58,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
     private MyAutoCompleteTextView usersView;
     private EditText userInput;
     private ArrayAdapter<String> myAutoCompleteAdapter;
-    private ArrayList<String> availableUsers;
+    private ArrayList<String> availableUserNames;
     private String parameter = null;
     //All messages
     private Hashtable<String, MessageView> allMessages;
@@ -99,12 +102,12 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         usersView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView c = (TextView) view;
-                addUser(c.getText().toString());
+                String item = ((TextView) view).getText().toString();
+                addUser(getUserIdByName(item));
             }
         });
-        availableUsers = getAvailableUsers();
-        myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUsers);
+        availableUserNames = getAvailableUserNames();
+        myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUserNames);
         usersView.setTokenizer(new MyAutoCompleteTextView.CommaTokenizer());
         usersView.setAdapter(myAutoCompleteAdapter);
         usersView.addTextChangedListener(new TextWatcher() {
@@ -113,8 +116,11 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if (!s.toString().isEmpty() && conversationView.getConversation().getParticipants().contains(s.toString()))
+                if (!s.toString().isEmpty() &&
+                        conversationView.getConversation().getParticipants().contains(LayerApplication.getUserIdByName(s.toString())))
                     user = Arrays.asList(s.toString().split(", ")).get(0);
+                else
+                    user = null;
             }
 
             @Override
@@ -125,10 +131,11 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 if (!s.toString().isEmpty() && count == 0) {
                     if ((conversationView.getConversation().getParticipants().size() - 1) > textUsers.size()) {
                         for (String participant : conversationView.getConversation().getParticipants()) {
-                            if (!textUsers.contains(participant) && !participant.equals(layerClient.getAuthenticatedUserId())) {
-                                conversationView.getConversation().removeParticipants(Arrays.asList(participant));
-                                availableUsers.add(participant);
-                                myAutoCompleteAdapter.add(participant);
+                            if (!textUsers.contains(getUserNameById(participant)) && !participant.equals(layerClient.getAuthenticatedUserId())) {
+//                                conversationView.getConversation().removeParticipants(Arrays.asList(participant));
+//                                availableUserNames.add(getUserNameById(participant));
+                                myAutoCompleteAdapter.add(getUserNameById(participant));
+//                                myAutoCompleteAdapter.notifyDataSetChanged();
                                 deleteUser = participant;
                             }
                         }
@@ -191,15 +198,24 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
             if (conversationView.getConversation().isDeleted())
                 finish();
 
-            List<String> participants = conversationView.getConversation().getParticipants();
+            List<String> participantIdList = conversationView.getConversation().getParticipants();
 
-            if (participants.isEmpty())
+            if (participantIdList.isEmpty())
                 finish();
             String title = "";
             if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
                 title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
-            else
-                title = participants.toString();
+            else {
+                List<String> userNames = new ArrayList<>();
+                for (String userId : participantIdList) {
+                    String userName = getUserNameById(userId);
+                    if (userName != null)
+                        userNames.add(userName);
+                    else
+                        userNames.add(userId);
+                }
+                title = userNames.toString();
+            }
             setTitle(title);
 
             //Clear the GUI first and empty the list of stored messages
@@ -220,15 +236,18 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 }
             });
 
-            for (String userName : participants) {
-                if (!userName.equals(layerClient.getAuthenticatedUserId())) {
-                    addBubble(userName);
+            for (String userId : participantIdList) {
+                if (!userId.equals(layerClient.getAuthenticatedUserId())) {
+                    String userName = getUserNameById(userId);
+                    if (userName != null)
+                        addBubble(userName);
+                    else
+                        addBubble(userId);
                 }
             }
             userInput.requestFocus();
         } else
             finish();
-
     }
 
     //Creates a GUI element (header and body) for each Message
@@ -267,25 +286,22 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         }
     }
 
-    private void addUser(String userName) {
-        conversationView.getConversation().addParticipants(Arrays.asList(userName));
-        availableUsers.remove(userName);
-        conversationView.getConversation().addParticipants(userName);
-        myAutoCompleteAdapter.clear();
-        myAutoCompleteAdapter.addAll(availableUsers);
-        addBubble(userName);
+    private void addUser(String userId) {
+        conversationView.getConversation().addParticipants(userId);
+        String name = getUserNameById(userId);
+        if (name == null)
+            name = userId;
+        myAutoCompleteAdapter.remove(name);
+        addBubble(name);
     }
 
-    private ArrayList<String> getAvailableUsers() {
+    private ArrayList<String> getAvailableUserNames() {
         ArrayList<String> users = new ArrayList<>();
-        List<ParseObject> results = UsersActivity.getParseUsers();
-        if (results != null) {
-            for (ParseObject obj : results) {
-                if (conversationView.getConversation() != null)
-                    if (!conversationView.getConversation().getParticipants().contains(obj.getString("username")))
-                        users.add(obj.getString("username"));
+        if (conversationView.getConversation() != null)
+            for (ParseObject obj : LayerApplication.getParseUsers()) {
+                if (!conversationView.getConversation().getParticipants().contains(obj.getObjectId()))
+                    users.add(((ParseUser) obj).getUsername());
             }
-        }
         return users;
     }
 
@@ -401,7 +417,8 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         switch (requestCode) {
             case MainActivity.requestCodeUsers:
                 if (resultCode == RESULT_OK) {
-                    String participantName = data.getExtras().getString(getString(R.string.participants));
+                    String participantId = data.getExtras().getString(getString(R.string.participant_key));
+                    String participantName = getUserNameById(participantId);
                     if (!usersView.getText().toString().contains(participantName) && !usersView.getText().toString().contains(layerClient.getAuthenticatedUserId())) {
                         addUser(participantName);
                     }
@@ -437,17 +454,22 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
             typingIndicator.setVisibility(View.GONE);
 
         } else if (typingUsers.size() == 1) {
-
+            String typeUser = LayerApplication.getUserNameById(typingUsers.get(0));
+            if (typeUser == null)
+                typeUser = typingUsers.get(0);
             //Name the one user that is typing (and make sure the text is grammatically correct)
             typingIndicator.setVisibility(View.VISIBLE);
-            typingIndicator.setText(typingUsers.get(0) + " is typing");
+            typingIndicator.setText(typeUser + " is typing");
 
         } else if (typingUsers.size() > 1) {
 
             //Name all the users that are typing (and make sure the text is grammatically correct)
             String users = "";
             for (int i = 0; i < typingUsers.size(); i++) {
-                users += typingUsers.get(i);
+                String typeUser = LayerApplication.getUserNameById(typingUsers.get(i));
+                if (typeUser == null)
+                    typeUser = typingUsers.get(i);
+                users += typeUser;
                 if (i < typingUsers.size() - 1)
                     users += ", ";
             }
