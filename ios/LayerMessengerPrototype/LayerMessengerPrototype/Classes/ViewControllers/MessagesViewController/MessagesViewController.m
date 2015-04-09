@@ -17,6 +17,26 @@
 #import <ATLLocationManager.h>
 #import "ImageViewController.h"
 
+static NSDateFormatter *DateFormatter()
+{
+    static NSDateFormatter *dateFormatter;
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"MMM dd, yyyy,"; // Nov 29, 2013,
+    }
+    return dateFormatter;
+}
+static NSDateFormatter *TimeFormatter()
+{
+    static NSDateFormatter *dateFormatter;
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
+    }
+    return dateFormatter;
+}
+
+
 @interface MessagesViewController () <DetailsViewControllerDelegate, EKEventEditViewDelegate, CLLocationManagerDelegate, MapViewControllerDelegate>
 
 @property (nonatomic, strong) UIBarButtonItem* detailsButton;
@@ -313,10 +333,8 @@
  */
 - (NSAttributedString *)conversationViewController:(ATLConversationViewController *)conversationViewController attributedStringForDisplayOfDate:(NSDate *)date
 {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"MMM dd, yyyy,"; // Nov 29, 2013,
-    NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
-    timeFormatter.timeStyle = NSDateFormatterShortStyle;
+    NSDateFormatter *dateFormatter = DateFormatter();
+    NSDateFormatter *timeFormatter = TimeFormatter();
     
     NSString *dateString = [dateFormatter stringFromDate:date];
     NSString *timeString = [timeFormatter stringFromDate:date];

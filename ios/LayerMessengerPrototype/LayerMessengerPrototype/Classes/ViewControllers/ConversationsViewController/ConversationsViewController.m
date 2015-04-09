@@ -15,9 +15,6 @@
 
 @interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
 
-//Can't remember why it's here. Probably it isn't used.
-//@property (strong,nonatomic) NSOrderedSet* conversations;
-
 /**
  *  Used to remove loading spinner if synchronization with Layer is finished.
  */
@@ -76,24 +73,6 @@
         self.syncHud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
         self.syncHud.labelText = @"Synchronisation";
     }
-    
-//    self.contentOffsetForTableOnly = self.tableView.contentOffset;
-//    
-//    if (!self.synchronizationIsFinished)
-//    {
-//        [self.refreshControl beginRefreshing];
-//        [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
-//                                                     self.contentOffsetForTableOnly.y - self.refreshControl.frame.size.height
-//                                                     - self.searchDisplayController.searchBar.frame.size.height)
-//                                animated:YES];
-//        if (self.synchronizationIsFinished)
-//        {
-//            [self.tableView setContentOffset:CGPointMake(self.contentOffsetForTableOnly.x,
-//                                                         self.contentOffsetForTableOnly.y)
-//                                    animated:YES];
-//            [self.refreshControl endRefreshing];
-//        }
-//    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -167,7 +146,7 @@
  */
 - (void)conversationListViewController:(ATLConversationListViewController *)conversationListViewController didDeleteConversation:(LYRConversation *)conversation deletionMode:(LYRDeletionMode)deletionMode
 {
-    NSLog(@"Conversation Successsfully Deleted");
+    NSLog(@"Conversation Successfully Deleted");
 }
 
 /**
@@ -238,7 +217,7 @@
  */
 - (void)registerNotificationObservers
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidFinishSynchronizationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidChangedObjectsNotification object:nil];
 }
 
 /**

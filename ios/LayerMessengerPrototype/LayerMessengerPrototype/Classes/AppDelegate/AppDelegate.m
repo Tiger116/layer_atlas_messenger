@@ -18,7 +18,7 @@ static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4
 NSString *const ConversationMetadataDidChangeNotification = @"ConversationMetadataDidChangeNotification";
 NSString *const ConversationParticipantsDidChangeNotification = @"ConversationParticipantsDidChangeNotification";
 NSString *const ConversationDidCreatedNotification = @"ConversationDidCreatedNotification";
-NSString *const LayerClientDidFinishSynchronizationNotification = @"LayerClientDidFinishSynchronizationNotification";
+NSString *const LayerClientDidChangedObjectsNotification = @"LayerClientDidChangedObjectsNotification";
 
 NSString* const metadataTitleKey = @"title";
 NSString* const metadataOwnerIdKey = @"owner";
@@ -257,6 +257,7 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 - (void)layerClient:(LYRClient *)client objectsDidChange:(NSArray *)changes
 {
     NSLog(@"Layer Client objects did change");
+    [[NSNotificationCenter defaultCenter] postNotificationName:LayerClientDidChangedObjectsNotification object:nil];
     for (NSDictionary *change in changes)
     {
         id changedObject = change[LYRObjectChangeObjectKey];
@@ -292,17 +293,6 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 - (void)layerClientDidDeauthenticate:(LYRClient *)client
 {
     NSLog(@"Layer Client did deauthenticate");
-}
-
-- (void)layerClient:(LYRClient *)client didFinishSynchronizationWithChanges:(NSArray *)changes
-{
-    NSLog(@"Layer Client did finish sychronization");
-    [[NSNotificationCenter defaultCenter] postNotificationName:LayerClientDidFinishSynchronizationNotification object:nil];
-}
-
-- (void)layerClient:(LYRClient *)client didFailSynchronizationWithError:(NSError *)error
-{
-    NSLog(@"Layer Client did fail synchronization with error: %@", error);
 }
 
 - (void)layerClient:(LYRClient *)client willAttemptToConnect:(NSUInteger)attemptNumber afterDelay:(NSTimeInterval)delayInterval maximumNumberOfAttempts:(NSUInteger)attemptLimit

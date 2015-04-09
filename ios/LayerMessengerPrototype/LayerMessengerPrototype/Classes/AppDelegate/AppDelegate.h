@@ -15,7 +15,7 @@
 extern NSString *const ConversationMetadataDidChangeNotification;
 extern NSString *const ConversationParticipantsDidChangeNotification;
 extern NSString *const ConversationDidCreatedNotification;
-extern NSString *const LayerClientDidFinishSynchronizationNotification;
+extern NSString *const LayerClientDidChangedObjectsNotification;
 
 extern NSString* const metadataTitleKey;
 extern NSString* const metadataOwnerIdKey;
