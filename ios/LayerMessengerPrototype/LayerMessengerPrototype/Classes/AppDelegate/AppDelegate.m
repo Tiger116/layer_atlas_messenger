@@ -263,6 +263,10 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
         id changedObject = change[LYRObjectChangeObjectKey];
         if (![changedObject isKindOfClass:[LYRConversation class]]) continue;
         
+//        if ([[((LYRConversation*)changedObject).identifier absoluteString] isEqualToString:@"layer:///conversations/485be210-33c1-4db4-af8a-5f79b8003034"]) {
+//            NSLog(@"%@\n%@",changedObject,change[LYRObjectChangeTypeKey]);
+//        }
+        
         LYRObjectChangeType changeType = [change[LYRObjectChangeTypeKey] integerValue];
         NSString *changedProperty = change[LYRObjectChangePropertyKey];
         

@@ -103,7 +103,7 @@ static NSDateFormatter *TimeFormatter()
 - (void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    if (self.conversation) {
+    if (self.conversation && !self.addressBarController.addressBarView.addressBarTextView.isFirstResponder) {
         [self.view becomeFirstResponder];
     }
 }
