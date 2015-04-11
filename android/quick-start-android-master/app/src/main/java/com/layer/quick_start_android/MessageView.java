@@ -116,25 +116,31 @@ public class MessageView {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
+                if (!msgText.isEmpty()) {
+                    messageTV.setVisibility(View.VISIBLE);
+                    messageTV.setText(msgText);
+                } else
+                    messageTV.setVisibility(View.GONE);
             }
             if (parts.get(i).getMimeType().equalsIgnoreCase("image/jpeg")) {
                 layerClient.registerProgressListener(parts.get(i), listener);
-                byte[] imageArray = parts.get(i).getData();
-                if (imageArray != null) {
-                    Log.d("SIZE", String.valueOf(imageArray.length));
-                    Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
-                    if (parts.get(i).isContentReady()) {
-                            messageImage.setImageBitmap(bm);
+                if (parts.get(i).isContentReady()) {
+                    byte[] imageArray = parts.get(i).getData();
+                    if (imageArray != null) {
+                        Log.d("SIZE", String.valueOf(imageArray.length));
+                        Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
+                        messageImage.setImageBitmap(bm);
                     }
                 }
+                return;
             }
             if (parts.get(i).getMimeType().equalsIgnoreCase("image/jpeg+preview")) {
                 layerClient.registerProgressListener(parts.get(i), listener);
-                byte[] imageArray = parts.get(i).getData();
-                if (imageArray != null) {
-                    Log.d("SIZE PREVIEW", String.valueOf(imageArray.length));
-                    Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
-                    if (parts.get(i).isContentReady()) {
+                if (parts.get(i).isContentReady()) {
+                    byte[] imageArray = parts.get(i).getData();
+                    if (imageArray != null) {
+                        Log.d("SIZE PREVIEW", String.valueOf(imageArray.length));
+                        Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
                         messageImage.setImageBitmap(bm);
                     }
                 }
@@ -152,11 +158,6 @@ public class MessageView {
             }
 //            layerClient.unregisterProgressListener(parts.get(i), listener);
         }
-        if (!msgText.isEmpty()) {
-            messageTV.setVisibility(View.VISIBLE);
-            messageTV.setText(msgText);
-        } else
-            messageTV.setVisibility(View.GONE);
     }
 
     //Checks the recipient status of the message (based on all participants)
