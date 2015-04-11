@@ -6,7 +6,6 @@ import android.content.Context;
 
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerChangeEventListener;
-import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -14,6 +13,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,9 +95,10 @@ public class LayerApplication extends Application implements LayerChangeEventLis
         }
         return null;
     }
+
     public static String getUserIdByName(String userName) {
         for (ParseObject object : parseUsers) {
-            if (((ParseUser)object).getUsername().equals(userName)) {
+            if (((ParseUser) object).getUsername().equals(userName)) {
                 return object.getObjectId();
             }
         }

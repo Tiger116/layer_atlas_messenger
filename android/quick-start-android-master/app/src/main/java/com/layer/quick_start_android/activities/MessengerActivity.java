@@ -1,9 +1,12 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.activities;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -12,6 +15,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +23,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.layer.quick_start_android.ConversationViewController;
+import com.layer.quick_start_android.ImageParams;
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.MessageView;
+import com.layer.quick_start_android.MyAutoCompleteTextView;
+import com.layer.quick_start_android.R;
+import com.layer.quick_start_android.layer_utils.MyProgressListener;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
@@ -31,6 +44,9 @@ import com.layer.sdk.messaging.MessagePart;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,20 +61,19 @@ import static com.layer.quick_start_android.LayerApplication.getUserNameById;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 public class MessengerActivity extends ActionBarActivity implements View.OnClickListener, TextWatcher, LayerTypingIndicatorListener {
-    //    private ConversationViewController conversationView;
+    private static final int REQUEST_LOAD_IMAGE = 2;
 
     //List of all users currently typing
     private ArrayList<String> typingUsers;
     //GUI elements
     private Button sendButton;
-    //    private EditText userInput;
     private ScrollView conversationScroll;
     private LinearLayout conversationLayout;
     private TextView typingIndicator;
     private MyAutoCompleteTextView usersView;
     private EditText userInput;
+    private ImageButton attach_button;
     private ArrayAdapter<String> myAutoCompleteAdapter;
-    private ArrayList<String> availableUserNames;
     private String parameter = null;
     //All messages
     private Hashtable<String, MessageView> allMessages;
@@ -86,6 +101,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         //Cache off gui objects
         sendButton = (Button) findViewById(R.id.send);
         userInput = (EditText) findViewById(R.id.input);
+        attach_button = (ImageButton) findViewById(R.id.attach_photo);
         conversationScroll = (ScrollView) findViewById(R.id.scrollView);
         conversationLayout = (LinearLayout) findViewById(R.id.conversation);
         typingIndicator = (TextView) findViewById(R.id.typingIndicator);
@@ -95,6 +111,13 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
         //Capture user input
         sendButton.setOnClickListener(this);
+        attach_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, REQUEST_LOAD_IMAGE);
+            }
+        });
         userInput.setText("");
         userInput.addTextChangedListener(this);
 
@@ -106,7 +129,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 addUser(getUserIdByName(item));
             }
         });
-        availableUserNames = getAvailableUserNames();
+        ArrayList<String> availableUserNames = getAvailableUserNames();
         myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUserNames);
         usersView.setTokenizer(new MyAutoCompleteTextView.CommaTokenizer());
         usersView.setAdapter(myAutoCompleteAdapter);
@@ -132,10 +155,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                     if ((conversationView.getConversation().getParticipants().size() - 1) > textUsers.size()) {
                         for (String participant : conversationView.getConversation().getParticipants()) {
                             if (!textUsers.contains(getUserNameById(participant)) && !participant.equals(layerClient.getAuthenticatedUserId())) {
-//                                conversationView.getConversation().removeParticipants(Arrays.asList(participant));
-//                                availableUserNames.add(getUserNameById(participant));
                                 myAutoCompleteAdapter.add(getUserNameById(participant));
-//                                myAutoCompleteAdapter.notifyDataSetChanged();
                                 deleteUser = participant;
                             }
                         }
@@ -168,7 +188,6 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         }
         if (!userInput.getText().toString().isEmpty())
             sendMessage(userInput.getText().toString());
-
         //Clears the text input field
         userInput.setText("");
     }
@@ -183,7 +202,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
         //Formats the push notification that the other participants will receive
         Map<String, String> metadata = new HashMap<>();
-        metadata.put("layer-push-message", layerClient.getAuthenticatedUserId() + ": " + text);
+        metadata.put("layer-push-message", ParseUser.getCurrentUser().getUsername() + ": " + text);
         message.setMetadata(metadata);
 
         //Sends the message
@@ -202,7 +221,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
             if (participantIdList.isEmpty())
                 finish();
-            String title = "";
+            String title;
             if (conversationView.getConversation().getMetadata().get(getString(R.string.title_label)) != null)
                 title = conversationView.getConversation().getMetadata().get(getString(R.string.title_label)).toString();
             else {
@@ -424,6 +443,44 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                     }
                 }
                 break;
+            case REQUEST_LOAD_IMAGE:
+                if (resultCode == RESULT_OK && data != null) {
+                    Uri selectedImage = data.getData();
+                    Bitmap bitmap;
+                    ByteArrayOutputStream outputStream;
+                    byte[] imageArray;
+                    int quality = 100;
+                    try {
+                        ContentResolver cr = getBaseContext().getContentResolver();
+                        InputStream inputStream = cr.openInputStream(selectedImage);
+                        bitmap = BitmapFactory.decodeStream(inputStream);
+                        outputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                        imageArray = outputStream.toByteArray();
+
+                        if (imageArray != null) {
+                            MessagePart jpeg = layerClient.newMessagePart("image/jpeg", imageArray);
+                            ImageParams params = new ImageParams(bitmap);
+                            Gson gson = new Gson();
+                            String json = gson.toJson(params);
+                            MessagePart jsonPart = layerClient.newMessagePart("application/json+imageSize", json.getBytes());
+
+                            Log.d("LENGTH", String.format("%d, %d", imageArray.length, layerClient.getAutoDownloadSizeThreshold()));
+                            
+                            while (imageArray.length > layerClient.getAutoDownloadSizeThreshold() && quality > 1) {
+                                quality /= 2;
+                                outputStream.reset();
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                                imageArray = outputStream.toByteArray();
+                            }
+                            MessagePart jpegPreview = layerClient.newMessagePart("image/jpeg+preview", imageArray);
+                            Message message = layerClient.newMessage(jpeg, jpegPreview, jsonPart);
+                            conversationView.getConversation().send(message);
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
         }
     }
 

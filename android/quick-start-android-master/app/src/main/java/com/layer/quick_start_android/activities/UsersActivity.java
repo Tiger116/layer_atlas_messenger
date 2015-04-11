@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.R;
 import com.layer.quick_start_android.contacts_utils.Contact;
 import com.layer.quick_start_android.contacts_utils.ContactsAdapter;
 import com.layer.quick_start_android.contacts_utils.pinned_header_utils.PinnedHeaderListView;

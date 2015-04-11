@@ -1,10 +1,8 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.layer_utils;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.util.Log;
 
+import com.layer.quick_start_android.activities.MainActivity;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerAuthenticationListener;
@@ -13,7 +11,10 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import java.util.Arrays;
 import java.util.HashMap;
+
+import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 
 public class MyAuthenticationListener implements LayerAuthenticationListener {
@@ -38,7 +39,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
         //Note: This Layer Authentication Service is for TESTING PURPOSES ONLY
         //When going into production, you will need to create your own web service
         //Check out https://developer.layer.com/docs/guides#authentication for guidance
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("userID", userID);
         params.put("nonce", nonce);
 

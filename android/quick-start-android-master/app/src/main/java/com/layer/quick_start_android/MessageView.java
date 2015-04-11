@@ -1,14 +1,19 @@
 package com.layer.quick_start_android;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.layer.quick_start_android.layer_utils.MyProgressListener;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
@@ -16,7 +21,9 @@ import com.layer.sdk.messaging.MessagePart;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
+import static com.layer.quick_start_android.LayerApplication.getUserNameById;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 /**
@@ -25,10 +32,12 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
 public class MessageView {
 
     //The sender and message views
-    private ImageView senderPhoto;
+//    private ImageView senderPhoto;
     private TextView senderTV;
     private TextView sendTime;
     private TextView messageTV;
+    private View messageImageIndent;
+    private RoundedCorners messageImage;
     private ImageView statusImage;
 
     private Context context;
@@ -38,12 +47,15 @@ public class MessageView {
     public MessageView(LinearLayout parent, LinearLayout meLayout, Message msg) {
         this.context = LayerApplication.getContext();
         this.conversation = msg.getConversation();
-        senderPhoto = (ImageView) meLayout.findViewById(R.id.message_user_photo);
+//        senderPhoto = (ImageView) meLayout.findViewById(R.id.message_user_photo);
         senderTV = (TextView) meLayout.findViewById(R.id.message_username);
         sendTime = (TextView) meLayout.findViewById(R.id.message_time);
+        messageTV = (TextView) meLayout.findViewById(R.id.message_text);
+        messageImageIndent = meLayout.findViewById(R.id.message_image_indent);
+        messageImage = (RoundedCorners) meLayout.findViewById(R.id.message_image);
+        messageImage.setRadius(10);
         statusImage = (ImageView) meLayout.findViewById(R.id.message_status);
         createStatusImage(msg);
-        messageTV = (TextView) meLayout.findViewById(R.id.message_text);
         //Populates the text views
         craftMessage(msg);
         parent.addView(meLayout);
@@ -51,17 +63,23 @@ public class MessageView {
 
     private void craftMessage(Message msg) {
 
-        String senderTxt = "";
+        String senderTxt = msg.getSentByUserId();
         Drawable background;
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        if (!layerClient.getAuthenticatedUserId().equals(msg.getSentByUserId())) {
-            if (conversation.getParticipants().size() > 2)
-                senderTxt = LayerApplication.getUserNameById(msg.getSentByUserId());
+        if (!layerClient.getAuthenticatedUserId().equals(senderTxt)) {
+            if (conversation.getParticipants().size() > 2) {
+                if (getUserNameById(senderTxt) != null)
+                    senderTxt = getUserNameById(msg.getSentByUserId());
+            } else
+                senderTxt = "";
             background = context.getResources().getDrawable(R.drawable.bubble_yellow);
+            messageImageIndent.setVisibility(View.GONE);
         } else {
+            senderTxt = "";
             background = context.getResources().getDrawable(R.drawable.bubble_green);
-            params.gravity = Gravity.END;
-            messageTV.setLayoutParams(params);
+            LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            paramsText.gravity = Gravity.END;
+            messageTV.setLayoutParams(paramsText);
+            messageImageIndent.setVisibility(View.INVISIBLE);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             messageTV.setBackground(background);
@@ -78,7 +96,7 @@ public class MessageView {
         //Add the timestamp
         String time = "";
         if (msg.getSentAt() != null) {
-            time = new SimpleDateFormat("dd MMMM H:mm:ss").format(msg.getReceivedAt());
+            time = new SimpleDateFormat("dd MMMM H:mm:ss", Locale.ENGLISH).format(msg.getReceivedAt());
         }
         sendTime.setText(time);
 
@@ -88,8 +106,8 @@ public class MessageView {
         //Go through each part, and if it is text (which it should be by default), append it to the
         // message text
         List<MessagePart> parts = msg.getMessageParts();
+        MyProgressListener listener = new MyProgressListener(messageImage);
         for (int i = 0; i < msg.getMessageParts().size(); i++) {
-
             //You can always set the mime type when creating a message part, by default the mime type
             // is initialized to plain text when the message part is created
             if (parts.get(i).getMimeType().equalsIgnoreCase("text/plain")) {
@@ -99,8 +117,46 @@ public class MessageView {
                     e.printStackTrace();
                 }
             }
+            if (parts.get(i).getMimeType().equalsIgnoreCase("image/jpeg")) {
+                layerClient.registerProgressListener(parts.get(i), listener);
+                byte[] imageArray = parts.get(i).getData();
+                if (imageArray != null) {
+                    Log.d("SIZE", String.valueOf(imageArray.length));
+                    Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
+                    if (parts.get(i).isContentReady()) {
+                            messageImage.setImageBitmap(bm);
+                    }
+                }
+            }
+            if (parts.get(i).getMimeType().equalsIgnoreCase("image/jpeg+preview")) {
+                layerClient.registerProgressListener(parts.get(i), listener);
+                byte[] imageArray = parts.get(i).getData();
+                if (imageArray != null) {
+                    Log.d("SIZE PREVIEW", String.valueOf(imageArray.length));
+                    Bitmap bm = BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length);
+                    if (parts.get(i).isContentReady()) {
+                        messageImage.setImageBitmap(bm);
+                    }
+                }
+            }
+            if (parts.get(i).getMimeType().equalsIgnoreCase("application/json+imageSize")) {
+                byte[] imageArray = parts.get(i).getData();
+                String json = new String(imageArray);
+                Log.d("JSON", json);
+                Gson gson = new Gson();
+                ImageParams params = gson.fromJson(json, ImageParams.class);
+//                if (params != null) {
+//                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(params.getWidth(), params.getHeight());
+//                    messageImage.setLayoutParams(layoutParams);
+//                }
+            }
+//            layerClient.unregisterProgressListener(parts.get(i), listener);
         }
-        messageTV.setText(msgText);
+        if (!msgText.isEmpty()) {
+            messageTV.setVisibility(View.VISIBLE);
+            messageTV.setText(msgText);
+        } else
+            messageTV.setVisibility(View.GONE);
     }
 
     //Checks the recipient status of the message (based on all participants)

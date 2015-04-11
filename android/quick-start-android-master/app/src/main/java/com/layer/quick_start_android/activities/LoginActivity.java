@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;

@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.R;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -37,7 +39,6 @@ public class RegisterActivity extends ActionBarActivity {
     private TextView passwordTextView;
     private TextView confirmPasswordTextView;
     private TextView emailTextView;
-    private Button confirmButton;
     private Button moreButton;
 
     private ProgressDialog dialog;
@@ -69,7 +70,7 @@ public class RegisterActivity extends ActionBarActivity {
                 }
             }
         });
-        confirmButton = (Button) findViewById(R.id.btn_register);
+        Button confirmButton = (Button) findViewById(R.id.btn_register);
         confirmButton.setOnClickListener(onClickListener);
     }
 
@@ -132,7 +133,7 @@ public class RegisterActivity extends ActionBarActivity {
                             finish();
                         } else {
                             Log.d("Error Registration", e.toString());
-                            Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_LONG);
+                            Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });

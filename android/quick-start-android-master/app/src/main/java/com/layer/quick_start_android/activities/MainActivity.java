@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -15,6 +15,11 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.MyArrayAdapter;
+import com.layer.quick_start_android.layer_utils.MyAuthenticationListener;
+import com.layer.quick_start_android.layer_utils.MyConnectionListener;
+import com.layer.quick_start_android.R;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.Query;
@@ -22,6 +27,7 @@ import com.layer.sdk.query.SortDescriptor;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
@@ -79,39 +85,23 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     public void dataChange() {
         Handler handler = new Handler();
         if (layerClient.isAuthenticated()) {
-            Boolean isDeleted = false;
+//            Boolean isDeleted = false;
             Query query = Query.builder(Conversation.class).sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_RECEIVED_AT, SortDescriptor.Order.DESCENDING)).build();
             conversations = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
             List<Conversation> toRemove = new ArrayList<>();
             if (!conversations.isEmpty()) {
                 for (Conversation conversation : conversations) {
                     if (conversation.getParticipants().isEmpty() || conversation.getParticipants().size() == 1) {
-//                        conversation.addParticipants(layerClient.getAuthenticatedUserId());
                         if (!conversation.isDeleted()) {
                             toRemove.add(conversation);
                             conversation.delete(LayerClient.DeletionMode.LOCAL);
 //                            isDeleted = true;
                         }
                     }
-//                    if (!conversation.getParticipants().contains(layerClient.getAuthenticatedUserId())) {
-//                        conversation.delete(LayerClient.DeletionMode.LOCAL);
-//                    }
                 }
                 if (!toRemove.isEmpty()) {
                     conversations.removeAll(toRemove);
                 }
-//                conversationList = null;
-//                conversationList = new ArrayList<>();
-//                conversationList.clear();
-//                for (Conversation conversation : conversations) {
-//                    if (conversation.getMetadata().get(getString(R.string.title_label)) != null)
-//                        conversationList.add(conversation.getMetadata().get(getString(R.string.title_label)).toString());
-//                }
-//                myAdapter.clear();
-//                myAdapter.addAll(conversationList);
-//                myAdapter.setList(conversations);
-//                myAdapter.notifyDataSetChanged();
-//                myAdapter = null;
                 myAdapter = new MyArrayAdapter(MainActivity.this, conversations);
                 lvMain.setAdapter(myAdapter);
 
@@ -169,6 +159,10 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 if (!layerClient.isAuthenticated()) layerClient.authenticate();
                 else if (!layerClient.isConnected()) layerClient.connect();
                 else {
+
+                    layerClient.setAutoDownloadSizeThreshold(1024 * 128);
+                    layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview", "image/jpeg", "application/json+imageSize"));
+                    layerClient.setDiskCapacity(1024 * 1024 * 100);
                     dataChange();
                 }
             } else {
@@ -215,7 +209,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     private void logOut() {
         ParseUser.logOut();
         layerClient.deauthenticate();
-        myAdapter.clear();
+        dataChange();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, requestCodeLogin);
     }
@@ -301,7 +295,6 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 break;
         }
     }
-
     @Override
     public void onBackPressed() {
         finish();

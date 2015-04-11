@@ -35,26 +35,26 @@ import android.widget.Filter;
  * <p>
  * You must provide a {@link Tokenizer} to distinguish the
  * various substrings.
- *
+ * <p/>
  * <p>The following code snippet shows how to create a text view which suggests
  * various countries names while the user is typing:</p>
- *
+ * <p/>
  * <pre class="prettyprint">
  * public class CountriesActivity extends Activity {
- *     protected void onCreate(Bundle savedInstanceState) {
- *         super.onCreate(savedInstanceState);
- *         setContentView(R.layout.autocomplete_7);
- *
- *         ArrayAdapter&lt;String&gt; adapter = new ArrayAdapter&lt;String&gt;(this,
- *                 android.R.layout.simple_dropdown_item_1line, COUNTRIES);
- *         MultiAutoCompleteTextView textView = (MultiAutoCompleteTextView) findViewById(R.id.edit);
- *         textView.setAdapter(adapter);
- *         textView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
- *     }
- *
- *     private static final String[] COUNTRIES = new String[] {
- *         "Belgium", "France", "Italy", "Germany", "Spain"
- *     };
+ * protected void onCreate(Bundle savedInstanceState) {
+ * super.onCreate(savedInstanceState);
+ * setContentView(R.layout.autocomplete_7);
+ * <p/>
+ * ArrayAdapter&lt;String&gt; adapter = new ArrayAdapter&lt;String&gt;(this,
+ * android.R.layout.simple_dropdown_item_1line, COUNTRIES);
+ * MultiAutoCompleteTextView textView = (MultiAutoCompleteTextView) findViewById(R.id.edit);
+ * textView.setAdapter(adapter);
+ * textView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+ * }
+ * <p/>
+ * private static final String[] COUNTRIES = new String[] {
+ * "Belgium", "France", "Italy", "Germany", "Spain"
+ * };
  * }</pre>
  */
 
@@ -70,15 +70,8 @@ public class MyAutoCompleteTextView extends AutoCompleteTextView {
     }
 
     public MyAutoCompleteTextView(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public MyAutoCompleteTextView(
-            Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr);
     }
-
-    /* package */ void finishInit() { }
 
     /**
      * Sets the Tokenizer that will be used to determine the relevant
@@ -129,11 +122,7 @@ public class MyAutoCompleteTextView extends AutoCompleteTextView {
 
         int start = mTokenizer.findTokenStart(text, end);
 
-        if (end - start >= getThreshold()) {
-            return true;
-        } else {
-            return false;
-        }
+        return (end - start) >= getThreshold();
     }
 
     /**
@@ -172,8 +161,7 @@ public class MyAutoCompleteTextView extends AutoCompleteTextView {
      * override this method to filter with a different pattern, for
      * instance a smaller substring of <code>text</code>.</p>
      */
-    protected void performFiltering(CharSequence text, int start, int end,
-                                    int keyCode) {
+    protected void performFiltering(CharSequence text, int start, int end, int keyCode) {
         getFilter().filter(text.subSequence(start, end), this);
     }
 

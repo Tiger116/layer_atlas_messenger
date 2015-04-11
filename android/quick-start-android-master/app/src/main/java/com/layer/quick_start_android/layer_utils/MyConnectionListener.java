@@ -1,5 +1,6 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.layer_utils;
 
+import com.layer.quick_start_android.activities.MainActivity;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerConnectionListener;
@@ -25,12 +26,10 @@ public class MyConnectionListener implements LayerConnectionListener {
     @Override
     public void onConnectionDisconnected(LayerClient arg0) {
         System.out.println("Connection to Layer closed");
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void onConnectionError(LayerClient arg0, LayerException e) {
-        // TODO Auto-generated method stub
         System.out.println("Error connecting to layer: " + e.toString());
     }
 }

@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.layer_utils;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+
+import com.layer.quick_start_android.R;
+import com.layer.quick_start_android.activities.MessengerActivity;
 
 public class LayerPushReceiver extends BroadcastReceiver {
     @Override
