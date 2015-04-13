@@ -92,3 +92,5 @@
  */
 extern NSString *const ATLVersionString;
 
+extern NSString* const metadataIsGroupKey;
+

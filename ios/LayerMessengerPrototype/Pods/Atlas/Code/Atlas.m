@@ -21,3 +21,5 @@
 #import "Atlas.h"
 
 NSString *const ATLVersionString = @"1.0.2";
+
+NSString* const metadataIsGroupKey = @"isGroup";

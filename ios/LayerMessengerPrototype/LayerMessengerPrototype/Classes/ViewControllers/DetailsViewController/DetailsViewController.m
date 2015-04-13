@@ -492,6 +492,10 @@ typedef NS_ENUM(NSInteger, DetailsTableSection) {
         return;
     }
     
+    if (self.conversation.participants.count > 2) {
+        [self.conversation setValue:@"YES" forMetadataAtKeyPath:metadataIsGroupKey];
+    }
+    
     self.participantIdentifiers = [self.conversation.participants.allObjects mutableCopy];
     [self.tableView reloadData];
 }

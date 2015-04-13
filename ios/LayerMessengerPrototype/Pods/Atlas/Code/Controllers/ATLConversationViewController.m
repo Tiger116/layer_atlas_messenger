@@ -29,6 +29,7 @@
 #import "ATLConversationDataSource.h"
 #import "ATLMediaAttachment.h"
 #import "ATLLocationManager.h"
+#import "Atlas.h"
 
 @interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ATLMessageInputToolbarDelegate, UIActionSheetDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, LYRQueryControllerDelegate, CLLocationManagerDelegate>
 
@@ -200,7 +201,16 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
     // Configure avatar image display
     NSMutableSet *otherParticipantIDs = [self.conversation.participants mutableCopy];
     if (self.layerClient.authenticatedUserID) [otherParticipantIDs removeObject:self.layerClient.authenticatedUserID];
-    self.shouldDisplayAvatarItem = otherParticipantIDs.count > 1;
+//    self.shouldDisplayAvatarItem = otherParticipantIDs.count > 1;
+    NSString* isGroup = self.conversation.metadata[metadataIsGroupKey];
+    if (isGroup)
+    {
+        self.shouldDisplayAvatarItem = [isGroup isEqualToString:@"YES"] || otherParticipantIDs.count == 0;
+    }else
+    {
+        self.shouldDisplayAvatarItem = otherParticipantIDs.count != 1;
+    }
+    
     
     // Configure message bar button enablement
     BOOL shouldEnableButton = self.conversation ? YES : NO;
@@ -414,9 +424,11 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
     return NO;
 }
 
+//Method is changed.
 - (BOOL)shouldDisplaySenderLabelForSection:(NSUInteger)section
 {
-    if (self.conversation.participants.count <= 2) return NO;
+//    if (self.conversation.participants.count <= 2) return NO;
+    if (!self.shouldDisplayAvatarItem) return NO;
     
     LYRMessage *message = [self.conversationDataSource messageAtCollectionViewSection:section];
     if ([message.sentByUserID isEqualToString:self.layerClient.authenticatedUserID]) return NO;

@@ -429,7 +429,16 @@ static NSDateFormatter *TimeFormatter()
     NSSet *participantIdentifiers = [participants valueForKey:@"participantIdentifier"];
     BOOL deliveryReceiptsEnabled = participants.count <= 5;
     NSDictionary *options = @{LYRConversationOptionsDeliveryReceiptsEnabledKey: @(deliveryReceiptsEnabled)};
-    return [self.layerClient newConversationWithParticipants:participantIdentifiers options:options error:nil];
+    LYRConversation *newConversation = [self.layerClient newConversationWithParticipants:participantIdentifiers options:options error:nil];
+    [newConversation setValue:self.layerClient.authenticatedUserID forMetadataAtKeyPath:metadataOwnerIdKey];
+    if(participants.count > 2)
+    {
+        [newConversation setValue:@"YES" forMetadataAtKeyPath:metadataIsGroupKey];
+    }else
+    {
+        [newConversation setValue:@"NO" forMetadataAtKeyPath:metadataIsGroupKey];
+    }
+    return newConversation;
 }
 
 #pragma mark - ATLParticipantTableViewControllerDelegate
@@ -659,10 +668,14 @@ static NSDateFormatter *TimeFormatter()
  *
  *  @param notification received notification.
  */
+//wrong
 - (void)conversationDidCreated:(NSNotification*) notification
 {
+    if (!self.conversation) return;
+    if (!notification.object) return;
+    if (![notification.object isEqual:self.conversation]) return;
+    
     [self.navigationItem setRightBarButtonItem:self.detailsButton];
-    [((LYRConversation*)notification.object) setValue:self.layerClient.authenticatedUserID forMetadataAtKeyPath:metadataOwnerIdKey];
 }
 
 @end
