@@ -55,12 +55,23 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
+    self.usernameField.text = @"";
+    self.passwordField.text = @"";
+    
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self.view endEditing:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [self.navigationController setNavigationBarHidden:NO];
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -77,7 +88,8 @@
 {
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     hud.labelText = @"Signing in";
-    [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:^(BOOL success, NSError *error) {
+    
+    void (^authenticateCompletionBlock)(BOOL success, NSError *error) = ^(BOOL success, NSError *error) {
         if (success) {
             [hud hide:YES];
             [self signIn];
@@ -93,7 +105,30 @@
                 [alert show];
             }
         }
-    }];
+    };
+    
+    if (self.appDelegate.layerClient.authenticatedUserID) {
+        [self.appDelegate.layerClient deauthenticateWithCompletion:^(BOOL success, NSError *error) {
+            if (! success)
+            {
+                [hud hide:YES];
+                NSLog(@"Failed to deauthenticate user: %@ with error: %@",self.appDelegate.layerClient.authenticatedUserID,error);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Authentication failed"
+                                                                message:@"Failed to deauthenticate previously authenticated user"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"OK"
+                                                      otherButtonTitles:nil];
+                [alert show];
+                return;
+            } else
+            {
+                [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:authenticateCompletionBlock];
+            }
+        }];
+    } else
+    {
+        [self.appDelegate authenticateLayerWithUsername:self.usernameField.text andPassword:self.passwordField.text completion:authenticateCompletionBlock];
+    }
 }
 
 /**

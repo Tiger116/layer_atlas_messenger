@@ -12,20 +12,22 @@
 #import "UsersDataSource.h"
 #import "LoadingHUD.h"
 #import "AppDelegate.h"
+#import "SyncReporter.h"
 
-@interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate>
+@interface ConversationsViewController () <ATLConversationListViewControllerDataSource, ATLConversationListViewControllerDelegate, SyncReporterDelegate>
 
 /**
  *  Used to remove loading spinner if synchronization with Layer is finished.
  */
-@property (atomic) BOOL synchronizationIsFinished;
 
 @property (nonatomic) CGPoint contentOffsetForTableOnly;
 @property (nonatomic) LoadingHUD *syncHud;
+@property (nonatomic) SyncReporter *syncReporter;
 
 @end
 
 @implementation ConversationsViewController
+
 
 /**
  *  Called after the controller's view is loaded into memory.
@@ -40,8 +42,8 @@
     self.dataSource = self;
     self.allowsEditing = YES;
     self.deletionModes = [NSArray new];
-    self.synchronizationIsFinished = NO;
-    [self registerNotificationObservers];
+    self.syncReporter = [[SyncReporter alloc] initWithClient:self.layerClient];
+    self.syncReporter.delegate = self;
     
     // Left navigation item
     UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sign out" style:UIBarButtonItemStylePlain target:self action:@selector(signOutButtonTapped)];
@@ -68,10 +70,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    if (!self.synchronizationIsFinished)
+    if (!self.syncReporter.done && ([self.tableView numberOfRowsInSection:0] ==  0))
     {
         self.syncHud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
         self.syncHud.labelText = @"Synchronisation";
+        self.syncHud.userInteractionEnabled = NO;
     }
 }
 
@@ -211,31 +214,6 @@
 
 }
 
-#pragma mark - Notifications
-/**
- *  Adds ('ConversationViewController *')self as observer to different notifications.
- */
-- (void)registerNotificationObservers
-{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(synchronizationDidFinished:) name:LayerClientDidChangedObjectsNotification object:nil];
-}
-
-/**
- *  Handles LayerClientDidFinishSynchronizationNotification.
- *
- *  Hides refreshing spinner.
- *
- *  @param notification received notification.
- */
-- (void) synchronizationDidFinished:(NSNotification*) notification
-{
-    if (!self.synchronizationIsFinished)
-    {
-        self.synchronizationIsFinished = YES;
-        [self.syncHud hide:YES];
-    }
-}
-
 #pragma mark - UITableViewDataSource
 
 /**
@@ -253,15 +231,11 @@
     return NO;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+#pragma mark - SyncReporterDelegate
+
+-(void)syncReporterDidFinishSyncing:(SyncReporter *)reporter
 {
-    NSInteger result = [super tableView:tableView numberOfRowsInSection:section];
-    if ((!self.synchronizationIsFinished) && (result > 0))
-    {
-        self.synchronizationIsFinished = YES;
-        [self.syncHud hide:YES];
-    }
-    return result;
+    [self.syncHud hide:YES];
 }
 
 @end

@@ -59,6 +59,7 @@
 		35EEC53B1ACD29DE00D2AF47 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35EEC53A1ACD29DE00D2AF47 /* MapKit.framework */; };
 		35EEC5401ACD2A9500D2AF47 /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35EEC53E1ACD2A9500D2AF47 /* MapViewController.m */; };
 		35EEC5411ACD2A9500D2AF47 /* MapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35EEC53F1ACD2A9500D2AF47 /* MapViewController.xib */; };
+		35F72E671ADE8D8700E6E3DE /* SyncReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 35F72E661ADE8D8700E6E3DE /* SyncReporter.m */; };
 		35FA565B1AA4AC640090148B /* ParticipantsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35FA565A1AA4AC640090148B /* ParticipantsViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -148,6 +149,8 @@
 		35EEC53D1ACD2A9500D2AF47 /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
 		35EEC53E1ACD2A9500D2AF47 /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
 		35EEC53F1ACD2A9500D2AF47 /* MapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MapViewController.xib; sourceTree = "<group>"; };
+		35F72E651ADE8D8700E6E3DE /* SyncReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyncReporter.h; sourceTree = "<group>"; };
+		35F72E661ADE8D8700E6E3DE /* SyncReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyncReporter.m; sourceTree = "<group>"; };
 		35FA56591AA4AC640090148B /* ParticipantsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticipantsViewController.h; sourceTree = "<group>"; };
 		35FA565A1AA4AC640090148B /* ParticipantsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParticipantsViewController.m; sourceTree = "<group>"; };
 		5EFA945ED357962BF6694591 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -331,6 +334,7 @@
 		35BF37361AA5F1490014ED96 /* DataRelated */ = {
 			isa = PBXGroup;
 			children = (
+				35F72E641ADE8D4500E6E3DE /* SyncReporter */,
 				35BF37371AA5F1490014ED96 /* User */,
 				35BF373A1AA5F1490014ED96 /* UsersDataSource */,
 			);
@@ -452,6 +456,15 @@
 				35EEC53F1ACD2A9500D2AF47 /* MapViewController.xib */,
 			);
 			path = MapViewController;
+			sourceTree = "<group>";
+		};
+		35F72E641ADE8D4500E6E3DE /* SyncReporter */ = {
+			isa = PBXGroup;
+			children = (
+				35F72E651ADE8D8700E6E3DE /* SyncReporter.h */,
+				35F72E661ADE8D8700E6E3DE /* SyncReporter.m */,
+			);
+			path = SyncReporter;
 			sourceTree = "<group>";
 		};
 		35FA56581AA4AC2F0090148B /* ParticipantsController */ = {
@@ -660,6 +673,7 @@
 				35D25D8E1AB1B5FB0047DFC4 /* RegistrationInputCell.m in Sources */,
 				35D5B6EE1AA9D1D50039AF46 /* DetailsConversationTitleCell.m in Sources */,
 				359427EB1AA728690027ADE7 /* AuthenticationViewController.m in Sources */,
+				35F72E671ADE8D8700E6E3DE /* SyncReporter.m in Sources */,
 				35BB42921A975BD1006248F8 /* ConversationsViewController.m in Sources */,
 				35BF373E1AA5F1490014ED96 /* UsersDataSource.m in Sources */,
 				35BB428F1A975BBB006248F8 /* AppDelegate.m in Sources */,

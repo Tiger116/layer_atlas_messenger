@@ -11,6 +11,7 @@
 #import <Parse/Parse.h>
 #import "LoadingHUD.h"
 #import <UbertestersSDK/Ubertesters.h>
+#import "SyncReporter.h"
 
 
 static NSString *const LayerAppIDString = @"07b40518-aaaa-11e4-bceb-a25d000000f4";
@@ -26,6 +27,8 @@ NSString* const metadataOwnerIdKey = @"owner";
 NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOptionsRemoteNotificationKey";
 
 @interface AppDelegate () <LYRClientDelegate>
+
+@property (strong, nonatomic) SyncReporter* syncReporter;
 
 @end
 
@@ -196,15 +199,8 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
  */
 - (void)authenticateLayerWithUsername:(NSString *)username andPassword:(NSString*)password completion:(void (^)(BOOL success, NSError * error))completion
 {
-    if (self.layerClient.authenticatedUserID) {
-        NSLog(@"Layer Authenticated as User %@", self.layerClient.authenticatedUserID);
-        if (completion) completion(YES, nil);
-        return;
-    }
-    
     // Request an authentication nonce from Layer
     [self.layerClient requestAuthenticationNonceWithCompletion:^(NSString *nonce, NSError *error) {
-        NSLog(@"Authentication nonce %@", nonce);
         
         // Upon reciept of nonce, post to your backend and acquire a Layer identityToken
         if (nonce) {
@@ -219,7 +215,6 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
                                                 block:^(NSString *token, NSError *error) {
                         if (!error) {
                             // Send the Identity Token to Layer to authenticate the user
-                            NSLog(@"Token:%@",token);
                             [self.layerClient authenticateWithIdentityToken:token completion:^(NSString *authenticatedUserID, NSError *error) {
                                 if (!error) {
                                     NSLog(@"Parse User authenticated with Layer Identity Token");
@@ -257,7 +252,6 @@ NSString* const launchOptionsKeyForRemoteNotifications = @"UIApplicationLaunchOp
 - (void)layerClient:(LYRClient *)client objectsDidChange:(NSArray *)changes
 {
     NSLog(@"Layer Client objects did change");
-    [[NSNotificationCenter defaultCenter] postNotificationName:LayerClientDidChangedObjectsNotification object:nil];
     for (NSDictionary *change in changes)
     {
         id changedObject = change[LYRObjectChangeObjectKey];
