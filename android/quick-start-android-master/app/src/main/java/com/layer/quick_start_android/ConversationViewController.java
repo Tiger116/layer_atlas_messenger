@@ -10,8 +10,10 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 
+import java.io.File;
 import java.util.List;
 
+import static com.layer.quick_start_android.LayerApplication.getContext;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 /**
@@ -19,7 +21,6 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
  * messages in the GUI.
  */
 public class ConversationViewController implements LayerChangeEventListener.MainThread, LayerChangeEventListener.BackgroundThread {
-
 
     //Current conversation
     private Conversation activeConversation;
@@ -92,8 +93,17 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                         break;
 
                     case DELETE:
+                        File directory = new File(getContext().getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
+                        if (directory.isDirectory()) {
+                            String[] children = directory.list();
+                            for (String child : children) {
+                                new File(directory, child).delete();
+                            }
+                        }
+                        directory.delete();
                         conversationId = null;
                         activeConversation = null;
+
                         Log.d("Conversation", "DELETE");
                         break;
                 }

@@ -211,6 +211,8 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     private void logOut() {
+        File cacheDir = new File(getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId());
+        deleteDir(cacheDir);
         ParseUser.logOut();
         layerClient.deauthenticate();
         if (myAdapter != null)
@@ -305,6 +307,20 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 }
                 break;
         }
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (String child : children) {
+                boolean success = deleteDir(new File(dir, child));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // The directory is now empty so delete it
+        return dir.delete();
     }
 
     @Override
