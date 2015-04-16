@@ -86,6 +86,7 @@
  */
 - (IBAction)signInButtonTapped:(UIButton *)sender
 {
+    [self.view endEditing:YES];
     LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
     hud.labelText = @"Signing in";
     

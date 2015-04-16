@@ -22,6 +22,7 @@
 
 @property (nonatomic) CGPoint contentOffsetForTableOnly;
 @property (nonatomic) LoadingHUD *syncHud;
+@property (nonatomic) LoadingHUD *signingOutHud;
 @property (nonatomic) SyncReporter *syncReporter;
 
 @end
@@ -44,6 +45,7 @@
     self.deletionModes = [NSArray new];
     self.syncReporter = [[SyncReporter alloc] initWithClient:self.layerClient];
     self.syncReporter.delegate = self;
+    [self registerNotificationObservers];
     
     // Left navigation item
     UIBarButtonItem *singOutButton = [[UIBarButtonItem alloc] initWithTitle:@"Sign out" style:UIBarButtonItemStylePlain target:self action:@selector(signOutButtonTapped)];
@@ -70,11 +72,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    if (!self.syncReporter.done && ([self.tableView numberOfRowsInSection:0] ==  0))
+    if (!self.syncReporter.done && ([self.tableView numberOfRowsInSection:0] ==  0) && !self.syncHud)
     {
-        self.syncHud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+        //When HUD appears first time it blocks table but don't block navigation bar. If we go to creating a new message and then return back, HUD appears and blocks entire viewController with navigation bar.
+        self.syncHud = [LoadingHUD showHUDAddedTo:self.navigationController.view animated:YES];
         self.syncHud.labelText = @"Synchronisation";
-        self.syncHud.userInteractionEnabled = NO;
     }
 }
 
@@ -102,16 +104,15 @@
  */
 - (void)signOutButtonTapped
 {
-    LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
-    [self.layerClient deauthenticateWithCompletion:^(BOOL success, NSError *error) {
-        if (!success) {
-            [hud hide:YES afterShowingText:@"Failed"];
-            NSLog(@"Failed to deauthenticate with error: %@",error);
-        } else {
-            [hud hide:YES];
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        }
-    }];
+    if (self.syncHud)
+    {
+        [self.syncHud hide:YES];
+    }
+    if (! self.signingOutHud)
+    {
+        self.signingOutHud = [LoadingHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    }
+    [self.layerClient deauthenticateWithCompletion:nil];
 }
 
 #pragma mark - Conversation Selection
@@ -125,6 +126,12 @@
 {
     AppDelegate* appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     appDelegate.messagesViewController = [MessagesViewController conversationViewControllerWithLayerClient:self.layerClient andConversation:conversation];
+    
+    if (self.syncHud)
+    {
+        [self.syncHud hide:YES];
+        self.syncHud = nil;
+    }
     
     if (self.navigationController.topViewController == self) {
         [self.navigationController pushViewController:appDelegate.messagesViewController animated:YES];
@@ -235,7 +242,23 @@
 
 -(void)syncReporterDidFinishSyncing:(SyncReporter *)reporter
 {
-    [self.syncHud hide:YES];
+    if (self.syncHud)
+    {
+        [self.syncHud hide:YES];
+    }
+}
+
+#pragma mark - Notifications
+
+- (void)registerNotificationObservers
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didDeauthenticateNotificationReceived:) name:LYRClientDidDeauthenticateNotification object:nil];
+}
+
+-(void)didDeauthenticateNotificationReceived:(NSNotification*)notification
+{
+    [self.signingOutHud hide:YES];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 @end
