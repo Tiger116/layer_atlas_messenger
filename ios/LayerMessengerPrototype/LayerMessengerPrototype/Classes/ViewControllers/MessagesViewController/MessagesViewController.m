@@ -664,11 +664,10 @@ static NSDateFormatter *TimeFormatter()
 }
 
 /**
- *  Handles ConversationDidCreatedNotification. Sets "Details" button and stores conversation creator's identifier in conversation's metadata.
+ *  Handles ConversationDidCreatedNotification. Sets "Details" button.
  *
  *  @param notification received notification.
  */
-//wrong
 - (void)conversationDidCreated:(NSNotification*) notification
 {
     if (!self.conversation) return;

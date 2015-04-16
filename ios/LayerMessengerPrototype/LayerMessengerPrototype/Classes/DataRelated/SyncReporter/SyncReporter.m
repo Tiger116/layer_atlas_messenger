@@ -14,16 +14,13 @@
 
 @implementation SyncReporter
 
-//+(instancetype)sharedSyncReporterWithLayerClient:(LYRClient *)layerClient
-//{
-//    static dispatch_once_t onceToken;
-//    static SyncReporter *syncReporter = nil;
-//    dispatch_once(&onceToken,^{
-//        syncReporter = [[self alloc] initWithClient:layerClient];
-//    });
-//    return syncReporter;
-//}
-
+/**
+ *  Initializes SyncReporter object with LYRClient object and registers as observer to notifications about LYRClient's synchronisation state.
+ *
+ *  @param client LYRClient object which synchronisation state needed to report.
+ *
+ *  @return Initialized SyncReporter object
+ */
 - (instancetype)initWithClient:(LYRClient *)client
 {
     self = [super init];
@@ -41,6 +38,11 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+/**
+ *  Handles LYRClientWillBeginSynchronizationNotification and if it is first synchronisation tells delegate that synchronisation will begin.
+ *
+ *  @param notification Received NSNotification.
+ */
 - (void)didReceiveWillBeginSynchronizationNotification:(NSNotification *)notification
 {
     NSLog(@"Synchronisation will begin");
@@ -53,6 +55,11 @@
     }
 }
 
+/**
+ *  Handles LYRClientDidFinishSynchronizationNotification and if it was first synchronisation tells delegate that synchronisation did finish.
+ *
+ *  @param notification Received NSNotification.
+ */
 - (void)didReceiveDidFinishSynchronizationNotification:(NSNotification *)notification
 {
     NSLog(@"Synchronisation did finish");

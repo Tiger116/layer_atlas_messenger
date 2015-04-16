@@ -255,6 +255,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didDeauthenticateNotificationReceived:) name:LYRClientDidDeauthenticateNotification object:nil];
 }
 
+/**
+ *  Handles LYRClientDidDeauthenticateNotification. Returns to AuthenticationViewController
+ *
+ *  @param notification <#notification description#>
+ */
 -(void)didDeauthenticateNotificationReceived:(NSNotification*)notification
 {
     [self.signingOutHud hide:YES];

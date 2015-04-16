@@ -14,7 +14,14 @@
 @protocol SyncReporterDelegate <NSObject>
 
 @optional
+/**
+ *  Tells delegate that synchronisation will begin.
+ */
 - (void)syncReporterWillBeginSyncing:(SyncReporter*)reporter;
+
+/**
+ *  Tells delegate that synchronisation did finish.
+ */
 - (void)syncReporterDidFinishSyncing:(SyncReporter*)reporter;
 @end
 
@@ -23,7 +30,6 @@
 @property (nonatomic) BOOL done;
 
 - (instancetype)initWithClient:(LYRClient *)client;
-//+ (instancetype)sharedSyncReporterWithLayerClient:(LYRClient *)layerClient;
 
 @property (nonatomic, weak) id<SyncReporterDelegate> delegate;
 

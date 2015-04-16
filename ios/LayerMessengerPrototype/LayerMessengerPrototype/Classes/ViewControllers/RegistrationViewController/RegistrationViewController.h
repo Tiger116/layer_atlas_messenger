@@ -11,6 +11,12 @@
 @protocol RegistrationViewControllerDelegate <NSObject>
 
 @optional
+/**
+ *  Tells delegate that registration was successful.
+ *
+ *  @param username NSString with registered user's username.
+ *  @param password NSString with registered user's password.
+ */
 -(void)registeredWithUsername:(NSString*)username andPassword:(NSString*)password;
 
 @end
