@@ -13,7 +13,7 @@
 #import "RegistrationViewController.h"
 #import "UsersDataSource.h"
 
-@interface AuthenticationViewController () <UITextFieldDelegate>
+@interface AuthenticationViewController () <UITextFieldDelegate, RegistrationViewControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet UITextField *usernameField;
 @property (strong, nonatomic) IBOutlet UITextField *passwordField;
@@ -57,9 +57,6 @@
 {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
-    self.usernameField.text = @"";
-    self.passwordField.text = @"";
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -70,6 +67,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+    self.usernameField.text = @"";
+    self.passwordField.text = @"";
     [self.navigationController setNavigationBarHidden:NO];
     [super viewWillDisappear:animated];
 }
@@ -140,6 +139,7 @@
 - (IBAction)registerButtonTapped:(UIButton *)sender
 {
     RegistrationViewController* viewController = [[RegistrationViewController alloc] initWithNibName:@"RegistrationViewController" bundle:nil];
+    viewController.delegate = self;
     [self presentViewController:viewController animated:YES completion:nil];
 }
 
@@ -239,6 +239,14 @@
         [self signInButtonTapped:nil];
     }
     return YES;
+}
+
+#pragma mark - RegistrationViewControllerDeleagate
+
+-(void)registeredWithUsername:(NSString *)username andPassword:(NSString *)password
+{
+    self.usernameField.text = username;
+    self.passwordField.text = password;
 }
 
 @end

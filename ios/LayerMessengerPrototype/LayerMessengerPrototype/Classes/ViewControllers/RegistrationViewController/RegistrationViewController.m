@@ -11,7 +11,7 @@
 #import "RegistrationButtonCell.h"
 #import <Parse/Parse.h>
 #import "User.h"
-#import <MBProgressHUD.h>
+#import "LoadingHUD.h"
 
 typedef NS_ENUM(NSInteger, RegistrationTableSection)
 {
@@ -245,8 +245,20 @@ typedef NS_ENUM(NSInteger, RegistrationInputTag)
                     parseUser[@"firstName"] = user.firstName;
                     parseUser[@"lastName"] = user.lastName;
                     [parseUser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                        if (succeeded) {
-                            [self dismissViewControllerAnimated:YES completion:nil];
+                        if (succeeded)
+                        {
+                            LoadingHUD* hud = [LoadingHUD showHUDAddedTo:self.view animated:YES];
+                            hud.mode = MBProgressHUDModeText;
+                            hud.labelText = @"Success";
+                            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+                            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                [hud hide:YES];
+                                [self dismissViewControllerAnimated:YES completion:nil];
+                            });
+                            if (self.delegate && [self.delegate respondsToSelector:@selector(registeredWithUsername:andPassword:)])
+                            {
+                                [self.delegate registeredWithUsername:user.username andPassword:user.password];
+                            }
                         } else {
                             NSLog(@"Failed to create new user: %@",error);
                             [tableView deselectRowAtIndexPath:indexPath animated:YES];

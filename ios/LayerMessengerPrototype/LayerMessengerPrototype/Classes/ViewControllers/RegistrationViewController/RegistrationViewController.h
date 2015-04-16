@@ -8,6 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol RegistrationViewControllerDelegate <NSObject>
+
+@optional
+-(void)registeredWithUsername:(NSString*)username andPassword:(NSString*)password;
+
+@end
+
 @interface RegistrationViewController : UITableViewController <UITextFieldDelegate>
+
+@property (nonatomic, weak) id<RegistrationViewControllerDelegate> delegate;
 
 @end
