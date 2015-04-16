@@ -8,59 +8,59 @@ import android.widget.SectionIndexer;
  * same type
  */
 public abstract class BaseSectionedAdapter extends BaseAdapter implements SectionIndexer {
-	private SectionedSectionIndexer mSectionIndexer;
+    private SectionedSectionIndexer mSectionIndexer;
 
-	public void setSectionIndexer(final SectionedSectionIndexer sectionIndexer) {
-		mSectionIndexer = sectionIndexer;
-	}
+    public void setSectionIndexer(final SectionedSectionIndexer sectionIndexer) {
+        mSectionIndexer = sectionIndexer;
+    }
 
-	public SectionIndexer getSectionIndexer() {
-		return this.mSectionIndexer;
-	}
+    public SectionIndexer getSectionIndexer() {
+        return this.mSectionIndexer;
+    }
 
-	@Override
-	public int getPositionForSection(final int sectionIndex) {
-		if (mSectionIndexer == null)
-			return -1;
-		return mSectionIndexer.getPositionForSection(sectionIndex);
-	}
+    @Override
+    public int getPositionForSection(final int sectionIndex) {
+        if (mSectionIndexer == null)
+            return -1;
+        return mSectionIndexer.getPositionForSection(sectionIndex);
+    }
 
-	@Override
-	public int getSectionForPosition(final int position) {
-		if (mSectionIndexer == null)
-			return -1;
-		return mSectionIndexer.getSectionForPosition(position);
-	}
+    @Override
+    public int getSectionForPosition(final int position) {
+        if (mSectionIndexer == null)
+            return -1;
+        return mSectionIndexer.getSectionForPosition(position);
+    }
 
-	@Override
-	public Object[] getSections() {
-		if (mSectionIndexer == null)
-			return new String[] { " " };
-		return mSectionIndexer.getSections();
-	}
+    @Override
+    public Object[] getSections() {
+        if (mSectionIndexer == null)
+            return new String[]{" "};
+        return mSectionIndexer.getSections();
+    }
 
-	@Override
-	public long getItemId(final int position) {
-		return position;
-	}
+    @Override
+    public long getItemId(final int position) {
+        return position;
+    }
 
-	@Override
-	public int getCount() {
-		return mSectionIndexer.getItemsCount();
-	}
+    @Override
+    public int getCount() {
+        return mSectionIndexer.getItemsCount();
+    }
 
-	@Override
-	public Object getItem(final int position) {
-		return mSectionIndexer.getItem(position);
-	}
+    @Override
+    public Object getItem(final int position) {
+        return mSectionIndexer.getItem(position);
+    }
 
-	@Override
-	public int getViewTypeCount() {
-		return mSectionIndexer.getSections().length;
-	}
+    @Override
+    public int getViewTypeCount() {
+        return mSectionIndexer.getSections().length;
+    }
 
-	@Override
-	public int getItemViewType(final int position) {
-		return mSectionIndexer.getSectionForPosition(position);
-	}
+    @Override
+    public int getItemViewType(final int position) {
+        return mSectionIndexer.getSectionForPosition(position);
+    }
 }

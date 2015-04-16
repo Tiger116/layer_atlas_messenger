@@ -58,7 +58,7 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/attach_photo"
                 tools:ignore="ContentDescription"
-                android:background="?android:attr/selectableItemBackground"/>
+                android:background="?android:attr/selectableItemBackground" />
 
             <EditText
                 android:layout_width="0dp"

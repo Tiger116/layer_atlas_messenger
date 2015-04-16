@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/header_text"
-          style="@style/PinnedHeader"
-          android:layout_width="40dp"
-          android:textColor="@color/pinned_header_text"
-          android:layout_height="40dp"
-          android:background="@null"
-          android:textSize="20sp"
-          tools:ignore="HardcodedText"/>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/header_text"
+    style="@style/PinnedHeader"
+    android:layout_width="40dp"
+    android:textColor="@color/pinned_header_text"
+    android:layout_height="40dp"
+    android:background="@null"
+    android:textSize="20sp"
+    tools:ignore="HardcodedText" />

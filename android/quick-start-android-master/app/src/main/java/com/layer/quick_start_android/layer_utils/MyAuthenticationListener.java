@@ -11,10 +11,7 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import java.util.Arrays;
 import java.util.HashMap;
-
-import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 
 public class MyAuthenticationListener implements LayerAuthenticationListener {
@@ -59,8 +56,10 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     public void onAuthenticated(LayerClient client, String userId) {
         //Start the conversation view after a successful authentication
         System.out.println("Authentication successful");
-        if (main_activity != null)
+        if (main_activity != null) {
             main_activity.dataChange();
+            main_activity.setLayerDownloadParams();
+        }
     }
 
     //Called when there was a problem authenticating

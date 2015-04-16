@@ -1,8 +1,8 @@
 package com.layer.quick_start_android;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -12,7 +12,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
-import android.content.Context;
 
 public class RoundedCorners extends ImageView {
 
@@ -36,8 +35,7 @@ public class RoundedCorners extends ImageView {
 
         Drawable maiDrawable = getDrawable();
 
-        if (maiDrawable!=null && maiDrawable instanceof BitmapDrawable && RADIUS > 0)
-        {
+        if (maiDrawable != null && maiDrawable instanceof BitmapDrawable && RADIUS > 0) {
 
             Paint paint = ((BitmapDrawable) maiDrawable).getPaint();
             final int color = 0xff000000;
@@ -71,7 +69,7 @@ public class RoundedCorners extends ImageView {
         }
     }
 
-    public void setRadius(int radius){
+    public void setRadius(int radius) {
         this.RADIUS = radius;
     }
 }

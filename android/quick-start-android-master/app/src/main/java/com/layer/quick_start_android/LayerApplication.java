@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import com.layer.quick_start_android.activities.MainActivity;
+import com.layer.quick_start_android.activities.MessengerActivity;
+import com.layer.quick_start_android.layer_utils.MySyncListener;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerChangeEventListener;
 import com.parse.Parse;
@@ -13,7 +16,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,14 +46,11 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
         UUID appID = UUID.fromString(Layer_App_ID);
         layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
+        layerClient.registerSyncListener(new MySyncListener());
         LayerClient.enableLogging();
         setParseUsers();
 
         conversationView = new ConversationViewController(null);
-    }
-
-    public static Activity getCurrentActivity() {
-        return mCurrentActivity;
     }
 
     public static void setCurrentActivity(Activity currentActivity) {
@@ -103,5 +102,15 @@ public class LayerApplication extends Application implements LayerChangeEventLis
             }
         }
         return null;
+    }
+
+    public static void reDrawUI() {
+        if (mCurrentActivity != null) {
+            if (mCurrentActivity.getClass().toString().equals(MainActivity.class.toString())) {
+                ((MainActivity) mCurrentActivity).dataChange();
+            } else if (mCurrentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
+                ((MessengerActivity) mCurrentActivity).drawConversation();
+            }
+        }
     }
 }

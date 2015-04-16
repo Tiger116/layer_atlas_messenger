@@ -7,25 +7,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.layer.quick_start_android.LayerApplication;
 import com.layer.quick_start_android.MyArrayAdapter;
+import com.layer.quick_start_android.R;
 import com.layer.quick_start_android.layer_utils.MyAuthenticationListener;
 import com.layer.quick_start_android.layer_utils.MyConnectionListener;
-import com.layer.quick_start_android.R;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
 import com.parse.ParseUser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,19 +88,16 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
 
     public void dataChange() {
         Handler handler = new Handler();
+        conversations.clear();
         if (layerClient.isAuthenticated()) {
-//            Boolean isDeleted = false;
             Query query = Query.builder(Conversation.class).sortDescriptor(new SortDescriptor(Conversation.Property.LAST_MESSAGE_RECEIVED_AT, SortDescriptor.Order.DESCENDING)).build();
             conversations = layerClient.executeQuery(query, Query.ResultType.OBJECTS);
             List<Conversation> toRemove = new ArrayList<>();
             if (!conversations.isEmpty()) {
                 for (Conversation conversation : conversations) {
-                    if (conversation.getParticipants().isEmpty() || conversation.getParticipants().size() == 1) {
-                        if (!conversation.isDeleted()) {
-                            toRemove.add(conversation);
-                            conversation.delete(LayerClient.DeletionMode.LOCAL);
-//                            isDeleted = true;
-                        }
+                    if (conversation.getParticipants().isEmpty() || conversation.getParticipants().size() == 1
+                            || conversation.isDeleted()) {
+                        toRemove.add(conversation);
                     }
                 }
                 if (!toRemove.isEmpty()) {
@@ -151,7 +152,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     private void loadLayerClient() {
-
+        Log.d("ON RESUME", "reload");
         if (layerClient != null) {
             layerClient.registerConnectionListener(connectionListener);
             layerClient.registerAuthenticationListener(authenticationListener);
@@ -159,10 +160,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 if (!layerClient.isAuthenticated()) layerClient.authenticate();
                 else if (!layerClient.isConnected()) layerClient.connect();
                 else {
-
-                    layerClient.setAutoDownloadSizeThreshold(1024 * 128);
-                    layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview", "image/jpeg", "application/json+imageSize"));
-                    layerClient.setDiskCapacity(1024 * 1024 * 100);
+                    setLayerDownloadParams();
                     dataChange();
                 }
             } else {
@@ -170,6 +168,12 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 startActivityForResult(intent, requestCodeLogin);
             }
         }
+    }
+
+    public void setLayerDownloadParams() {
+//        layerClient.setAutoDownloadSizeThreshold(1024 * 128);
+        layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));
+        layerClient.setDiskCapacity(1024 * 1024 * 100);
     }
 
     public void showProgressDialog() {
@@ -209,7 +213,8 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     private void logOut() {
         ParseUser.logOut();
         layerClient.deauthenticate();
-        dataChange();
+        if (myAdapter != null)
+            myAdapter.clear();
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivityForResult(intent, requestCodeLogin);
     }
@@ -242,22 +247,28 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 final EditText input = new EditText(dialog.getContext());
                 input.setSingleLine(true);
                 input.setSelectAllOnFocus(true);
-                String title = "";
-                if (conversations.get(info.position).getMetadata().get(getString(R.string.title_label)) != null)
-                    title = conversations.get(info.position).getMetadata().get(getString(R.string.title_label)).toString();
-                input.setText(title);
-                input.setSelection(input.getText().length());
-                dialog.setView(input);
+                if (conversations.get(info.position).getMetadata().get(getString(R.string.title_label)) != null) {
+                    String title = conversations.get(info.position).getMetadata().get(getString(R.string.title_label)).toString();
+                    input.setText(title);
+                }
+                input.setHint("Input dialog name");
+//                input.setSelection(input.getText().length());
+
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setGravity(Gravity.CENTER_HORIZONTAL);
+                layout.setPadding(10, 0, 10, 0);
+                layout.addView(input);
+
+                dialog.setView(layout);
 
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String title = input.getEditableText().toString();
                         if (!title.isEmpty())
-//                            title = conversations.get(info.position).getParticipants().toString();
                             conversations.get(info.position).putMetadataAtKeyPath(getString(R.string.title_label), title);
                         else
                             conversations.get(info.position).removeMetadataAtKeyPath(getString(R.string.title_label));
-//                        conversationList.set(info.position, title);
                         dataChange();
                     }
                 });
@@ -295,6 +306,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 break;
         }
     }
+
     @Override
     public void onBackPressed() {
         finish();

@@ -1,11 +1,8 @@
 package com.layer.quick_start_android;
 
-import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
-import com.layer.quick_start_android.activities.MainActivity;
-import com.layer.quick_start_android.activities.MessengerActivity;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
 import com.layer.sdk.listeners.LayerChangeEventListener;
@@ -15,7 +12,6 @@ import com.layer.sdk.messaging.Message;
 
 import java.util.List;
 
-import static com.layer.quick_start_android.LayerApplication.getCurrentActivity;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 /**
@@ -123,13 +119,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
         if (activeConversation == null)
             activeConversation = getConversation();
 
-        //If anything in the conversation changes, re-draw it in the GUI
-        Activity currentActivity = getCurrentActivity();
-        if (currentActivity.getClass().toString().equals(MainActivity.class.toString())) {
-            ((MainActivity) currentActivity).dataChange();
-        } else if (currentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
-            ((MessengerActivity) currentActivity).drawConversation();
-        }
+        LayerApplication.reDrawUI();
     }
 
     @Override

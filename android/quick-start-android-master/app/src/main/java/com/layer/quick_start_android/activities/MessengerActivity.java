@@ -35,7 +35,6 @@ import com.layer.quick_start_android.LayerApplication;
 import com.layer.quick_start_android.MessageView;
 import com.layer.quick_start_android.MyAutoCompleteTextView;
 import com.layer.quick_start_android.R;
-import com.layer.quick_start_android.layer_utils.MyProgressListener;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
@@ -157,6 +156,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                             if (!textUsers.contains(getUserNameById(participant)) && !participant.equals(layerClient.getAuthenticatedUserId())) {
                                 myAutoCompleteAdapter.add(getUserNameById(participant));
                                 deleteUser = participant;
+                                drawConversation();
                             }
                         }
                     }
@@ -228,10 +228,9 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 List<String> userNames = new ArrayList<>();
                 for (String userId : participantIdList) {
                     String userName = getUserNameById(userId);
-                    if (userName != null)
-                        userNames.add(userName);
-                    else
-                        userNames.add(userId);
+                    if (userName == null)
+                        userName = userId;
+                    userNames.add(userName);
                 }
                 title = userNames.toString();
             }
@@ -243,8 +242,8 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
             //Grab all the messages from the conversation and add them to the GUI
             List<Message> allMsgs = layerClient.getMessages(conversationView.getConversation());
-            for (int i = 0; i < allMsgs.size(); i++) {
-                addMessageToView(allMsgs.get(i));
+            for (Message msg : allMsgs) {
+                addMessageToView(msg);
             }
 
             //After redrawing, force the scroll view to the bottom (most recent message)
@@ -278,7 +277,6 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
         //Once the message has been displayed, we mark it as read
         //NOTE: the sender of a message CANNOT mark their own message as read
-//        if (ma.hasWindowFocus())
         if (!msg.getSentByUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
             msg.markAsRead();
 
@@ -337,7 +335,6 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
             usersView.setMovementMethod(LinkMovementMethod.getInstance());
             usersView.append(sb);
-            usersView.requestFocus();
         }
     }
 
@@ -445,44 +442,71 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 break;
             case REQUEST_LOAD_IMAGE:
                 if (resultCode == RESULT_OK && data != null) {
-                    Uri selectedImage = data.getData();
-                    Bitmap bitmap;
-                    ByteArrayOutputStream outputStream;
-                    byte[] imageArray;
-                    int quality = 100;
-                    try {
-                        ContentResolver cr = getBaseContext().getContentResolver();
-                        InputStream inputStream = cr.openInputStream(selectedImage);
-                        bitmap = BitmapFactory.decodeStream(inputStream);
-                        outputStream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-                        imageArray = outputStream.toByteArray();
-
-                        if (imageArray != null) {
-                            MessagePart jpeg = layerClient.newMessagePart("image/jpeg", imageArray);
-                            ImageParams params = new ImageParams(bitmap);
-                            Gson gson = new Gson();
-                            String json = gson.toJson(params);
-                            MessagePart jsonPart = layerClient.newMessagePart("application/json+imageSize", json.getBytes());
-
-                            Log.d("LENGTH", String.format("%d, %d", imageArray.length, layerClient.getAutoDownloadSizeThreshold()));
-                            
-                            while (imageArray.length > layerClient.getAutoDownloadSizeThreshold() && quality > 1) {
-                                quality /= 2;
-                                outputStream.reset();
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-                                imageArray = outputStream.toByteArray();
-                            }
-                            MessagePart jpegPreview = layerClient.newMessagePart("image/jpeg+preview", imageArray);
-                            Message message = layerClient.newMessage(jpeg, jpegPreview, jsonPart);
-                            conversationView.getConversation().send(message);
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    createImageMessage(data.getData());
                 }
         }
     }
+
+    private void createImageMessage(Uri selectedImage) {
+        Bitmap bitmap;
+        ByteArrayOutputStream outputStream;
+        InputStream inputStream;
+        int arraySize;
+        byte[] imageArray;
+        try {
+            ContentResolver cr = getBaseContext().getContentResolver();
+            inputStream = cr.openInputStream(selectedImage);
+            bitmap = BitmapFactory.decodeStream(inputStream);
+            outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            imageArray = outputStream.toByteArray();
+
+            if (imageArray != null) {
+                arraySize = imageArray.length;
+                Log.d("SEND IMAGE", "length original: " + arraySize);
+                Log.d("SEND IMAGE", "sizes original: " + bitmap.getWidth() + " x " + bitmap.getHeight());
+                MessagePart jpeg = layerClient.newMessagePart("image/jpeg", imageArray);
+                ImageParams params = new ImageParams(bitmap);
+                Gson gson = new Gson();
+                String json = gson.toJson(params);
+                Log.d("SEND IMAGE", "json: " + json);
+                MessagePart jsonPart = layerClient.newMessagePart("application/json+imageSize", json.getBytes());
+                final int reqSize = 1024 * 128;
+                int inSampleSize = 2;
+                while (arraySize > reqSize) {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+//                    options.inSampleSize = calculateInSampleSize(imageArray.length, reqSize);
+                    options.inSampleSize = inSampleSize;
+                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+                    inputStream = cr.openInputStream(selectedImage);
+                    outputStream.reset();
+                    bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    arraySize = outputStream.toByteArray().length;
+                    inSampleSize += 2;
+                }
+                Log.d("SEND IMAGE", "length preview: " + arraySize);
+                Log.d("SEND IMAGE", "sizes preview: " + bitmap.getWidth() + " x " + bitmap.getHeight());
+                MessagePart jpegPreview = layerClient.newMessagePart("image/jpeg+preview", outputStream.toByteArray());
+                Message message = layerClient.newMessage(jpeg, jpegPreview, jsonPart);
+                conversationView.getConversation().send(message);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    private int calculateInSampleSize(long size, long reqSize) {
+//        if (size > reqSize) {
+//            int inSampleSize = 2;
+//
+//            while ((size / inSampleSize) > reqSize) {
+//                inSampleSize += 2;
+//            }
+//            return inSampleSize;
+//        } else
+//            return 1;
+//    }
 
     //================================================================================
     // LayerTypingIndicatorListener methods

@@ -9,7 +9,7 @@ public class MyConnectionListener implements LayerConnectionListener {
 
     private MainActivity main_activity;
 
-    public MyConnectionListener(MainActivity ma){
+    public MyConnectionListener(MainActivity ma) {
         main_activity = ma;
     }
 
@@ -17,7 +17,7 @@ public class MyConnectionListener implements LayerConnectionListener {
     public void onConnectionConnected(LayerClient client) {
         System.out.println("Connected to Layer");
 
-        if(client.isAuthenticated())
+        if (client.isAuthenticated())
             main_activity.dataChange();
         else
             client.authenticate();

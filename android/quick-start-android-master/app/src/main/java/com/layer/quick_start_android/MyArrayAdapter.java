@@ -45,11 +45,6 @@ public class MyArrayAdapter extends ArrayAdapter {
     }
 
     @Override
-    public long getItemId(int position) {
-        return conversations.get(position).hashCode();
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         ViewHolder holder;
@@ -60,38 +55,36 @@ public class MyArrayAdapter extends ArrayAdapter {
             holder.newMessageIcon = (ImageView) view.findViewById(R.id.new_message_icon);
             Conversation conversation = conversations.get(position);
             if (conversation != null) {
-                if (conversation.isDeleted())
-                return view;
-                    String title = "";
-                    List<String> participants = new ArrayList<>();
-                    if (conversation.getMetadata() != null)
-                        if (conversation.getMetadata().get(context.getString(R.string.title_label)) != null)
-                            title = conversation.getMetadata().get(context.getString(R.string.title_label)).toString();
-                        else {
-                            for (String participantId : conversation.getParticipants()) {
-                                String name = LayerApplication.getUserNameById(participantId);
-                                if (name == null)
-                                    name = participantId;
-                                participants.add(name);
-                            }
-                            title = participants.toString();
-//                        conversation.putMetadataAtKeyPath(context.getString(R.string.title_label),title);
+                String title = "";
+                List<String> participants = new ArrayList<>();
+                if (conversation.getMetadata() != null)
+                    if (conversation.getMetadata().get(context.getString(R.string.title_label)) != null)
+                        title = conversation.getMetadata().get(context.getString(R.string.title_label)).toString();
+                    else {
+                        for (String participantId : conversation.getParticipants()) {
+                            String name = LayerApplication.getUserNameById(participantId);
+                            if (name == null)
+                                name = participantId;
+                            participants.add(name);
                         }
-                    holder.conversationName.setText(title);
+                        title = participants.toString();
+//                        conversation.putMetadataAtKeyPath(context.getString(R.string.title_label),title);
+                    }
+                holder.conversationName.setText(title);
 
-                    Query query = Query.builder(Message.class)
-                            .predicate(new CompoundPredicate(CompoundPredicate.Type.AND,
-                                    new Predicate(Message.Property.CONVERSATION, Predicate.Operator.EQUAL_TO, conversation),
-                                    new Predicate(Message.Property.IS_UNREAD, Predicate.Operator.EQUAL_TO, true)))
-                            .sortDescriptor(new SortDescriptor(Message.Property.SENT_AT, SortDescriptor.Order.DESCENDING))
-                            .build();
-                    List<Long> resultArray = layerClient.executeQuery(query, Query.ResultType.COUNT);
-                    int count = resultArray.get(0).intValue();
-                    if (count > 0)
-                        holder.newMessageIcon.setVisibility(View.VISIBLE);
-                    else
-                        holder.newMessageIcon.setVisibility(View.GONE);
-                }
+                Query query = Query.builder(Message.class)
+                        .predicate(new CompoundPredicate(CompoundPredicate.Type.AND,
+                                new Predicate(Message.Property.CONVERSATION, Predicate.Operator.EQUAL_TO, conversation),
+                                new Predicate(Message.Property.IS_UNREAD, Predicate.Operator.EQUAL_TO, true)))
+                        .sortDescriptor(new SortDescriptor(Message.Property.SENT_AT, SortDescriptor.Order.DESCENDING))
+                        .build();
+                List<Long> resultArray = layerClient.executeQuery(query, Query.ResultType.COUNT);
+                int count = resultArray.get(0).intValue();
+                if (count > 0)
+                    holder.newMessageIcon.setVisibility(View.VISIBLE);
+                else
+                    holder.newMessageIcon.setVisibility(View.GONE);
+            }
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();

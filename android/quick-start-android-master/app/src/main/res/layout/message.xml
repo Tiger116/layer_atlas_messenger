@@ -62,14 +62,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <com.layer.quick_start_android.RoundedCorners
             android:id="@+id/message_image"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             android:layout_weight="1"
-            android:scaleType="centerInside"
             android:adjustViewBounds="true"
             tools:ignore="ContentDescription" />
     </LinearLayout>
