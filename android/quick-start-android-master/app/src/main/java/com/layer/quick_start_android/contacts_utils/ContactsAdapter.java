@@ -84,10 +84,7 @@ public class ContactsAdapter extends SearchablePinnedHeaderListViewAdapter<Conta
         else {
             final int backgroundColorToUse = PHOTO_TEXT_BACKGROUND_COLORS[position
                     % PHOTO_TEXT_BACKGROUND_COLORS.length];
-            if (TextUtils.isEmpty(displayName))
-                holder.friendProfileCircularContactView.setImageResource(R.drawable.ic_person_white_120dp,
-                        backgroundColorToUse);
-            else {
+            if (!TextUtils.isEmpty(displayName)) {
                 final String characterToShow = TextUtils.isEmpty(displayName) ? "" : displayName.substring(0, 1).toUpperCase(Locale.getDefault());
                 holder.friendProfileCircularContactView.setTextAndBackgroundColor(characterToShow, backgroundColorToUse);
             }

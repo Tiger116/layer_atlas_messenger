@@ -173,7 +173,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     public void setLayerDownloadParams() {
 //        layerClient.setAutoDownloadSizeThreshold(1024 * 128);
         layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));
-        layerClient.setDiskCapacity(1024 * 1024 * 100);
+//        layerClient.setDiskCapacity(1024 * 1024 * 100);
     }
 
     public void showProgressDialog() {
@@ -211,7 +211,7 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     private void logOut() {
-        File cacheDir = new File(getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId());
+        File cacheDir = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId());
         deleteDir(cacheDir);
         ParseUser.logOut();
         layerClient.deauthenticate();

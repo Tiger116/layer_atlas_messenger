@@ -12,16 +12,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.layer.quick_start_android.activities.MapActivity;
 import com.layer.quick_start_android.layer_utils.MyProgressListener;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +38,7 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
  */
 public class MessageView {
 
+    private boolean isImage;
     //The sender and message views
 //    private ImageView senderPhoto;
     private TextView senderTV;
@@ -41,25 +47,48 @@ public class MessageView {
     private View messageImageIndent;
     private RoundedCorners messageImage;
     private ImageView statusImage;
+    private LinearLayout locationLayout;
 
     private Context context;
     private Message message;
 
     private File imageFile;
+    private List<HashMap<Double, Double>> locations;
 
     //Takes the Layout parent object and message
     public MessageView(LinearLayout parent, LinearLayout meLayout, final Message msg) {
         this.context = LayerApplication.getContext();
         this.message = msg;
-        File directory = new File(context.getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId() + File.separator + msg.getConversation().getId().getLastPathSegment());
+        File directory = new File(context.getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + msg.getConversation().getId().getLastPathSegment());
         directory.mkdirs();
         imageFile = new File(directory, msg.getId().getLastPathSegment() + ".jpeg");
+        locations = new ArrayList<>();
 //        senderPhoto = (ImageView) meLayout.findViewById(R.id.message_user_photo);
         senderTV = (TextView) meLayout.findViewById(R.id.message_username);
         sendTime = (TextView) meLayout.findViewById(R.id.message_time);
         messageTV = (TextView) meLayout.findViewById(R.id.message_text);
         messageImageIndent = meLayout.findViewById(R.id.message_image_indent);
         messageImage = (RoundedCorners) meLayout.findViewById(R.id.message_image);
+        locationLayout = (LinearLayout) meLayout.findViewById(R.id.location_layout);
+        locationLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!locations.isEmpty()) {
+                    Intent intent = new Intent(context, MapActivity.class);
+                    double[] longitude = new double[locations.size()];
+                    double[] latitude = new double[locations.size()];
+                    for (int i = 0; i < locations.size(); i++) {
+//                        Log.d(this.toString(), "" + locations.get(i).get("lat"));
+                        latitude[i] = locations.get(i).get("lat");
+                        longitude[i] = locations.get(i).get("lon");
+                    }
+                    intent.putExtra("latitude", latitude);
+                    intent.putExtra("longitude", longitude);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+            }
+        });
         messageImage.setRadius(10);
         messageImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,15 +121,18 @@ public class MessageView {
         } else {
             senderTxt = "";
             background = context.getResources().getDrawable(R.drawable.bubble_green);
-            LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            paramsText.gravity = Gravity.END;
-            messageTV.setLayoutParams(paramsText);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.END;
+            messageTV.setLayoutParams(params);
+            locationLayout.setLayoutParams(params);
             messageImageIndent.setVisibility(View.INVISIBLE);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             messageTV.setBackground(background);
+            locationLayout.setBackground(background);
         } else {
             messageTV.setBackgroundDrawable(background);
+            locationLayout.setBackgroundDrawable(background);
         }
         if (senderTxt.isEmpty()) {
             senderTV.setVisibility(View.GONE);
@@ -109,16 +141,8 @@ public class MessageView {
             senderTV.setVisibility(View.VISIBLE);
         }
 
-        //Add the timestamp
-        String time = "";
-        if (msg.getSentAt() != null) {
-            time = new SimpleDateFormat("dd MMMM H:mm:ss", Locale.ENGLISH).format(msg.getSentAt());
-        }
-        sendTime.setText(time);
-
         //The message text
         String msgText = "";
-
         //Go through each part, and if it is text (which it should be by default), append it to the
         // message text
         List<MessagePart> parts = msg.getMessageParts();
@@ -136,11 +160,13 @@ public class MessageView {
                         break;
                     case "image/jpeg":
                         if (part.isContentReady()) {
+                            isImage = true;
                             byte[] imageArray = part.getData();
                             if (imageArray != null) {
                                 Log.d("SIZE IMAGE", String.valueOf(imageArray.length));
                                 Log.d("SIZE FILE", String.valueOf(imageFile.length()));
                                 if (!imageFile.exists() || imageFile.length() < imageArray.length) {
+                                    imageFile.delete();
                                     byteArrayToFile(imageArray, imageFile);
                                 }
                             }
@@ -150,6 +176,7 @@ public class MessageView {
                         }
                         break;
                     case "image/jpeg+preview":
+                        isImage = true;
 //                        if (part.isContentReady()) {
                         if (!imageFile.exists()) {
                             byte[] imagePreviewArray = part.getData();
@@ -159,7 +186,7 @@ public class MessageView {
                             }
                         }
                         break;
-                    case "application/json+imageSize":
+//                    case "application/json+imageSize":
 //                        byte[] jsonArray = part.getData();
 //                        if (jsonArray != null) {
 //                            String json = new String(jsonArray);
@@ -167,18 +194,46 @@ public class MessageView {
 //                            Gson gson = new Gson();
 //                            ImageParams params = gson.fromJson(json, ImageParams.class);
 //                        }
+//                        break;
+                    case "text/location":
+                        isImage = false;
+                        locationLayout.setVisibility(View.VISIBLE);
+                        HashMap<Double, Double> location;
+                        byte[] data = part.getData();
+                        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+                        ObjectInputStream objectInputStream;
+                        try {
+                            objectInputStream = new ObjectInputStream(inputStream);
+                            location = (HashMap<Double, Double>) objectInputStream.readObject();
+                            locations.add(location);
+                        } catch (IOException | ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
             }
+
+//                Add the timestamp
+            String time;
+            if (msg.getSentAt() != null) {
+                time = new SimpleDateFormat("dd MMMM H:mm:ss", Locale.ENGLISH).format(msg.getSentAt());
+            } else {
+                statusImage.setVisibility(View.INVISIBLE);
+                time = "Loading... Please wait";
+            }
+            sendTime.setText(time);
+
             if (!msgText.isEmpty()) {
                 messageTV.setVisibility(View.VISIBLE);
                 messageTV.setText(msgText);
             } else {
                 messageTV.setVisibility(View.GONE);
-                if (imageFile.exists()) {
-                    Picasso.with(context).load(imageFile).into(messageImage);
-                } else {
-                    Picasso.with(context).load(R.drawable.loading).into(messageImage);
+                if (isImage) {
+                    if (imageFile.exists()) {
+                        Picasso.with(context).load(imageFile).into(messageImage);
+                    } else {
+                        Picasso.with(context).load(R.drawable.loading).into(messageImage);
+                    }
                 }
             }
         }

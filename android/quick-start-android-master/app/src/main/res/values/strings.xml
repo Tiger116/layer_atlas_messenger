@@ -35,5 +35,12 @@
     <string name="firstname_hint">First Name</string>
     <string name="lastname_hint">Last Name</string>
     <string name="more_button_text">More...</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="ok_title">OK</string>
+    <string name="locations_label">Attachment: map marker</string>
+    <string name="pictures">Pictures</string>
+    <string name="photo">Take Photo</string>
+    <string name="marker">Marker on the map</string>
+    <string name="lase_image">Last sent image</string>
 
 </resources>

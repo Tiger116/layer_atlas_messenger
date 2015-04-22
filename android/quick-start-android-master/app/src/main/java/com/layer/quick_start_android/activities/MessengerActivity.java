@@ -1,6 +1,8 @@
 package com.layer.quick_start_android.activities;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +10,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Spannable;
@@ -16,7 +20,9 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.layer.quick_start_android.ConversationViewController;
@@ -44,8 +51,11 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,6 +71,8 @@ import static com.layer.quick_start_android.LayerApplication.layerClient;
 
 public class MessengerActivity extends ActionBarActivity implements View.OnClickListener, TextWatcher, LayerTypingIndicatorListener {
     private static final int REQUEST_LOAD_IMAGE = 2;
+    private static final int REQUEST_OPEN_CAMERA = 3;
+    private static final int REQUEST_MAP_MARKERS = 4;
 
     //List of all users currently typing
     private ArrayList<String> typingUsers;
@@ -76,6 +88,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
     private String parameter = null;
     //All messages
     private Hashtable<String, MessageView> allMessages;
+    private Uri imageURI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +113,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         //Cache off gui objects
         sendButton = (Button) findViewById(R.id.send);
         userInput = (EditText) findViewById(R.id.input);
-        attach_button = (ImageButton) findViewById(R.id.attach_photo);
+        attach_button = (ImageButton) findViewById(R.id.attachment);
         conversationScroll = (ScrollView) findViewById(R.id.scrollView);
         conversationLayout = (LinearLayout) findViewById(R.id.conversation);
         typingIndicator = (TextView) findViewById(R.id.typingIndicator);
@@ -113,8 +126,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         attach_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, REQUEST_LOAD_IMAGE);
+                openContextMenu(v);
             }
         });
         userInput.setText("");
@@ -175,9 +187,16 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
             }
         });
 
+        registerForContextMenu(attach_button);
+
         //If there is an active conversation, draw it
         drawConversation();
     }
+
+    private Dialog createDialog(Context context) {
+        return null;
+    }
+
 
     //Create a new message and send it
     private void sendButtonClicked() {
@@ -410,16 +429,59 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        switch (v.getId()) {
+            case R.id.attachment:
+                menu.setHeaderTitle("Add attachment");
+                menu.setHeaderIcon(R.drawable.attachment);
+//                menu.add("Picture");
+//                menu.add("Take photo");
+//                menu.add("Map marker");
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.menu_attach, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        String menuItemText = String.valueOf(item.getTitle());
+        switch (item.getItemId()) {
+            case R.id.pictures:
+                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, REQUEST_LOAD_IMAGE);
+                break;
+            case R.id.take_photo:
+                File file = new File(Environment.getExternalStorageDirectory(), "layer-photo.jpg");
+                imageURI = Uri.fromFile(file);
+                Log.d("Messenger", imageURI.toString());
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageURI);
+                startActivityForResult(cameraIntent, REQUEST_OPEN_CAMERA);
+                break;
+            case R.id.last_image:
+                if (imageURI != null)
+                    createImageMessage(imageURI);
+                else
+                    Toast.makeText(this, "You don't have last sent image!", Toast.LENGTH_SHORT);
+                break;
+            case R.id.map_marker:
+                Intent mapIntent = new Intent(MessengerActivity.this, MapActivity.class);
+                startActivityForResult(mapIntent, REQUEST_MAP_MARKERS);
+                break;
+        }
+        return true;
+    }
+
     //================================================================================
     // TextWatcher methods
     //================================================================================
 
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
     }
 
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
     }
 
     public void afterTextChanged(Editable s) {
@@ -440,10 +502,47 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                     }
                 }
                 break;
+            case REQUEST_OPEN_CAMERA:
+                if (resultCode == RESULT_OK) {
+                    if (imageURI != null)
+                        createImageMessage(imageURI);
+                }
             case REQUEST_LOAD_IMAGE:
                 if (resultCode == RESULT_OK && data != null) {
-                    createImageMessage(data.getData());
+                    imageURI = data.getData();
+                    createImageMessage(imageURI);
                 }
+                break;
+            case REQUEST_MAP_MARKERS:
+                if (data != null) {
+                    List<MessagePart> parts = new ArrayList<>();
+                    double[] latitudes = data.getExtras().getDoubleArray("latitude");
+                    double[] longitudes = data.getExtras().getDoubleArray("longitude");
+                    Log.d(this.toString(), Arrays.toString(latitudes));
+                    Log.d(this.toString(), Arrays.toString(longitudes));
+                    for (int i = 0; i < latitudes.length; i++) {
+                        HashMap location = new HashMap<String, String>();
+                        location.put("lat", latitudes[i]);
+                        location.put("lon", longitudes[i]);
+
+//                        Convert the location to data
+                        ByteArrayOutputStream locationData = new ByteArrayOutputStream();
+                        ObjectOutputStream outputStream;
+                        try {
+                            outputStream = new ObjectOutputStream(locationData);
+                            outputStream.writeObject(location);
+                            MessagePart locationPart = layerClient.newMessagePart("text/location", locationData.toByteArray());
+                            parts.add(locationPart);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (!parts.isEmpty()) {
+                        Message message = layerClient.newMessage(parts);
+                        conversationView.getConversation().send(message);
+                    }
+                }
+                break;
         }
     }
 
@@ -526,7 +625,6 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 typingUsers.remove(userID);
                 break;
         }
-
 
         if (typingUsers.size() == 0) {
 

@@ -51,12 +51,12 @@
             android:layout_gravity="center_horizontal">
 
             <ImageButton
-                android:id="@+id/attach_photo"
+                android:id="@+id/attachment"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:padding="@dimen/abc_control_padding_material"
                 android:scaleType="centerInside"
-                android:src="@drawable/attach_photo"
+                android:src="@drawable/attachment"
                 tools:ignore="ContentDescription"
                 android:background="?android:attr/selectableItemBackground" />
 

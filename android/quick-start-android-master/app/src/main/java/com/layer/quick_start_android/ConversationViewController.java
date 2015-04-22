@@ -93,7 +93,7 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                         break;
 
                     case DELETE:
-                        File directory = new File(getContext().getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
+                        File directory = new File(getContext().getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
                         if (directory.isDirectory()) {
                             String[] children = directory.list();
                             for (String child : children) {

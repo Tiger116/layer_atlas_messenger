@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/pictures"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/pictures"
+        android:title="@string/pictures" />
+
+    <item
+        android:id="@+id/take_photo"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/attach_photo"
+        android:title="@string/photo" />
+
+    <item
+        android:id="@+id/last_image"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/last_image"
+        android:title="@string/lase_image" />
+
+    <item
+        android:id="@+id/map_marker"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/map_marker"
+        android:title="@string/marker" />
+</menu>
