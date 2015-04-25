@@ -1,8 +1,6 @@
 package com.layer.quick_start_android.activities;
 
-import android.app.Dialog;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -20,28 +17,29 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ImageSpan;
 import android.util.Log;
-import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.layer.quick_start_android.ConversationViewController;
 import com.layer.quick_start_android.ImageParams;
 import com.layer.quick_start_android.LayerApplication;
 import com.layer.quick_start_android.MessageView;
 import com.layer.quick_start_android.MyAutoCompleteTextView;
 import com.layer.quick_start_android.R;
+import com.layer.quick_start_android.layer_utils.ConversationViewController;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;
 import com.layer.sdk.messaging.Conversation;
@@ -65,9 +63,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.layer.quick_start_android.LayerApplication.conversationView;
+import static com.layer.quick_start_android.LayerApplication.getImageURI;
 import static com.layer.quick_start_android.LayerApplication.getUserIdByName;
 import static com.layer.quick_start_android.LayerApplication.getUserNameById;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
+import static com.layer.quick_start_android.LayerApplication.setImageURI;
 
 public class MessengerActivity extends ActionBarActivity implements View.OnClickListener, TextWatcher, LayerTypingIndicatorListener {
     private static final int REQUEST_LOAD_IMAGE = 2;
@@ -88,7 +88,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
     private String parameter = null;
     //All messages
     private Hashtable<String, MessageView> allMessages;
-    private Uri imageURI;
+    private PopupWindow popUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,13 +120,12 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
 
         //List of users that are typing which is used with LayerTypingIndicatorListener
         typingUsers = new ArrayList<>();
-
         //Capture user input
         sendButton.setOnClickListener(this);
         attach_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openContextMenu(v);
+                createPopUp((View) conversationScroll.getParent());
             }
         });
         userInput.setText("");
@@ -187,16 +186,71 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
             }
         });
 
-        registerForContextMenu(attach_button);
-
         //If there is an active conversation, draw it
         drawConversation();
     }
 
-    private Dialog createDialog(Context context) {
-        return null;
+    private void createPopUp(final View parent) {
+
+        if (popUp == null) {
+            View popUpView = getLayoutInflater().inflate(R.layout.popup_attach, null);
+
+            popUp = new PopupWindow(popUpView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
+            popUp.setOutsideTouchable(true);
+
+
+            LinearLayout picturesLayout = (LinearLayout) popUpView.findViewById(R.id.pictures);
+            picturesLayout.setOnClickListener(onPopUpItemClick);
+            LinearLayout photoLayout = (LinearLayout) popUpView.findViewById(R.id.take_photo);
+            photoLayout.setOnClickListener(onPopUpItemClick);
+            LinearLayout lastImageLayout = (LinearLayout) popUpView.findViewById(R.id.last_image);
+            lastImageLayout.setOnClickListener(onPopUpItemClick);
+            LinearLayout mapLayout = (LinearLayout) popUpView.findViewById(R.id.map_marker);
+            mapLayout.setOnClickListener(onPopUpItemClick);
+
+            popUp.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    parent.setAlpha(1.0f);
+                }
+            });
+            popUp.setBackgroundDrawable(new BitmapDrawable(null, ""));
+        }
+        parent.setAlpha(0.3f);
+        popUp.showAtLocation(parent, Gravity.CENTER, 0, 0);
     }
 
+    View.OnClickListener onPopUpItemClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.pictures:
+                    Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(i, REQUEST_LOAD_IMAGE);
+                    break;
+                case R.id.take_photo:
+                    File phoroFile = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId(), "layer-photo.jpg");
+                    setImageURI(Uri.fromFile(phoroFile));
+                    Log.d("Messenger", getImageURI().toString());
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, getImageURI());
+                    startActivityForResult(cameraIntent, REQUEST_OPEN_CAMERA);
+                    break;
+                case R.id.last_image:
+                    if (getImageURI() != null) {
+                        createImageMessage(getImageURI());
+                    } else
+                        Toast.makeText(MessengerActivity.this, "You don't have last sent image", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.map_marker:
+                    Intent mapIntent = new Intent(MessengerActivity.this, MapActivity.class);
+                    startActivityForResult(mapIntent, REQUEST_MAP_MARKERS);
+                    break;
+            }
+            if (popUp != null)
+                popUp.dismiss();
+        }
+    };
 
     //Create a new message and send it
     private void sendButtonClicked() {
@@ -417,61 +471,16 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case android.R.id.home:
-                setResult(RESULT_OK);
-                finish();
-                return true;
+//            case android.R.id.home:
+//                setResult(RESULT_OK);
+//                finish();
+//                return true;
             case R.id.action_add_user:
                 Intent intentAdd = new Intent(MessengerActivity.this, UsersActivity.class);
                 startActivityForResult(intentAdd, MainActivity.requestCodeUsers);
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        switch (v.getId()) {
-            case R.id.attachment:
-                menu.setHeaderTitle("Add attachment");
-                menu.setHeaderIcon(R.drawable.attachment);
-//                menu.add("Picture");
-//                menu.add("Take photo");
-//                menu.add("Map marker");
-                MenuInflater inflater = getMenuInflater();
-                inflater.inflate(R.menu.menu_attach, menu);
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        String menuItemText = String.valueOf(item.getTitle());
-        switch (item.getItemId()) {
-            case R.id.pictures:
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, REQUEST_LOAD_IMAGE);
-                break;
-            case R.id.take_photo:
-                File file = new File(Environment.getExternalStorageDirectory(), "layer-photo.jpg");
-                imageURI = Uri.fromFile(file);
-                Log.d("Messenger", imageURI.toString());
-                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageURI);
-                startActivityForResult(cameraIntent, REQUEST_OPEN_CAMERA);
-                break;
-            case R.id.last_image:
-                if (imageURI != null)
-                    createImageMessage(imageURI);
-                else
-                    Toast.makeText(this, "You don't have last sent image!", Toast.LENGTH_SHORT);
-                break;
-            case R.id.map_marker:
-                Intent mapIntent = new Intent(MessengerActivity.this, MapActivity.class);
-                startActivityForResult(mapIntent, REQUEST_MAP_MARKERS);
-                break;
-        }
-        return true;
     }
 
     //================================================================================
@@ -504,13 +513,13 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 break;
             case REQUEST_OPEN_CAMERA:
                 if (resultCode == RESULT_OK) {
-                    if (imageURI != null)
-                        createImageMessage(imageURI);
+                    if (getImageURI() != null)
+                        createImageMessage(getImageURI());
                 }
             case REQUEST_LOAD_IMAGE:
                 if (resultCode == RESULT_OK && data != null) {
-                    imageURI = data.getData();
-                    createImageMessage(imageURI);
+                    setImageURI(data.getData());
+                    createImageMessage(getImageURI());
                 }
                 break;
             case REQUEST_MAP_MARKERS:

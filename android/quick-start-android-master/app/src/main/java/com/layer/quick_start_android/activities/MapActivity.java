@@ -113,8 +113,8 @@ public class MapActivity extends ActionBarActivity implements OnMapReadyCallback
                     if (marks.size() > 1)
                         cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     else
-                        cameraUpdate = CameraUpdateFactory.newLatLngZoom(marks.get(0), 12);
-                    map.animateCamera(cameraUpdate);
+                        cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 12);
+                    map.moveCamera(cameraUpdate);
                 }
             }
         } else {

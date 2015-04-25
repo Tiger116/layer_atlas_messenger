@@ -160,7 +160,6 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 if (!layerClient.isAuthenticated()) layerClient.authenticate();
                 else if (!layerClient.isConnected()) layerClient.connect();
                 else {
-                    setLayerDownloadParams();
                     dataChange();
                 }
             } else {
@@ -168,12 +167,6 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
                 startActivityForResult(intent, requestCodeLogin);
             }
         }
-    }
-
-    public void setLayerDownloadParams() {
-//        layerClient.setAutoDownloadSizeThreshold(1024 * 128);
-        layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));
-//        layerClient.setDiskCapacity(1024 * 1024 * 100);
     }
 
     public void showProgressDialog() {
@@ -211,8 +204,8 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     private void logOut() {
-        File cacheDir = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId());
-        deleteDir(cacheDir);
+//        File cacheDir = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId());
+//        deleteDir(cacheDir);
         ParseUser.logOut();
         layerClient.deauthenticate();
         if (myAdapter != null)

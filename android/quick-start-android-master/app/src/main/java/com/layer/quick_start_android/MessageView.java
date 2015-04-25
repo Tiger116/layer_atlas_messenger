@@ -159,20 +159,18 @@ public class MessageView {
                         }
                         break;
                     case "image/jpeg":
-                        if (part.isContentReady()) {
-                            isImage = true;
-                            byte[] imageArray = part.getData();
-                            if (imageArray != null) {
-                                Log.d("SIZE IMAGE", String.valueOf(imageArray.length));
-                                Log.d("SIZE FILE", String.valueOf(imageFile.length()));
-                                if (!imageFile.exists() || imageFile.length() < imageArray.length) {
-                                    imageFile.delete();
+                        isImage = true;
+                        if (imageFile.exists() && imageFile.length() < part.getSize()) {
+                            if (part.isContentReady()) {
+                                byte[] imageArray = part.getData();
+                                if (imageArray != null) {
                                     byteArrayToFile(imageArray, imageFile);
                                 }
+                            } else {
+                                Log.d(this.toString(),imageFile.length()+" " + part.getSize());
+                                MyProgressListener listener = new MyProgressListener();
+                                part.download(listener);
                             }
-                        } else {
-                            MyProgressListener listener = new MyProgressListener();
-                            part.download(listener);
                         }
                         break;
                     case "image/jpeg+preview":
@@ -181,7 +179,6 @@ public class MessageView {
                         if (!imageFile.exists()) {
                             byte[] imagePreviewArray = part.getData();
                             if (imagePreviewArray != null) {
-                                Log.d("SIZE PREVIEW", String.valueOf(imagePreviewArray.length));
                                 byteArrayToFile(imagePreviewArray, imageFile);
                             }
                         }
@@ -234,6 +231,7 @@ public class MessageView {
                     } else {
                         Picasso.with(context).load(R.drawable.loading).into(messageImage);
                     }
+                    messageImage.invalidate();
                 }
             }
         }

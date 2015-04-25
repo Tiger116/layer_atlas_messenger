@@ -41,7 +41,6 @@ public class UsersActivity extends ActionBarActivity {
         setContentView(R.layout.activity_users);
 
         LayerApplication.setCurrentActivity(this);
-        LayerApplication.setParseUsers();
 
         final PinnedHeaderListView lvUsers = (PinnedHeaderListView) findViewById(R.id.list);
         users = new ArrayList<>(getUsers());
@@ -97,6 +96,7 @@ public class UsersActivity extends ActionBarActivity {
                 lvUsers.setAdapter(adapter);
             }
         });
+        LayerApplication.setParseUsers();
     }
 
     private List<Contact> getUsers() {

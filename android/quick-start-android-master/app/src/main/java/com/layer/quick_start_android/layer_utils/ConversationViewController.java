@@ -1,4 +1,4 @@
-package com.layer.quick_start_android;
+package com.layer.quick_start_android.layer_utils;
 
 import android.net.Uri;
 import android.util.Log;
@@ -10,11 +10,10 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 
-import java.io.File;
 import java.util.List;
 
-import static com.layer.quick_start_android.LayerApplication.getContext;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
+import static com.layer.quick_start_android.LayerApplication.reDrawUI;
 
 /**
  * Handles the conversation between the pre-defined participants (Device, Emulator) and displays
@@ -29,7 +28,6 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
     public ConversationViewController(String parameter) {
         this.conversationId = parameter;
-//        this.participant = participant;
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
 
@@ -86,25 +84,29 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                 switch (change.getChangeType()) {
                     case INSERT:
                         Log.d("Conversation", "INSERT");
+                        reDrawUI();
                         break;
 
                     case UPDATE:
                         Log.d("Conversation", "UPDATE");
+                        reDrawUI();
                         break;
 
                     case DELETE:
-                        File directory = new File(getContext().getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
-                        if (directory.isDirectory()) {
-                            String[] children = directory.list();
-                            for (String child : children) {
-                                new File(directory, child).delete();
-                            }
-                        }
-                        directory.delete();
+//                        File directory = new File(getContext().getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
+//                        directory.mkdirs();
+//                        if (directory.isDirectory()) {
+//                            String[] children = directory.list();
+//                            for (String child : children) {
+//                                new File(directory, child).delete();
+//                            }
+//                        }
+//                        directory.delete();
                         conversationId = null;
                         activeConversation = null;
 
                         Log.d("Conversation", "DELETE");
+                        reDrawUI();
                         break;
                 }
 
@@ -115,21 +117,23 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
                 switch (change.getChangeType()) {
                     case INSERT:
+                        reDrawUI();
                         break;
 
                     case UPDATE:
+                        reDrawUI();
                         break;
 
                     case DELETE:
+                        reDrawUI();
                         break;
                 }
             }
+            if (change.getObjectType() == LayerObject.Type.MESSAGE_PART) {
+                Log.d(change.getObject().toString(), " attribute " + change.getAttributeName() + " was changed from " + change.getOldValue() + " to " + change.getNewValue());
+                reDrawUI();
+            }
         }
-        //If we don't have an active conversation, grab the oldest one
-        if (activeConversation == null)
-            activeConversation = getConversation();
-
-        LayerApplication.reDrawUI();
     }
 
     @Override

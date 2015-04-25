@@ -41,6 +41,6 @@
     <string name="pictures">Pictures</string>
     <string name="photo">Take Photo</string>
     <string name="marker">Marker on the map</string>
-    <string name="lase_image">Last sent image</string>
+    <string name="last_image">Last sent image</string>
 
 </resources>

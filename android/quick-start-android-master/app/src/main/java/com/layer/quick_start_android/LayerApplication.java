@@ -3,12 +3,14 @@ package com.layer.quick_start_android;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.net.Uri;
 
 import com.layer.quick_start_android.activities.MainActivity;
 import com.layer.quick_start_android.activities.MessengerActivity;
-import com.layer.quick_start_android.layer_utils.MySyncListener;
+import com.layer.quick_start_android.layer_utils.ConversationViewController;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerChangeEventListener;
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -16,6 +18,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +37,7 @@ public class LayerApplication extends Application implements LayerChangeEventLis
     private static Context mContext;
     private static Activity mCurrentActivity;
     private static List<ParseObject> parseUsers;
+    private static Uri imageURI;
 
     @Override
     public void onCreate() {
@@ -46,8 +50,9 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
         UUID appID = UUID.fromString(Layer_App_ID);
         layerClient = LayerClient.newInstance(this, appID, GCM_Project_Number);
-        layerClient.registerSyncListener(new MySyncListener());
         LayerClient.enableLogging();
+        layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));//, "image/jpeg"
+        parseUsers = new ArrayList<>();
         setParseUsers();
 
         conversationView = new ConversationViewController(null);
@@ -68,22 +73,23 @@ public class LayerApplication extends Application implements LayerChangeEventLis
     }
 
     public static void setParseUsers() {
-        parseUsers = new ArrayList<>();
+//        parseUsers = new ArrayList<>();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> parseObjects, ParseException e) {
-//                if (e == null)
-//                    parseUsers.addAll(parseObjects);
-//                else
-//                    e.printStackTrace();
-//            }
-//        });
-        try {
-            parseUsers = query.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> parseObjects, ParseException e) {
+                if (e == null) {
+                    parseUsers.clear();
+                    parseUsers.addAll(parseObjects);
+                } else
+                    e.printStackTrace();
+            }
+        });
+//        try {
+//            parseUsers = query.find();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static String getUserNameById(String userId) {
@@ -112,5 +118,13 @@ public class LayerApplication extends Application implements LayerChangeEventLis
                 ((MessengerActivity) mCurrentActivity).drawConversation();
             }
         }
+    }
+
+    public static Uri getImageURI() {
+        return imageURI;
+    }
+
+    public static void setImageURI(Uri URI) {
+        imageURI = URI;
     }
 }

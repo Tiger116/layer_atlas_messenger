@@ -58,7 +58,6 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
         System.out.println("Authentication successful");
         if (main_activity != null) {
             main_activity.dataChange();
-            main_activity.setLayerDownloadParams();
         }
     }
 
