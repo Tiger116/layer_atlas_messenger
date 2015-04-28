@@ -1,8 +1,12 @@
 package com.layer.quick_start_android.layer_utils;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
+import com.layer.quick_start_android.LayerApplication;
+import com.layer.quick_start_android.activities.MainActivity;
+import com.layer.quick_start_android.activities.MessengerActivity;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
 import com.layer.sdk.listeners.LayerChangeEventListener;
@@ -10,10 +14,11 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.messaging.LayerObject;
 import com.layer.sdk.messaging.Message;
 
+import java.io.File;
 import java.util.List;
 
+import static com.layer.quick_start_android.LayerApplication.getContext;
 import static com.layer.quick_start_android.LayerApplication.layerClient;
-import static com.layer.quick_start_android.LayerApplication.reDrawUI;
 
 /**
  * Handles the conversation between the pre-defined participants (Device, Emulator) and displays
@@ -72,6 +77,9 @@ public class ConversationViewController implements LayerChangeEventListener.Main
     public void onEventMainThread(LayerChangeEvent event) {
         Log.d("Conversation", "Main Thread");
 
+
+        Activity mCurrentActivity = LayerApplication.getCurrentActivity();
+
         //You can choose to handle changes to conversations or messages however you'd like:
         List<LayerChange> changes = event.getChanges();
         for (int i = 0; i < changes.size(); i++) {
@@ -84,32 +92,35 @@ public class ConversationViewController implements LayerChangeEventListener.Main
                 switch (change.getChangeType()) {
                     case INSERT:
                         Log.d("Conversation", "INSERT");
-                        reDrawUI();
                         break;
 
                     case UPDATE:
                         Log.d("Conversation", "UPDATE");
-                        reDrawUI();
                         break;
 
                     case DELETE:
-//                        File directory = new File(getContext().getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
-//                        directory.mkdirs();
-//                        if (directory.isDirectory()) {
-//                            String[] children = directory.list();
-//                            for (String child : children) {
-//                                new File(directory, child).delete();
-//                            }
-//                        }
-//                        directory.delete();
+                        File directory = new File(getContext().getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId() + File.separator + activeConversation.getId().getLastPathSegment());
+                        directory.mkdirs();
+                        if (directory.isDirectory()) {
+                            String[] children = directory.list();
+                            for (String child : children) {
+                                new File(directory, child).delete();
+                            }
+                        }
+                        directory.delete();
                         conversationId = null;
                         activeConversation = null;
 
                         Log.d("Conversation", "DELETE");
-                        reDrawUI();
                         break;
                 }
-
+                if (mCurrentActivity != null) {
+                    if (mCurrentActivity.getClass().toString().equals(MainActivity.class.toString())) {
+                        ((MainActivity) mCurrentActivity).dataChange();
+                    } else if (mCurrentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
+                        ((MessengerActivity) mCurrentActivity).drawMessengerUI();
+                    }
+                }
             } else if (change.getObjectType() == LayerObject.Type.MESSAGE) {
 
                 Message message = (Message) change.getObject();
@@ -117,21 +128,28 @@ public class ConversationViewController implements LayerChangeEventListener.Main
 
                 switch (change.getChangeType()) {
                     case INSERT:
-                        reDrawUI();
                         break;
 
                     case UPDATE:
-                        reDrawUI();
                         break;
 
                     case DELETE:
-                        reDrawUI();
                         break;
+                }
+                if (mCurrentActivity != null) {
+                    if (mCurrentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
+                        ((MessengerActivity) mCurrentActivity).drawMessengerUI();
+                    }
                 }
             }
             if (change.getObjectType() == LayerObject.Type.MESSAGE_PART) {
                 Log.d(change.getObject().toString(), " attribute " + change.getAttributeName() + " was changed from " + change.getOldValue() + " to " + change.getNewValue());
-                reDrawUI();
+
+                if (mCurrentActivity != null) {
+                    if (mCurrentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
+                        ((MessengerActivity) mCurrentActivity).drawMessengerUI();
+                    }
+                }
             }
         }
     }

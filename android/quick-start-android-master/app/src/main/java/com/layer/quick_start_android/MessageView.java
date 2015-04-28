@@ -10,12 +10,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.layer.quick_start_android.activities.MapActivity;
 import com.layer.quick_start_android.layer_utils.MyProgressListener;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayInputStream;
@@ -48,6 +50,7 @@ public class MessageView {
     private RoundedCorners messageImage;
     private ImageView statusImage;
     private LinearLayout locationLayout;
+    private ScrollView conversationScroll;
 
     private Context context;
     private Message message;
@@ -59,7 +62,8 @@ public class MessageView {
     public MessageView(LinearLayout parent, LinearLayout meLayout, final Message msg) {
         this.context = LayerApplication.getContext();
         this.message = msg;
-        File directory = new File(context.getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId() + File.separator + msg.getConversation().getId().getLastPathSegment());
+        this.conversationScroll = (ScrollView) parent.getParent();
+        File directory = new File(context.getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId() + File.separator + msg.getConversation().getId().getLastPathSegment());
         directory.mkdirs();
         imageFile = new File(directory, msg.getId().getLastPathSegment() + ".jpeg");
         locations = new ArrayList<>();
@@ -160,26 +164,28 @@ public class MessageView {
                         break;
                     case "image/jpeg":
                         isImage = true;
-                        if (imageFile.exists() && imageFile.length() < part.getSize()) {
-                            if (part.isContentReady()) {
-                                byte[] imageArray = part.getData();
-                                if (imageArray != null) {
-                                    byteArrayToFile(imageArray, imageFile);
+                        if (imageFile.exists())
+                            if (imageFile.length() < part.getSize()) {
+                                if (part.isContentReady()) {
+                                    byte[] imageArray = part.getData();
+                                    if (imageArray != null) {
+                                        byteArrayToFile(imageArray, imageFile);
+                                    }
+                                } else {
+                                    Log.d("Download part", String.valueOf(part.getId()));
+                                    MyProgressListener listener = new MyProgressListener();
+                                    part.download(listener);
                                 }
-                            } else {
-                                Log.d(this.toString(),imageFile.length()+" " + part.getSize());
-                                MyProgressListener listener = new MyProgressListener();
-                                part.download(listener);
                             }
-                        }
                         break;
                     case "image/jpeg+preview":
                         isImage = true;
-//                        if (part.isContentReady()) {
-                        if (!imageFile.exists()) {
-                            byte[] imagePreviewArray = part.getData();
-                            if (imagePreviewArray != null) {
-                                byteArrayToFile(imagePreviewArray, imageFile);
+                        if (part.isContentReady()) {
+                            if (!imageFile.exists()) {
+                                byte[] imagePreviewArray = part.getData();
+                                if (imagePreviewArray != null) {
+                                    byteArrayToFile(imagePreviewArray, imageFile);
+                                }
                             }
                         }
                         break;
@@ -227,11 +233,28 @@ public class MessageView {
                 messageTV.setVisibility(View.GONE);
                 if (isImage) {
                     if (imageFile.exists()) {
-                        Picasso.with(context).load(imageFile).into(messageImage);
+                        Picasso.with(context).invalidate(imageFile);
+                        Picasso.with(context).load(imageFile).into(messageImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                conversationScroll.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        conversationScroll.fullScroll(View.FOCUS_DOWN);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+//                        messageImage.setImageURI(Uri.fromFile(imageFile));
                     } else {
+                        Log.d("Image not loaded", imageFile.getName());
                         Picasso.with(context).load(R.drawable.loading).into(messageImage);
                     }
-                    messageImage.invalidate();
                 }
             }
         }
@@ -302,16 +325,14 @@ public class MessageView {
         }
     }
 
-    private boolean byteArrayToFile(byte[] array, File file) {
+    private void byteArrayToFile(byte[] array, File file) {
         try {
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(array);
             fos.flush();
             fos.close();
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
     }
 }

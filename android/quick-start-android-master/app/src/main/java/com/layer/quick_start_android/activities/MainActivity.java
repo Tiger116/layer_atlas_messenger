@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -31,12 +32,11 @@ import com.parse.ParseUser;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.layer.quick_start_android.LayerApplication.layerClient;
 
-public class MainActivity extends ActionBarActivity {       //} implements LayerChangeEventListener.MainThread, LayerChangeEventListener.BackgroundThread {
+public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
@@ -44,6 +44,8 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
 
     public static final int requestCodeLogin = 0;
     public static final int requestCodeUsers = 1;
+
+    private SwipeRefreshLayout mainLayout;
 
     private ProgressDialog dialog;
     private MyArrayAdapter myAdapter;
@@ -65,6 +67,9 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
 
         if (authenticationListener == null)
             authenticationListener = new MyAuthenticationListener(this);
+
+        mainLayout = (SwipeRefreshLayout) findViewById(R.id.main_layout);
+        mainLayout.setOnRefreshListener(this);
 
         lvMain = (ListView) findViewById(R.id.list_view);
 
@@ -204,8 +209,8 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     }
 
     private void logOut() {
-//        File cacheDir = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId());
-//        deleteDir(cacheDir);
+        File cacheDir = new File(getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId());
+        deleteDir(cacheDir);
         ParseUser.logOut();
         layerClient.deauthenticate();
         if (myAdapter != null)
@@ -319,5 +324,17 @@ public class MainActivity extends ActionBarActivity {       //} implements Layer
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    @Override
+    public void onRefresh() {
+        mainLayout.setRefreshing(true);
+        dataChange();
+        mainLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mainLayout.setRefreshing(false);
+            }
+        }, 1000);
     }
 }

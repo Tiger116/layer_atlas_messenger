@@ -1,10 +1,7 @@
 package com.layer.quick_start_android.layer_utils;
 
-import com.layer.quick_start_android.MessageView;
 import com.layer.sdk.listeners.LayerProgressListener;
 import com.layer.sdk.messaging.MessagePart;
-
-import static com.layer.quick_start_android.LayerApplication.reDrawUI;
 
 public class MyProgressListener implements LayerProgressListener {
 
@@ -21,10 +18,9 @@ public class MyProgressListener implements LayerProgressListener {
     }
 
     public void onProgressComplete(final MessagePart part, Operation operation) {
-//        MessageView.isDownload = false;
         System.out.println("Message part finished " + operation.toString() + " " + part.getMimeType());
 
-        reDrawUI();
+//        reDrawUI();
     }
 
     public void onProgressError(MessagePart part, Operation operation, Throwable e) {

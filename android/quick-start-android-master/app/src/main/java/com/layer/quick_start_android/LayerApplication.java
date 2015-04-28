@@ -5,8 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 
-import com.layer.quick_start_android.activities.MainActivity;
-import com.layer.quick_start_android.activities.MessengerActivity;
 import com.layer.quick_start_android.layer_utils.ConversationViewController;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerChangeEventListener;
@@ -39,6 +37,10 @@ public class LayerApplication extends Application implements LayerChangeEventLis
     private static List<ParseObject> parseUsers;
     private static Uri imageURI;
 
+    public static Activity getCurrentActivity() {
+        return mCurrentActivity;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -53,7 +55,7 @@ public class LayerApplication extends Application implements LayerChangeEventLis
         LayerClient.enableLogging();
         layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));//, "image/jpeg"
         parseUsers = new ArrayList<>();
-        setParseUsers();
+        setParseUsersSync();
 
         conversationView = new ConversationViewController(null);
     }
@@ -85,11 +87,15 @@ public class LayerApplication extends Application implements LayerChangeEventLis
                     e.printStackTrace();
             }
         });
-//        try {
-//            parseUsers = query.find();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
+    }
+
+    private static void setParseUsersSync() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("_User");
+        try {
+            parseUsers = query.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public static String getUserNameById(String userId) {
@@ -108,16 +114,6 @@ public class LayerApplication extends Application implements LayerChangeEventLis
             }
         }
         return null;
-    }
-
-    public static void reDrawUI() {
-        if (mCurrentActivity != null) {
-            if (mCurrentActivity.getClass().toString().equals(MainActivity.class.toString())) {
-                ((MainActivity) mCurrentActivity).dataChange();
-            } else if (mCurrentActivity.getClass().toString().equals(MessengerActivity.class.toString())) {
-                ((MessengerActivity) mCurrentActivity).drawConversation();
-            }
-        }
     }
 
     public static Uri getImageURI() {

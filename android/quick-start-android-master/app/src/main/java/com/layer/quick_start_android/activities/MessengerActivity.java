@@ -167,7 +167,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                             if (!textUsers.contains(getUserNameById(participant)) && !participant.equals(layerClient.getAuthenticatedUserId())) {
                                 myAutoCompleteAdapter.add(getUserNameById(participant));
                                 deleteUser = participant;
-                                drawConversation();
+                                drawMessengerUI();
                             }
                         }
                     }
@@ -181,13 +181,13 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                 if (deleteUser != null) {
                     conversationView.getConversation().removeParticipants(deleteUser);
                     deleteUser = null;
-                    drawConversation();
+                    drawMessengerUI();
                 }
             }
         });
 
         //If there is an active conversation, draw it
-        drawConversation();
+        drawMessengerUI();
     }
 
     private void createPopUp(final View parent) {
@@ -229,8 +229,8 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
                     startActivityForResult(i, REQUEST_LOAD_IMAGE);
                     break;
                 case R.id.take_photo:
-                    File phoroFile = new File(getExternalFilesDir(null) + File.separator + layerClient.getAuthenticatedUserId(), "layer-photo.jpg");
-                    setImageURI(Uri.fromFile(phoroFile));
+                    File photoFile = new File(getExternalCacheDir() + File.separator + layerClient.getAuthenticatedUserId(), "layer-photo.jpg");
+                    setImageURI(Uri.fromFile(photoFile));
                     Log.d("Messenger", getImageURI().toString());
                     Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                     cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, getImageURI());
@@ -284,7 +284,7 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
     }
 
     //Redraws the conversation window in the GUI
-    public void drawConversation() {
+    public void drawMessengerUI() {
         //Only proceed if there is a valid conversation
         if (conversationView.getConversation() != null) {
             if (conversationView.getConversation().isDeleted())
@@ -441,6 +441,8 @@ public class MessengerActivity extends ActionBarActivity implements View.OnClick
         super.onResume();
 
         LayerApplication.setCurrentActivity(this);
+
+        drawMessengerUI();
 
         //Every time the app is brought to the foreground, register the typing indicator
         if (layerClient != null && conversationView != null)

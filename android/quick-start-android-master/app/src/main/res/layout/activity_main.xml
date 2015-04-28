@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,7 +7,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity"
-    android:id="@+id/mainholder"
+    android:id="@+id/main_layout"
     android:background="@color/background_material_light">
 
     <ListView
@@ -16,4 +16,4 @@
         android:layout_height="match_parent"
         android:scrollingCache="false"
         android:cacheColorHint="@android:color/transparent" />
-</RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
