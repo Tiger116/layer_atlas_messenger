@@ -39,7 +39,7 @@
             android:imeOptions="actionSearch" />
     </LinearLayout>
 
-    <com.layer.quick_start_android.contacts_utils.pinned_header_utils.PinnedHeaderListView
+    <com.layer.messenger.contacts_utils.pinned_header_utils.PinnedHeaderListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:visibility="gone" />
 
-        <com.layer.quick_start_android.RoundedCorners
+        <com.layer.messenger.RoundedCorners
             android:id="@+id/message_image"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -99,7 +99,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/abc_text_size_body_1_material"
-            android:textColor="@color/primary_text_default_material_light"
+            android:textColor="@color/secondary_text_default_material_light"
+            android:textStyle="bold"
             android:text="@string/locations_label" />
     </LinearLayout>
 

@@ -30,10 +30,10 @@ repositories {
 dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.google.android.gms:play-services:7.0.0'
-    compile 'com.layer.sdk:layer-sdk:0.11.+'
-    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'com.layer.sdk:layer-sdk:0.13.+'
+    compile 'org.slf4j:slf4j-api:1.7.12'
     compile 'com.parse.bolts:bolts-android:1.2.0'
-    compile 'com.squareup.picasso:picasso:2.5.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.code.gson:gson:2.3.1'
     compile files('libs/Parse-1.9.1.jar')
 }

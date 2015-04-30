@@ -4,19 +4,15 @@
     <string name="app_name">Layer Messenger</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
-
     <string name="password_hint">Password</string>
     <string name="username_hint">User Name</string>
     <string name="button_text">Sign in</string>
-    <string name="logout_menu_text">Log out</string>
     <string name="send_text">Send</string>
     <string name="add_dialog_title">Add Dialog</string>
     <string name="logout_title">Log out</string>
-    <string name="title_activity_dialog_chooser">DialogChooserActivity</string>
-    <string name="title_activity_messenger">MessengerActivity</string>
+    <string name="title_activity_messenger">Messenger</string>
     <string name="title_activity_users">Add User</string>
     <string name="participant_key">Participant</string>
-    <string name="add_user">Add User</string>
     <string name="userName_label">username</string>
     <string name="options_label">Options</string>
     <string name="title_label">Title</string>
@@ -26,7 +22,6 @@
     <string name="title_activity_register">Register new user</string>
     <string name="firstname_parse_key">firstName</string>
     <string name="lastname_parse_key">lastName</string>
-
     <string name="name_hint">Nickname</string>
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="btn_register_text">Register</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.layer.quick_start_android">
+    package="com.layer.messenger">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -19,13 +19,13 @@
     <uses-feature android:name="android.hardware.camera"/>
     <!-- GCM permission for your app -->
     <permission
-        android:name="com.layer.quick_start_android.permission.C2D_MESSAGE"
+        android:name="com.layer.messenger.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.layer.quick_start_android.permission.C2D_MESSAGE" />
 
     <application
-        android:name=".LayerApplication"
+        android:name="com.layer.messenger.LayerApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -56,7 +56,7 @@
 
         <service android:name="com.layer.sdk.services.GcmIntentService" />
 
-        <receiver android:name=".layer_utils.LayerPushReceiver">
+        <receiver android:name="com.layer.messenger.layer_utils.LayerPushReceiver">
             <intent-filter>
                 <action android:name="com.layer.sdk.PUSH" />
 
@@ -70,7 +70,7 @@
         </receiver>
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name="com.layer.messenger.activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,35 +78,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.LoginActivity"
+            android:name="com.layer.messenger.activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".activities.MessengerActivity"
+            android:name="com.layer.messenger.activities.MessengerActivity"
             android:label="@string/title_activity_messenger">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value="com.layer.messenger.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.UsersActivity"
+            android:name="com.layer.messenger.activities.UsersActivity"
             android:label="@string/title_activity_users">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MessengerActivity" />
+                android:value="com.layer.messenger.activities.MessengerActivity" />
         </activity>
         <activity
-            android:name=".activities.RegisterActivity"
+            android:name="com.layer.messenger.activities.RegisterActivity"
             android:label="@string/title_activity_register">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.LoginActivity" />
+                android:value="com.layer.messenger.activities.LoginActivity" />
         </activity>
         <activity
-            android:name="com.layer.quick_start_android.activities.MapActivity"
+            android:name="com.layer.messenger.activities.MapActivity"
             android:label="@string/title_activity_maps">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MessengerActivity" />
+                android:value="com.layer.messenger.activities.MessengerActivity" />
         </activity>
     </application>
 
