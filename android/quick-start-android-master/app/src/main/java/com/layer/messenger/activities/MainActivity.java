@@ -29,6 +29,7 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
 import com.parse.ParseUser;
+import com.ubertesters.sdk.Ubertesters;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mainLayout.setOnRefreshListener(this);
 
         lvMain = (ListView) findViewById(R.id.list_view);
-
 //        conversationList = new ArrayList<>();
         conversations = new ArrayList<>();
 //        myAdapter = new MyArrayAdapter(MainActivity.this, conversations);
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
         registerForContextMenu(lvMain);
+        Ubertesters.takeScreenshot();
     }
 
     public void dataChange() {
@@ -157,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void loadLayerClient() {
-        Log.d("ON RESUME", "reload");
         if (layerClient != null) {
             layerClient.registerConnectionListener(connectionListener);
             layerClient.registerAuthenticationListener(authenticationListener);

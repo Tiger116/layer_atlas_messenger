@@ -85,6 +85,7 @@ public class MessengerActivity extends AppCompatActivity implements View.OnClick
     private MyAutoCompleteTextView usersView;
     private EditText userInput;
     private ArrayAdapter<String> myAutoCompleteAdapter;
+    private ArrayList<String> availableUserNames;
     private String parameter = null;
     //All messages
     private Hashtable<String, MessageView> allMessages;
@@ -140,15 +141,17 @@ public class MessengerActivity extends AppCompatActivity implements View.OnClick
                 addUser(getUserIdByName(item));
             }
         });
-        ArrayList<String> availableUserNames = getAvailableUserNames();
+        availableUserNames = getAvailableUserNames();
         myAutoCompleteAdapter = new ArrayAdapter<>(MessengerActivity.this, android.R.layout.simple_dropdown_item_1line, availableUserNames);
         usersView.setTokenizer(new MyAutoCompleteTextView.CommaTokenizer());
         usersView.setAdapter(myAutoCompleteAdapter);
         usersView.addTextChangedListener(new TextWatcher() {
             private String deleteUser = null;
+            private String textBefore;
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                textBefore = s.toString();
             }
 
             @Override
@@ -159,8 +162,14 @@ public class MessengerActivity extends AppCompatActivity implements View.OnClick
 //                    if ((conversationView.getConversation().getParticipants().size()) > textUsers.size() + 1) {
                     for (String participant : conversationView.getConversation().getParticipants()) {
                         if (!textUsers.contains(getUserNameById(participant)) && !participant.equals(layerClient.getAuthenticatedUserId())) {
-                            myAutoCompleteAdapter.add(getUserNameById(participant));
-                            deleteUser = participant;
+                            if (deleteUser == null) {
+                                if (!availableUserNames.contains(getUserNameById(participant))) {
+                                    availableUserNames.add(getUserNameById(participant));
+                                    myAutoCompleteAdapter.clear();
+                                    myAutoCompleteAdapter.addAll(availableUserNames);
+                                }
+                                deleteUser = participant;
+                            }
 //                            drawMessengerUI();
                         }
                     }
@@ -169,15 +178,24 @@ public class MessengerActivity extends AppCompatActivity implements View.OnClick
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (deleteUser != null) {
-                    if (conversationView.getConversation().getParticipants().contains(layerClient.getAuthenticatedUserId())) {
-                        if (conversationView.getConversation().getParticipants().size() > 2)
-                            conversationView.getConversation().removeParticipants(deleteUser);
-                    } else
-                        finish();
-                    deleteUser = null;
-                    drawMessengerUI();
-                }
+                String textAfter = s.toString();
+                if (textBefore.length() > textAfter.length())
+                    if (deleteUser != null) {
+                        //if conversation is new (not contains creator)
+                        if (conversationView.getConversation().getParticipants().contains(layerClient.getAuthenticatedUserId())) {
+                            if (conversationView.getConversation().getParticipants().size() > 2)
+                                conversationView.getConversation().removeParticipants(deleteUser);
+                            deleteUser = null;
+                            drawMessengerUI();
+                        } else {
+                            if (!textBefore.contains(",") && !textAfter.contains(",")) {
+                                //If text contains only login (without whitespaces) or empty, close activity
+                                if (!textBefore.contains(" ") || textAfter.isEmpty())
+                                    finish();
+                            } else if (s.toString().replace(" ", "").split(",").length < textBefore.replace(" ", "").split(",").length)
+                                deleteUser = null;
+                        }
+                    }
             }
         });
 
@@ -383,7 +401,9 @@ public class MessengerActivity extends AppCompatActivity implements View.OnClick
         String name = getUserNameById(userId);
         if (name == null)
             name = userId;
-        myAutoCompleteAdapter.remove(name);
+        availableUserNames.removeAll(Collections.singleton(name));
+        myAutoCompleteAdapter.clear();
+        myAutoCompleteAdapter.addAll(availableUserNames);
         addBubble(name);
     }
 

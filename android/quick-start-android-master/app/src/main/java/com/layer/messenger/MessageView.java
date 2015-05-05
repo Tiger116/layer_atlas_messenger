@@ -2,9 +2,11 @@ package com.layer.messenger;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -163,13 +165,17 @@ public class MessageView {
                         }
                         break;
                     case "image/jpeg":
+                        Log.d("Available Megs", String.valueOf(Runtime.getRuntime().freeMemory()));
+                        Log.d("Part size", String.valueOf(part.getSize()));
                         isImage = true;
                         if (imageFile.exists())
                             if (imageFile.length() < part.getSize()) {
                                 if (part.isContentReady()) {
-                                    byte[] imageArray = part.getData();
-                                    if (imageArray != null) {
-                                        byteArrayToFile(imageArray, imageFile);
+                                    if (Runtime.getRuntime().freeMemory() > part.getSize()) {
+                                        byte[] imageArray = part.getData();
+                                        if (imageArray != null) {
+                                            byteArrayToFile(imageArray, imageFile);
+                                        }
                                     }
                                 } else {
                                     Log.d("Download part", String.valueOf(part.getId()));
@@ -216,7 +222,6 @@ public class MessageView {
                 }
             }
 
-//                Add the timestamp
             String time;
             if (msg.getSentAt() != null) {
                 time = new SimpleDateFormat("dd MMMM H:mm:ss", Locale.ENGLISH).format(msg.getSentAt());
@@ -229,12 +234,17 @@ public class MessageView {
             if (!msgText.isEmpty()) {
                 messageTV.setVisibility(View.VISIBLE);
                 messageTV.setText(msgText);
+
+                int mask = createLinkifyMask();
+
+                Linkify.addLinks(messageTV, mask);
             } else {
                 messageTV.setVisibility(View.GONE);
                 if (isImage) {
                     if (imageFile.exists()) {
                         Picasso.with(context).invalidate(imageFile);
-                        Picasso.with(context).load(imageFile).error(R.drawable.image_not_available).placeholder(R.drawable.loading).fit().centerInside().into(messageImage, new Callback() {
+                        int halfWidth = context.getResources().getDisplayMetrics().widthPixels / 2;
+                        Picasso.with(context).load(imageFile).error(R.drawable.image_not_available).placeholder(R.drawable.loading).resize(halfWidth, 0).into(messageImage, new Callback() {
                             @Override
                             public void onSuccess() {
                                 scrollDown();
@@ -254,7 +264,6 @@ public class MessageView {
                                 });
                             }
                         });
-//                        messageImage.setImageURI(Uri.fromFile(imageFile));
                     } else {
                         Log.d("Image not loaded", imageFile.getName());
                         Picasso.with(context).load(R.drawable.loading).into(messageImage);
@@ -262,6 +271,36 @@ public class MessageView {
                 }
             }
         }
+    }
+
+    private int createLinkifyMask() {
+        List activities;
+        PackageManager packageManager = context.getPackageManager();
+
+        int mask = 0;
+
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://xxxxx.xx"));
+        Intent emailIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:xxxxxxx.xxxxxxxx@xxxx.xx"));
+        Intent phoneIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:xxxxxxxxxx"));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?z=15"));
+
+        activities = packageManager.queryIntentActivities(webIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (!activities.isEmpty())
+            mask += Linkify.WEB_URLS;
+
+        activities = packageManager.queryIntentActivities(emailIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (!activities.isEmpty())
+            mask += Linkify.EMAIL_ADDRESSES;
+
+        activities = packageManager.queryIntentActivities(phoneIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (!activities.isEmpty())
+            mask += Linkify.PHONE_NUMBERS;
+
+        activities = packageManager.queryIntentActivities(mapIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (!activities.isEmpty())
+            mask += Linkify.MAP_ADDRESSES;
+
+        return mask;
     }
 
     private void openImage() {

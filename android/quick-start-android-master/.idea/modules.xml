@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/layer_messenger.iml" filepath="$PROJECT_DIR$/layer_messenger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/quick-start-android-master.iml" filepath="$PROJECT_DIR$/quick-start-android-master.iml" />
     </modules>
   </component>
 </project>

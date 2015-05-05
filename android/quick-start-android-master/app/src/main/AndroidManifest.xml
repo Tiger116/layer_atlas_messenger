@@ -16,8 +16,15 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera"/>
+
+    <uses-feature android:name="android.hardware.camera" />
     <!-- GCM permission for your app -->
+
+    <!-- Ubertesters library user-permissions -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Ubertesters library user-permissions -->
+
     <permission
         android:name="com.layer.messenger.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -36,6 +43,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="ubertesters_organization_token"
+            android:value="91dfed4e-7c95-11e4-92a1-22000ac44c54" />
         <!-- Layer SDK has these for monitoring network, boot, and GCM -->
         <receiver android:name="com.layer.sdk.services.LayerReceiver">
             <intent-filter>
