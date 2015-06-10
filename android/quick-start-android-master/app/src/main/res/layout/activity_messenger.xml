@@ -11,7 +11,7 @@
     android:orientation="vertical"
     android:id="@+id/messenger_layout">
 
-    <com.layer.messenger.MyAutoCompleteTextView
+    <com.layer.messenger.ui_utils.MyAutoCompleteTextView
         android:id="@+id/participants_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

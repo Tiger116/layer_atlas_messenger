@@ -16,6 +16,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.layer.messenger.layer_utils.MyProgressListener;
+import com.layer.messenger.ui_utils.RoundedCorners;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;
 import com.squareup.picasso.Callback;

@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils;
+package com.layer.messenger.ui_utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;

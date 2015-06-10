@@ -1,4 +1,4 @@
-package com.layer.messenger;
+package com.layer.messenger.ui_utils;
 
 /*
  * Copyright (C) 2007 The Android Open Source Project

@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils;
+package com.layer.messenger.ui_utils;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;

@@ -1,4 +1,4 @@
-package com.layer.messenger;
+package com.layer.messenger.ui_utils;
 
 import android.content.Context;
 import android.graphics.Canvas;

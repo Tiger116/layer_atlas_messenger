@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils.pinned_header_utils;
+package com.layer.messenger.ui_utils.pinned_header_utils;
 
 import android.graphics.Color;
 import android.os.Build.VERSION;

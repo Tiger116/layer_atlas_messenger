@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils.async_task_thread_pool;
+package com.layer.messenger.ui_utils.async_task_thread_pool;
 
 import java.util.HashSet;
 import java.util.Set;

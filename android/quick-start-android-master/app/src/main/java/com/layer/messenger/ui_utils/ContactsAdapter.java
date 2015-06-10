@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils;
+package com.layer.messenger.ui_utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.layer.messenger.R;
-import com.layer.messenger.contacts_utils.async_task_thread_pool.AsyncTaskEx;
-import com.layer.messenger.contacts_utils.async_task_thread_pool.AsyncTaskThreadPool;
-import com.layer.messenger.contacts_utils.pinned_header_utils.SearchablePinnedHeaderListViewAdapter;
-import com.layer.messenger.contacts_utils.pinned_header_utils.StringArrayAlphabetIndexer;
+import com.layer.messenger.ui_utils.async_task_thread_pool.AsyncTaskEx;
+import com.layer.messenger.ui_utils.async_task_thread_pool.AsyncTaskThreadPool;
+import com.layer.messenger.ui_utils.pinned_header_utils.SearchablePinnedHeaderListViewAdapter;
+import com.layer.messenger.ui_utils.pinned_header_utils.StringArrayAlphabetIndexer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -25,7 +25,6 @@ import com.layer.sdk.messaging.Conversation;
 import com.layer.sdk.query.Query;
 import com.layer.sdk.query.SortDescriptor;
 import com.parse.ParseUser;
-import com.ubertesters.sdk.Ubertesters;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,13 +34,11 @@ import static com.layer.messenger.LayerApplication.layerClient;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+    public static final int requestCodeLogin = 0;
+    public static final int requestCodeUsers = 1;
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
-
-    public static final int requestCodeLogin = 0;
-    public static final int requestCodeUsers = 1;
-
     private SwipeRefreshLayout mainLayout;
 
     private ProgressDialog dialog;
@@ -51,6 +48,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private ListView lvMain;
 
     private int count = 0;
+    private Runnable run = new Runnable() {
+        @Override
+        public void run() {
+            count++;
+            dataChange();
+        }
+    };
 
     //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
         registerForContextMenu(lvMain);
-        Ubertesters.takeScreenshot();
+//        Ubertesters.takeScreenshot();
     }
 
     public void dataChange() {
@@ -120,14 +124,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         }
     }
-
-    private Runnable run = new Runnable() {
-        @Override
-        public void run() {
-            count++;
-            dataChange();
-        }
-    };
 
     @Override
     protected void onResume() {

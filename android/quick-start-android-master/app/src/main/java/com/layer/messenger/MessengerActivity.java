@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.layer.messenger.ui_utils.MyAutoCompleteTextView;
 import com.layer.messenger.layer_utils.ConversationViewController;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;

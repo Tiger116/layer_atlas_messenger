@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils;
+package com.layer.messenger.ui_utils;
 
 public class Contact {
     private String contactId;

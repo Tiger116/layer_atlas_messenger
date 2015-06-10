@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils.pinned_header_utils;
+package com.layer.messenger.ui_utils.pinned_header_utils;
 
 import android.view.View;
 import android.view.ViewGroup;

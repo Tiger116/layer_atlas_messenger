@@ -13,9 +13,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 
-import com.layer.messenger.contacts_utils.Contact;
-import com.layer.messenger.contacts_utils.ContactsAdapter;
-import com.layer.messenger.contacts_utils.pinned_header_utils.PinnedHeaderListView;
+import com.layer.messenger.ui_utils.Contact;
+import com.layer.messenger.ui_utils.ContactsAdapter;
+import com.layer.messenger.ui_utils.pinned_header_utils.PinnedHeaderListView;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 

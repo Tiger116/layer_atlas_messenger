@@ -1,4 +1,4 @@
-package com.layer.messenger.contacts_utils.async_task_thread_pool;
+package com.layer.messenger.ui_utils.async_task_thread_pool;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
