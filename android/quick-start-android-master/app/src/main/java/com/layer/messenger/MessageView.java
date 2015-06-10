@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.layer.messenger.activities.MapActivity;
 import com.layer.messenger.layer_utils.MyProgressListener;
 import com.layer.sdk.messaging.Message;
 import com.layer.sdk.messaging.MessagePart;

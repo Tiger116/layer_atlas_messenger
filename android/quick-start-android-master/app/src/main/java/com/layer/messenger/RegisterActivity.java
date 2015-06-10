@@ -1,4 +1,4 @@
-package com.layer.messenger.activities;
+package com.layer.messenger;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.layer.messenger.LayerApplication;
-import com.layer.messenger.R;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;

@@ -1,4 +1,4 @@
-package com.layer.messenger.activities;
+package com.layer.messenger;
 
 import android.content.Intent;
 import android.location.Criteria;

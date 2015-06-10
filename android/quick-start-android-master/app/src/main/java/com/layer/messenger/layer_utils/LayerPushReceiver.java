@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.layer.messenger.R;
-import com.layer.messenger.activities.MessengerActivity;
+import com.layer.messenger.MessengerActivity;
 
 public class LayerPushReceiver extends BroadcastReceiver {
     @Override

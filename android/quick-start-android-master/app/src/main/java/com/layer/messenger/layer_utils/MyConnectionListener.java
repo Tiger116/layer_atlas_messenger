@@ -1,6 +1,6 @@
 package com.layer.messenger.layer_utils;
 
-import com.layer.messenger.activities.MainActivity;
+import com.layer.messenger.MainActivity;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.exceptions.LayerException;
 import com.layer.sdk.listeners.LayerConnectionListener;

@@ -14,8 +14,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.ubertesters.common.models.LockingMode;
-import com.ubertesters.sdk.Ubertesters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,31 +38,6 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
     public static Activity getCurrentActivity() {
         return mCurrentActivity;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = this;
-        mCurrentActivity = null;
-
-        // Enable Local Datastore
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8", "XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx");
-
-        Ubertesters.initialize(this);
-        Ubertesters.logger().info("logs");
-
-//        UUID appID = UUID.fromString(Layer_App_ID);
-        LayerClient.Options options = new LayerClient.Options();
-        options.googleCloudMessagingSenderId(GCM_Project_Number);
-        layerClient = LayerClient.newInstance(this, Layer_App_ID, options);
-        LayerClient.enableLogging();
-        layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));//, "image/jpeg"
-        parseUsers = new ArrayList<>();
-        setParseUsersSync();
-//        setParseUsers();
-        conversationView = new ConversationViewController(null);
     }
 
     public static void setCurrentActivity(Activity currentActivity) {
@@ -129,5 +102,30 @@ public class LayerApplication extends Application implements LayerChangeEventLis
 
     public static void setImageURI(Uri URI) {
         imageURI = URI;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = this;
+        mCurrentActivity = null;
+
+        // Enable Local Datastore
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8", "XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx");
+
+//        Ubertesters.initialize(this);
+//        Ubertesters.logger().info("logs");
+
+//        UUID appID = UUID.fromString(Layer_App_ID);
+        LayerClient.Options options = new LayerClient.Options();
+        options.googleCloudMessagingSenderId(GCM_Project_Number);
+        layerClient = LayerClient.newInstance(this, Layer_App_ID, options);
+        LayerClient.enableLogging();
+        layerClient.setAutoDownloadMimeTypes(Arrays.asList("image/jpeg+preview"));//, "image/jpeg"
+        parseUsers = new ArrayList<>();
+        setParseUsersSync();
+//        setParseUsers();
+        conversationView = new ConversationViewController(null);
     }
 }

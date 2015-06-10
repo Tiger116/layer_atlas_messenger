@@ -1,4 +1,4 @@
-package com.layer.messenger.activities;
+package com.layer.messenger;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.layer.messenger.LayerApplication;
-import com.layer.messenger.R;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;

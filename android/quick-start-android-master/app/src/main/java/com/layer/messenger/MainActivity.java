@@ -1,4 +1,4 @@
-package com.layer.messenger.activities;
+package com.layer.messenger;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
@@ -19,9 +18,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.layer.messenger.LayerApplication;
-import com.layer.messenger.MyArrayAdapter;
-import com.layer.messenger.R;
 import com.layer.messenger.layer_utils.MyAuthenticationListener;
 import com.layer.messenger.layer_utils.MyConnectionListener;
 import com.layer.sdk.LayerClient;

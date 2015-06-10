@@ -97,24 +97,4 @@ public class MyArrayAdapter extends ArrayAdapter {
         TextView conversationName;
         ImageView newMessageIcon;
     }
-//
-//    @Override
-//    public void registerDataSetObserver(DataSetObserver observer) {
-//        super.registerDataSetObserver(observer);
-//        Log.d(MyArrayAdapter.class.toString(), "observer registered");
-//        if (observer != null) {
-//            this.observer = observer;
-//            observerRegistered = true;
-//        }
-//    }
-//
-//    @Override
-//    public void unregisterDataSetObserver(DataSetObserver observer) {
-//        super.unregisterDataSetObserver(observer);
-//        Log.d(MyArrayAdapter.class.toString(), "observer unregistered");
-//        if (observer != null) {
-//            if (observerRegistered)
-//            observerRegistered = false;
-//        }
-//    }
 }

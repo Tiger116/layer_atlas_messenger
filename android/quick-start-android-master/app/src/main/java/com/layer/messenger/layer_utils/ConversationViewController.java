@@ -5,8 +5,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.layer.messenger.LayerApplication;
-import com.layer.messenger.activities.MainActivity;
-import com.layer.messenger.activities.MessengerActivity;
+import com.layer.messenger.MainActivity;
+import com.layer.messenger.MessengerActivity;
 import com.layer.sdk.changes.LayerChange;
 import com.layer.sdk.changes.LayerChangeEvent;
 import com.layer.sdk.listeners.LayerChangeEventListener;

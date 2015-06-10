@@ -1,4 +1,4 @@
-package com.layer.messenger.activities;
+package com.layer.messenger;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -35,11 +35,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.layer.messenger.ImageParams;
-import com.layer.messenger.LayerApplication;
-import com.layer.messenger.MessageView;
-import com.layer.messenger.MyAutoCompleteTextView;
-import com.layer.messenger.R;
 import com.layer.messenger.layer_utils.ConversationViewController;
 import com.layer.sdk.LayerClient;
 import com.layer.sdk.listeners.LayerTypingIndicatorListener;

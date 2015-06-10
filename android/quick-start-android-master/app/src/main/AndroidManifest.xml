@@ -80,7 +80,7 @@
         </receiver>
 
         <activity
-            android:name="com.layer.messenger.activities.MainActivity"
+            android:name="MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,35 +88,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.layer.messenger.activities.LoginActivity"
+            android:name="LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name="com.layer.messenger.activities.MessengerActivity"
+            android:name=".MessengerActivity"
             android:label="@string/title_activity_messenger">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.layer.messenger.activities.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
         <activity
-            android:name="com.layer.messenger.activities.UsersActivity"
+            android:name=".UsersActivity"
             android:label="@string/title_activity_users">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.layer.messenger.activities.MessengerActivity" />
+                android:value=".MessengerActivity" />
         </activity>
         <activity
-            android:name="com.layer.messenger.activities.RegisterActivity"
+            android:name=".RegisterActivity"
             android:label="@string/title_activity_register">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.layer.messenger.activities.LoginActivity" />
+                android:value=".LoginActivity" />
         </activity>
         <activity
-            android:name="com.layer.messenger.activities.MapActivity"
+            android:name=".MapActivity"
             android:label="@string/title_activity_maps">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.layer.messenger.activities.MessengerActivity" />
+                android:value=".MessengerActivity" />
         </activity>
     </application>
 
