@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright 2015 Layer. All rights reserved.
+    
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+        
+          http://www.apache.org/licenses/LICENSE-2.0
+          
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.    
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/atlas_background_white"
+    tools:context="com.layer.atlas.messenger.AtlasSettingsScreen">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!--  START -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:text="Options"
+                    android:textColor="@color/atlas_text_blue"
+                    android:textSize="@dimen/atlas_text_size_smaller" />
+
+
+                <EditText
+                    android:id="@+id/atlas_screen_conversation_settings_groupname_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:background="@drawable/atlas_ctl_edit_text"
+                    android:hint="Group Name"
+                    android:imeOptions="actionDone"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/atlas_text_black"
+                    android:textSize="@dimen/atlas_text_size_general" />
+
+                <TextView
+                    android:id="@+id/atlas_screen_conversation_settings_delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:text="Delete conversation"
+                    android:textColor="@color/atlas_text_black"
+                    android:textSize="@dimen/atlas_text_size_general" />
+
+                <TextView
+                    android:id="@+id/atlas_screen_conversation_settings_leave_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:text="Leave this Group"
+                    android:textColor="@color/atlas_text_black"
+                    android:textSize="@dimen/atlas_text_size_general" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/atlas_background_gray" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:text="Participants"
+                    android:textColor="@color/atlas_text_blue"
+                    android:textSize="@dimen/atlas_text_size_smaller" />
+
+                <LinearLayout
+                    android:id="@+id/atlas_screen_conversation_settings_participants_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp">
+
+                    <include layout="@layout/atlas_screen_conversation_settings_participant_convert" />
+
+                    <include layout="@layout/atlas_screen_conversation_settings_participant_convert" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/atlas_screen_conversation_settings_add_participant"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
+                    android:text="Add People"
+                    android:textColor="@color/atlas_text_black"
+                    android:textSize="@dimen/atlas_text_size_general" />
+
+            </LinearLayout>
+
+            <!--   END    -->
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</FrameLayout>
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2015 Layer. All rights reserved.
+    
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+        
+          http://www.apache.org/licenses/LICENSE-2.0
+          
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.    
+-->
+<resources>
+
+    <string name="app_name">Atlas Messenger</string>
+    <string name="atlas_screen_settings_title">Settings</string>
+    <string name="atlas_screen_messages_title">New Message</string>
+    <string name="atlas_screen_qr_prompt">Scan Layer Atlas QR Code</string>
+    <string name="text_hint_password">Password</string>
+    <string name="text_hint_password_confirm">Confirm password</string>
+    <string name="text_hint_login">Login</string>
+
+    <string name="title_activity_show_image">Attached Image</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="bitmap_array_key">bitmap_array</string>
+    <string name="parse_firstname_key">firstName</string>
+    <string name="lastname_parse_key">lastName</string>
+    <string name="registration_button_text">Registration</string>
+    <string name="more_button_text">More...</string>
+    <string name="text_hint_firstname">First Name</string>
+    <string name="text_hint_email">Email</string>
+    <string name="text_hint_lastname">Last Name</string>
+    <string name="parse_lastname_key">lastName</string>
+    <string name="parse_email_key">email</string>
+    <string name="atlas_screen_registration_title">Registration</string>
+    <string name="atlas_screen_log_in_title">Log in</string>
+    <string name="menu_settings_title">Settings</string>
+    <string name="menu_details_title">Details</string>
+    <string name="search_hint">Search</string>
+    <string name="ok_title">OK</string>
+    <string name="map_activity_label">Map</string>
+    <string name="locations_json_array_key">locations_json_array</string>
+    <string name="nav_header_username_text">Username</string>
+    <string name="atlas_conversations_settings_screen_tittle">Conversation settings</string>
+    <string name="options_title">Options</string>
+    <string name="log_out_title">Log Out</string>
+    <string name="about_title">About</string>
+
+</resources>
