@@ -40,7 +40,7 @@ public class MessengerApp extends Application implements AppIdCallback {
     //==============================================================================================
 
     // 1. Set your Layer App ID from the Developer Console to bypass the QR code flow
-    private static final String LAYER_APP_ID = "07b40518-aaaa-11e4-bceb-a25d000000f4";
+    private static final String LAYER_APP_ID = "layer:///apps/staging/07b40518-aaaa-11e4-bceb-a25d000000f4";
 
     // 2. Optionally replace the Google Cloud Messaging Sender ID (in the Developer Console too)
     private static final String GCM_SENDER_ID = "965375418488"; // Set your GCM Sender ID
@@ -81,13 +81,13 @@ public class MessengerApp extends Application implements AppIdCallback {
     @Override
     public void onCreate() {
         super.onCreate();
-        LayerClient.enableLogging();
+        LayerClient.enableLogging(this);
         LayerClient.applicationCreated(this);
         if (appId == null) appId = loadAppId();
         identityProvider = new QRIdentityProvider(this);
         participantProvider = new ParticipantProvider(this, new QRParticipantProviderCallback(this));
 
-        // Enable Local Datastore
+        //Enable Local Datastore
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "hE41H4TvIuyn1eiPMV8E7mSOFCxAM5sBnhv9b3D8", "XTcDzrh0b2E299VsdeP7YqzuzBkSk0dUIIW2w6Gx");
     }

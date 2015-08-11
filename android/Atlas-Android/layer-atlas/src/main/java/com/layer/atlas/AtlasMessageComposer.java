@@ -25,10 +25,11 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -64,7 +65,6 @@ public class AtlasMessageComposer extends FrameLayout {
 
     // styles
     private int textColor;
-    private float textSize;
     private Typeface typeFace;
     private int textStyle;
 
@@ -84,7 +84,6 @@ public class AtlasMessageComposer extends FrameLayout {
     public void parseStyle(Context context, AttributeSet attrs, int defStyle) {
         TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AtlasMessageComposer, R.attr.AtlasMessageComposer, defStyle);
         this.textColor = ta.getColor(R.styleable.AtlasMessageComposer_textColor, context.getResources().getColor(R.color.atlas_text_black));
-        //this.textSize  = ta.getDimension(R.styleable.AtlasMessageComposer_textSize, context.getResources().getDimension(R.dimen.atlas_text_size_general));
         this.textStyle = ta.getInt(R.styleable.AtlasMessageComposer_textStyle, Typeface.NORMAL);
         String typeFaceName = ta.getString(R.styleable.AtlasMessageComposer_textTypeface);
         this.typeFace = typeFaceName != null ? Typeface.create(typeFaceName, textStyle) : null;
@@ -159,11 +158,11 @@ public class AtlasMessageComposer extends FrameLayout {
                 if (conv == null) return;
                 try {
                     if (s.length() > 0) {
-                        conv.send(LayerTypingIndicatorListener.TypingIndicator.STARTED);
                         btnSend.setTextColor(getResources().getColor(R.color.atlas_text_blue));
+                        conv.send(LayerTypingIndicatorListener.TypingIndicator.STARTED);
                     } else {
-                        conv.send(LayerTypingIndicatorListener.TypingIndicator.FINISHED);
                         btnSend.setTextColor(getResources().getColor(R.color.atlas_text_gray));
+                        conv.send(LayerTypingIndicatorListener.TypingIndicator.FINISHED);
                     }
                 } catch (LayerException e) {
                     // `e.getType() == LayerException.Type.CONVERSATION_DELETED`
@@ -174,36 +173,48 @@ public class AtlasMessageComposer extends FrameLayout {
         btnSend = (TextView) findViewById(R.id.atlas_message_composer_send);
         btnSend.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-
                 String text = messageText.getText().toString();
-
-                if (text.trim().length() > 0) {
-
-                    ArrayList<MessagePart> parts = new ArrayList<MessagePart>();
-                    String[] lines = text.split("\n+");
-                    for (String line : lines) {
-                        parts.add(layerClient.newMessagePart(line));
-                    }
-                    Message msg = layerClient.newMessage(parts);
-
-                    if (listener != null) {
-                        boolean proceed = listener.beforeSend(msg);
-                        if (!proceed) return;
-                    } else if (conv == null) {
-                        Log.e(TAG, "Cannot send message. Conversation is not set");
-                    }
-                    if (conv == null) return;
-
-                    conv.send(msg);
-                    messageText.setText("");
+                sendMessage(text);
+            }
+        });
+        messageText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    String text = messageText.getText().toString();
+                    sendMessage(text);
+                    return true;
                 }
+                return false;
             }
         });
         applyStyle();
     }
 
+    private void sendMessage(String text) {
+        if (text.trim().length() > 0) {
+
+            ArrayList<MessagePart> parts = new ArrayList<MessagePart>();
+            String[] lines = text.split("\n+");
+            for (String line : lines) {
+                parts.add(layerClient.newMessagePart(line));
+            }
+            Message msg = layerClient.newMessage(parts);
+
+            if (listener != null) {
+                boolean proceed = listener.beforeSend(msg);
+                if (!proceed) return;
+            } else if (conv == null) {
+                Log.e(TAG, "Cannot send message. Conversation is not set");
+            }
+            if (conv == null) return;
+
+            conv.send(msg);
+            messageText.setText("");
+        }
+    }
+
     private void applyStyle() {
-        //messageText.setTextSize(textSize);
         messageText.setTypeface(typeFace, textStyle);
         messageText.setTextColor(textColor);
     }

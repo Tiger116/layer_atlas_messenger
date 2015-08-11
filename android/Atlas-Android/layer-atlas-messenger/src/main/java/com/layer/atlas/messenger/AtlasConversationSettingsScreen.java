@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,10 +38,6 @@ import com.layer.sdk.messaging.Conversation;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/**
- * @author Oleg Orlov
- * @since 23 Apr 2015
- */
 public class AtlasConversationSettingsScreen extends AppCompatActivity {
     private static final String TAG = AtlasConversationSettingsScreen.class.getSimpleName();
     private static final boolean debug = true;
@@ -58,9 +55,13 @@ public class AtlasConversationSettingsScreen extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             Participant participant = (Participant) v.getTag();
-            Toast.makeText(v.getContext(), "Removing " + Atlas.getFullName(participant), Toast.LENGTH_LONG).show();
-            conv.removeParticipants(participant.getId());
-            updateValues();
+            int size = conv.getParticipants().size();
+            if (conv.getParticipants().size() > 2) {
+                Toast.makeText(v.getContext(), "Removing " + Atlas.getFullName(participant), Toast.LENGTH_SHORT).show();
+                conv.removeParticipants(participant.getId());
+                updateValues();
+            } else
+                Toast.makeText(v.getContext(), Atlas.getFullName(participant) + " not removed, because it's last participant", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -116,12 +117,15 @@ public class AtlasConversationSettingsScreen extends AppCompatActivity {
     private void updateValues() {
 
         MessengerApp app101 = (MessengerApp) getApplication();
-        String conversationTitle = "";
+        String conversationTitle;
         if (conv != null) {
             conversationTitle = Atlas.getTitle(conv);
-            setTitle(String.format("\"%s\" settings", conversationTitle));
+            if (conversationTitle != null && !conversationTitle.isEmpty()) {
+                setTitle(String.format("\"%s\" settings", conversationTitle));
+                textGroupName.setText(conversationTitle.trim());
+                textGroupName.clearFocus();
+            }
         }
-        textGroupName.setText(conversationTitle.trim());
 
         // refresh names screen
         namesList.removeAllViews();
@@ -129,9 +133,8 @@ public class AtlasConversationSettingsScreen extends AppCompatActivity {
         HashSet<String> participantSet = new HashSet<String>(conv.getParticipants());
         participantSet.remove(app101.getLayerClient().getAuthenticatedUserId());
         Atlas.Participant[] participants = new Atlas.Participant[participantSet.size()];
-        if (participants.length == 0) {
-
-        }
+//        if (participants.length == 0) {
+//        }
         int i = 0;
         for (String userId : participantSet) {
             Participant participant = app101.getParticipantProvider().get(userId);
@@ -147,11 +150,14 @@ public class AtlasConversationSettingsScreen extends AppCompatActivity {
             TextView nameText = (TextView) convert.findViewById(R.id.atlas_screen_conversation_settings_convert_name);
             nameText.setText(Atlas.getFullName(participants[iContact]));
 
-            convert.setTag(participants[iContact]);
-            convert.setOnClickListener(contactClickListener);
+            ImageButton removeButton = (ImageButton) convert.findViewById(R.id.atlas_screen_conversation_settings_convert_remove_button);
+
+            removeButton.setTag(participants[iContact]);
+            removeButton.setOnClickListener(contactClickListener);
 
             namesList.addView(convert);
         }
+        namesList.setVisibility(View.VISIBLE);
 
         if (participantSet.size() == 1) { // one-on-one
             btnLeaveGroup.setVisibility(View.GONE);
@@ -184,13 +190,14 @@ public class AtlasConversationSettingsScreen extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
-        Atlas.setTitle(conv, textGroupName.getText().toString().trim());
+        if (!conv.isDeleted())
+            Atlas.setTitle(conv, textGroupName.getText().toString().trim());
     }
 
     @Override
     protected void onDestroy() {
         HashSet<String> participantSet = new HashSet<String>(conv.getParticipants());
-        if (participantSet.size() <= 1) {
+        if (participantSet.size() < 2) {
             Toast.makeText(this, "Delete conversation without participants", Toast.LENGTH_LONG).show();
             conv.delete(LayerClient.DeletionMode.ALL_PARTICIPANTS);
             finish();

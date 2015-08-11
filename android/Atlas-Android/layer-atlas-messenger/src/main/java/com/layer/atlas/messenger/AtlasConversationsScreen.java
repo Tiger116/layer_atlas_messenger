@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2015 Layer. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.layer.atlas.messenger;
 
 import android.content.Context;
@@ -38,24 +23,42 @@ import com.layer.atlas.Atlas;
 import com.layer.atlas.AtlasConversationsList;
 import com.layer.atlas.AtlasConversationsList.ConversationClickListener;
 import com.layer.atlas.AtlasConversationsList.ConversationLongClickListener;
+import com.layer.sdk.LayerClient;
+import com.layer.sdk.exceptions.LayerException;
+import com.layer.sdk.listeners.LayerConnectionListener;
 import com.layer.sdk.messaging.Conversation;
 import com.parse.ParseUser;
 
+import java.util.UUID;
+
 public class AtlasConversationsScreen extends AppCompatActivity implements DrawerLayout.DrawerListener {
-    public static final String EXTRA_FORCE_LOGOUT = "settings.force.logout";
     private static final String TAG = AtlasConversationsScreen.class.getSimpleName();
     private static final boolean debug = true;
     private static final int REQUEST_CODE_LOGIN_SCREEN = 191;
     private static final int REQUEST_CODE_SETTINGS_SCREEN = 192;
     private MessengerApp app;
+    private View headView;
+    private final LayerConnectionListener connectionListener = new LayerConnectionListener() {
+        @Override
+        public void onConnectionConnected(LayerClient layerClient) {
+            updateStatus();
+        }
 
+        @Override
+        public void onConnectionDisconnected(LayerClient layerClient) {
+            updateStatus();
+        }
+
+        @Override
+        public void onConnectionError(LayerClient layerClient, LayerException e) {
+            updateStatus();
+        }
+    };
     private AtlasConversationsList conversationsList;
-    private NavigationView navigationView;
-    private ActionBar ab;
+    private ActionBar actionBar;
     private boolean isInitialized = false;
     private boolean forceLogout = false;
     private boolean showSplash = true;
-
     private DrawerLayout mDrawerLayout;
 
     @Override
@@ -63,12 +66,17 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.atlas_screen_conversations);
 
-        ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-            ab.setDisplayHomeAsUpEnabled(true);
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.hide();
         }
         this.app = (MessengerApp) getApplication();
+
+        this.mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mDrawerLayout.setDrawerListener(this);
     }
 
     private synchronized void initializeViews() {
@@ -89,16 +97,10 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
                     AtlasConversationSettingsScreen.conv = conversation;
                     Intent settingsIntent = new Intent(AtlasConversationsScreen.this, AtlasConversationSettingsScreen.class);
                     startActivity(settingsIntent);
-//                    conversation.delete(DeletionMode.ALL_PARTICIPANTS);
-//                    updateValues();
-//                    Toast.makeText(AtlasConversationsScreen.this, "Deleted: " + conversation, Toast.LENGTH_SHORT).show();
                 }
             });
 
-            this.mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-            mDrawerLayout.setDrawerListener(this);
-
-            navigationView = (NavigationView) findViewById(R.id.nav_view);
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             if (navigationView != null) {
                 setupDrawerContent(navigationView);
             }
@@ -125,12 +127,18 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOGIN_SCREEN && resultCode != RESULT_OK) {
-            finish(); // no login - no app
+        if (requestCode == REQUEST_CODE_LOGIN_SCREEN) {
+            if (resultCode != RESULT_OK) {
+                finish(); // no login - no app
+            } else {
+                this.forceLogout = false;
+            }
             return;
         }
         if (requestCode == IntentIntegrator.REQUEST_CODE && resultCode == RESULT_OK) {
             String qrCodeAppId = IntentIntegrator.parseActivityResult(requestCode, resultCode, data).getContents();
+            if (!qrCodeAppId.startsWith("layer:///"))
+                qrCodeAppId = "layer:///apps/staging/" + UUID.fromString(qrCodeAppId).toString();
             Log.w(TAG, "Captured App ID: " + qrCodeAppId);
             try {
                 app.initLayerClient(qrCodeAppId);
@@ -162,8 +170,12 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
         // Can we continue in this Activity?
         if ((app.getAppId() != null) && (app.getLayerClient() != null) && app.getLayerClient().isAuthenticated()) {
             findViewById(R.id.atlas_screen_login_splash).setVisibility(View.GONE);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            if (actionBar != null)
+                actionBar.show();
             initializeViews();
             invalidateOptionsMenu();
+            app.getLayerClient().registerConnectionListener(connectionListener);
             return;
         }
 
@@ -178,28 +190,17 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
                     }, 3000);
         } else {
             findViewById(R.id.atlas_screen_login_splash).setVisibility(View.GONE);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            if (actionBar != null)
+                actionBar.show();
             route();
         }
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        View headView = navigationView.inflateHeaderView(R.layout.nav_header);
-        TextView userNameText = (TextView) headView.findViewById(R.id.nav_header_username);
-        TextView emailText = (TextView) headView.findViewById(R.id.nav_header_email);
+        headView = navigationView.inflateHeaderView(R.layout.atlas_nav_drawer_header);
 
-        Atlas.Participant currentUser = app.getParticipantProvider().getParticipant(app.getLayerClient().getAuthenticatedUserId());
-        if (currentUser != null) {
-            String fullName = "Vitaliy Zhuravlev";//Atlas.getFullName(currentUser);
-            userNameText.setText(fullName);
-
-            String email = currentUser.getEmail();
-
-            if (email != null && email.isEmpty()) {
-                emailText.setText(email);
-                emailText.setVisibility(View.VISIBLE);
-            } else
-                emailText.setVisibility(View.GONE);
-        }
+        updateStatus();
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -208,10 +209,11 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
                 switch (menuItem.getItemId()) {
                     case R.id.nav_about:
                         Intent intent = new Intent(AtlasConversationsScreen.this, AtlasSettingsScreen.class);
+                        mDrawerLayout.closeDrawers();
                         startActivityForResult(intent, REQUEST_CODE_SETTINGS_SCREEN);
                         break;
                     case R.id.nav_log_out:
-                        logout(EXTRA_FORCE_LOGOUT);
+                        logout();
                         break;
                 }
                 mDrawerLayout.closeDrawers();
@@ -219,6 +221,37 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
             }
         });
 
+    }
+
+    private void updateStatus() {
+        if (headView != null) {
+            TextView statusText = (TextView) headView.findViewById(R.id.nav_header_status);
+            TextView userNameText = (TextView) headView.findViewById(R.id.nav_header_username);
+            TextView emailText = (TextView) headView.findViewById(R.id.nav_header_email);
+            TextView avatarText = (TextView) headView.findViewById(R.id.nav_header_user_avatar_text);
+
+            LayerClient client = app.getLayerClient();
+
+            if (client != null) {
+                statusText.setText((client.isConnected()) ? "Connected" : "Disconnected");
+                Atlas.Participant currentUser = app.getParticipantProvider().getParticipant(client.getAuthenticatedUserId());
+                if (currentUser != null) {
+                    String fullName = Atlas.getFullName(currentUser);
+                    userNameText.setText(fullName);
+
+                    String initials = Atlas.getInitials(currentUser);
+                    avatarText.setText(initials);
+
+                    String email = currentUser.getEmail();
+
+                    if (email != null && !email.isEmpty()) {
+                        emailText.setText(email);
+                        emailText.setVisibility(View.VISIBLE);
+                    } else
+                        emailText.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     private void route() {
@@ -236,15 +269,19 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
             // Use provided App ID to initialize new client
             app.initLayerClient(app.getAppId());
         }
-
         // Optionally launch the login screen
         if ((app.getLayerClient() != null) && (!app.getLayerClient().isAuthenticated() || forceLogout)) {
             forceLogout = false;
             Intent intent = new Intent(this, AtlasLogInScreen.class);
+            if (mDrawerLayout != null)
+                mDrawerLayout.closeDrawers();
             startActivityForResult(intent, REQUEST_CODE_LOGIN_SCREEN);
             return;
         }
         findViewById(R.id.atlas_screen_login_splash).setVisibility(View.GONE);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        if (actionBar != null)
+            actionBar.show();
         initializeViews();
     }
 
@@ -252,7 +289,9 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
     protected void onPause() {
         super.onPause();
         if (app.getLayerClient() != null) {
-            app.getLayerClient().unregisterEventListener(conversationsList);
+            app.getLayerClient()
+                    .unregisterEventListener(conversationsList)
+                    .unregisterConnectionListener(connectionListener);
         }
     }
 
@@ -322,17 +361,19 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
 
     @Override
     public void onDrawerOpened(View drawerView) {
-        if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-            ab.setDisplayHomeAsUpEnabled(true);
+        if (headView!=null)
+            updateStatus();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     @Override
     public void onDrawerClosed(View drawerView) {
-        if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-            ab.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -340,10 +381,14 @@ public class AtlasConversationsScreen extends AppCompatActivity implements Drawe
     public void onDrawerStateChanged(int newState) {
     }
 
-    private void logout(String extra) {
-        app.getLayerClient().deauthenticate();
+    private void logout() {
         ParseUser.logOut();
+        app.getLayerClient().deauthenticate();
         this.forceLogout = true;
-        recreate();
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        Intent intent = new Intent(this, AtlasLogInScreen.class);
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+        startActivityForResult(intent, REQUEST_CODE_LOGIN_SCREEN);
     }
 }

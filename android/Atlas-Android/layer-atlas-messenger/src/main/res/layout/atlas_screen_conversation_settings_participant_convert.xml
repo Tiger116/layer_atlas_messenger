@@ -29,8 +29,8 @@
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:background="@drawable/atlas_shape_circle_gray"
-            android:textColor="@color/atlas_text_black"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textColor="@color/atlas_text_black" />
     </FrameLayout>
 
     <!-- right content part -->
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:paddingRight="16dp">
 
             <TextView
@@ -55,6 +55,13 @@
                 android:text="Tomaz Stolfa"
                 android:textColor="@color/atlas_text_black"
                 android:textSize="16sp" />
+
+            <ImageButton
+                android:background="?android:selectableItemBackground"
+                android:id="@+id/atlas_screen_conversation_settings_convert_remove_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
 
         </LinearLayout>
 

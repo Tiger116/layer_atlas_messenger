@@ -37,7 +37,7 @@
             android:id="@+id/atlas_screen_login_splash"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/atlas_background_blue_dark"
+            android:background="?attr/colorPrimaryDark"
             android:padding="32dp"
             android:src="@drawable/atlas_logo_splash" />
 

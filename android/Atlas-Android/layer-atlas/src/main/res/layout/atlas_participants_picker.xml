@@ -27,6 +27,8 @@
         <HorizontalScrollView
             android:id="@+id/atlas_participants_picker_scroll"
             android:layout_width="0dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_height="48dp"
             android:layout_weight="1"
             android:fillViewport="true"
@@ -79,20 +81,11 @@
                     android:layout_height="48dp"
                     android:background="@color/atlas_background_white"
                     android:minWidth="12dp"
-                    android:paddingLeft="4dp"
                     android:singleLine="true" />
 
             </LinearLayout>
 
         </HorizontalScrollView>
-
-
-        <TextView
-            android:id="@+id/atlas_participants_picker_plus"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:text="+" />
 
     </LinearLayout>
 

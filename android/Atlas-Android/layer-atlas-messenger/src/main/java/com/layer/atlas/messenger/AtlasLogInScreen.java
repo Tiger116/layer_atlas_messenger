@@ -16,8 +16,6 @@
 package com.layer.atlas.messenger;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -32,10 +30,6 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
-/**
- * @author Oleg Orlov
- * @since 24 Apr 2015
- */
 public class AtlasLogInScreen extends Activity {
     private static final String TAG = AtlasLogInScreen.class.getSimpleName();
     private static final boolean debug = true;
@@ -44,12 +38,11 @@ public class AtlasLogInScreen extends Activity {
     private volatile boolean inProgress = false;
     private EditText loginText;
     private EditText passwordText;
-    private Button registrationButton;
-    private ProgressDialog dialog;
+    private MyDialogFragment dialog;
     TextView.OnEditorActionListener actionListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if (actionId == EditorInfo.IME_ACTION_DONE || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+            if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 login();
                 return true;
             }
@@ -70,7 +63,7 @@ public class AtlasLogInScreen extends Activity {
 
         loginText.requestFocus();
 
-        registrationButton = (Button) findViewById(R.id.atlas_screen_login_button);
+        Button registrationButton = (Button) findViewById(R.id.atlas_screen_login_button);
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,66 +71,50 @@ public class AtlasLogInScreen extends Activity {
                 startActivityForResult(registrationIntent, REGISTRATION_CODE_REQUEST);
             }
         });
-    }
 
-    private void updateValues() {
-//        if (dialog!= null)
-//            dialog.dismiss();
-        // TODO: Do something with inProgress
+        dialog = new MyDialogFragment();
     }
 
     private void login() {
         final String userName = loginText.getText().toString().trim();
         final String password = passwordText.getText().toString().trim();
-        if (password.isEmpty())
-            passwordText.requestFocus();
-        else if (userName.isEmpty())
+        if (userName.isEmpty()) {
             loginText.requestFocus();
-        else {
+            return;
+        } else if (password.isEmpty()) {
+            passwordText.requestFocus();
+            return;
+        }
+        if (userName.length() < 4 && !userName.matches(".*[^a-zA-Z0-9_-].*")) {
+            loginText.setText("");
+            passwordText.setText("");
+            loginText.setError("Incorrect login!");
+            loginText.requestFocus();
+        } else if (password.length() < 4 && !password.matches(".*[^a-zA-Z0-9_-].*")) {
+            passwordText.setText("");
+            passwordText.setError("Incorrect password!");
+            passwordText.requestFocus();
+        } else {
             setInProgress(true);
-
-            dialog = new ProgressDialog(this);
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setTitle("Loading");
-            dialog.setMessage("Please wait...");
-            dialog.setIndeterminate(true);
-            dialog.setCanceledOnTouchOutside(true);
-            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    ParseUser.logOut();
-                }
-            });
-            dialog.show();
 
             ParseUser.logInInBackground(userName, password, new LogInCallback() {
                 @Override
                 public void done(ParseUser parseUser, ParseException e) {
+                    setInProgress(false);
                     if (e == null) {
                         final MessengerApp app = (MessengerApp) getApplication();
                         final LayerClient layerClient = app.getLayerClient();
                         layerClient.registerAuthenticationListener(new MyAuthenticationListener(AtlasLogInScreen.this));
                         layerClient.authenticate();
-                        updateValues();
                     } else {
-                        setInProgress(false);
                         loginText.setText("");
                         passwordText.setText("");
                         loginText.requestFocus();
                         loginText.setError(e.getLocalizedMessage());
-                        if (dialog != null && dialog.isShowing())
-                            dialog.cancel();
                     }
                 }
             });
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (dialog != null)
-            dialog.dismiss();
-        super.onDestroy();
     }
 
     @Override
@@ -153,8 +130,11 @@ public class AtlasLogInScreen extends Activity {
 
     public void setInProgress(boolean inProgress) {
         this.inProgress = inProgress;
-        if (!inProgress && this.dialog != null) {
-            dialog.dismiss();
+        if (this.dialog != null) {
+            if (inProgress)
+                dialog.show(getFragmentManager(), TAG);
+            else
+                dialog.dismiss();
         }
     }
 }

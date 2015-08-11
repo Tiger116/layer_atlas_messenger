@@ -45,7 +45,7 @@ public class Participant implements Atlas.Participant {
 
     @Override
     public String getEmail() {
-        return null;
+        return email;
     }
 
     public String toString() {

@@ -29,11 +29,11 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
             public void run() {
                 ParseUser user = ParseUser.getCurrentUser();
 
-                String userID;
+                String userID ="";
                 if (user != null)
                     userID = user.getObjectId();
 
-                userID = "MQSYNxGvDn";
+//                userID = "MQSYNxGvDn";
 
                 HashMap<String, Object> params = new HashMap<>();
                 params.put("userID", userID);

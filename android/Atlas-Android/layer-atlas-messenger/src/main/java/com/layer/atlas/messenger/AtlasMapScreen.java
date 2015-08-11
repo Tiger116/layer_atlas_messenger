@@ -67,7 +67,7 @@ public class AtlasMapScreen extends AppCompatActivity implements OnMapReadyCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
+        setContentView(R.layout.atlas_screen_map);
 
         this.uiHandler = new Handler();
 
@@ -161,7 +161,8 @@ public class AtlasMapScreen extends AppCompatActivity implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap map) {
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(59.931994, 30.420635), 15));
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setCompassEnabled(true);
         map.setMyLocationEnabled(true);
         if (bundle != null) {
             if (bundle.containsKey(getString(R.string.locations_json_array_key))) {
@@ -180,12 +181,12 @@ public class AtlasMapScreen extends AppCompatActivity implements OnMapReadyCallb
                     e.printStackTrace();
                 }
                 LatLngBounds bounds = builder.build();
-                int padding = 5; // offset from edges of the map in pixels
+                int padding = 32; // offset from edges of the map in pixels
                 CameraUpdate cameraUpdate;
                 if (marks.size() > 1)
                     cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 else
-                    cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 12);
+                    cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
                 map.moveCamera(cameraUpdate);
 
             }
@@ -199,8 +200,8 @@ public class AtlasMapScreen extends AppCompatActivity implements OnMapReadyCallb
                 latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
             } else {
-                latLng = new LatLng(59.932005, 30.420464);
-                cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 7);
+                latLng = new LatLng(53.0, 21.0);
+                cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 3);
             }
             mapView.getMap().animateCamera(cameraUpdate);
             map.setOnMapClickListener(this);

@@ -19,11 +19,6 @@
     android:background="@color/atlas_background_white"
     tools:context="com.layer.atlas.messenger.AtlasSettingsScreen">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -124,11 +119,7 @@
 
             </LinearLayout>
 
-            <!--   END    -->
-
         </ScrollView>
-
-    </LinearLayout>
 
 </FrameLayout>
 

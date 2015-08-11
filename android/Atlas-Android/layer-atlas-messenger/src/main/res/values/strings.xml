@@ -16,7 +16,7 @@
 <resources>
 
     <string name="app_name">Atlas Messenger</string>
-    <string name="atlas_screen_settings_title">Settings</string>
+    <string name="atlas_screen_settings_title">About</string>
     <string name="atlas_screen_messages_title">New Message</string>
     <string name="atlas_screen_qr_prompt">Scan Layer Atlas QR Code</string>
     <string name="text_hint_password">Password</string>
@@ -49,5 +49,6 @@
     <string name="options_title">Options</string>
     <string name="log_out_title">Log Out</string>
     <string name="about_title">About</string>
+    <string name="atlas_nav_drawer_header_status_text">Connected</string>
 
 </resources>

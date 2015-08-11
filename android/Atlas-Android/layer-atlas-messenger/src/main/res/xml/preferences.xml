@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Versions">
+        <Preference
+            android:key="layerVersion"
+            android:title="Layer SDK version" />
+        <Preference
+            android:key="atlasVersion"
+            android:title="Layer Atlas version" />
+        <Preference
+            android:key="appVersion"
+            android:summary="anything_you_want"
+            android:title="App version" />
+        <Preference
+            android:key="parseVersion"
+            android:title="Parse version" />
+    </PreferenceCategory>
+</PreferenceScreen>

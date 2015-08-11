@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.layer.atlas.messenger.util.SystemUiHider;
 
@@ -59,7 +60,7 @@ public class AtlasShowPhotoScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_show_image);
+        setContentView(R.layout.atlas_screen_show_image);
 
         ImageViewTouch imageView = (ImageViewTouch) findViewById(R.id.fullscreen_content);
 
@@ -72,6 +73,10 @@ public class AtlasShowPhotoScreen extends AppCompatActivity {
                 scale =  (double)getResources().getDisplayMetrics().widthPixels / (double) bitmap.getWidth();
             }
             imageView.setImageBitmap(Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * scale), (int) (bitmap.getHeight() * scale), false));
+        }
+        else
+        {
+            finish();
         }
 
         final View controlsView = findViewById(R.id.fullscreen_content_controls);

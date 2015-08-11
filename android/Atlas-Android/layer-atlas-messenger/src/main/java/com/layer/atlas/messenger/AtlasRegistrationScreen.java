@@ -16,8 +16,8 @@
 package com.layer.atlas.messenger;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,7 +40,7 @@ import static android.view.View.VISIBLE;
 public class AtlasRegistrationScreen extends Activity {
     private static final String TAG = AtlasRegistrationScreen.class.getSimpleName();
     private static final boolean debug = true;
-
+    private MessengerApp app;
     private volatile boolean inProgress = false;
     private EditText loginText;
     private EditText passwordText;
@@ -50,15 +50,12 @@ public class AtlasRegistrationScreen extends Activity {
     private EditText emailText;
     private LinearLayout expandLayout;
     private Button moreButton;
-    private ProgressDialog dialog;
+    private MyDialogFragment dialog;
     TextView.OnEditorActionListener actionListener = new TextView.OnEditorActionListener() {
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            if (actionId == EditorInfo.IME_ACTION_DONE || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                if (loginText.getText().toString().isEmpty()) {
-                    loginText.setError("Login cannot be empty!");
-                    loginText.requestFocus();
-                } else if (isValidEmail() && isValidPassword())
+            if (actionId == EditorInfo.IME_ACTION_DONE || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                if (isValidLogin() && isValidEmail() && isValidPassword())
                     registration();
                 return true;
             }
@@ -81,6 +78,7 @@ public class AtlasRegistrationScreen extends Activity {
 
         confirmPasswordText.setOnEditorActionListener(actionListener);
         emailText.setOnEditorActionListener(actionListener);
+        emailText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         loginText.requestFocus();
 
@@ -97,6 +95,10 @@ public class AtlasRegistrationScreen extends Activity {
                 }
             }
         });
+
+        dialog = new MyDialogFragment();
+
+        app = (MessengerApp) getApplication();
     }
 
     private void updateValues() {
@@ -113,14 +115,6 @@ public class AtlasRegistrationScreen extends Activity {
         if (login.isEmpty() || password.isEmpty() || confirmPassword.isEmpty())
             return;
         setInProgress(true);
-
-        dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setTitle("Loading");
-        dialog.setMessage("Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
 
         ParseUser newUser = new ParseUser();
 
@@ -140,8 +134,7 @@ public class AtlasRegistrationScreen extends Activity {
         newUser.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if (dialog != null)
-                    dialog.dismiss();
+                setInProgress(false);
                 if (e == null) {
                     Log.d(this.toString(), String.format("create new user %s", login));
 
@@ -153,34 +146,23 @@ public class AtlasRegistrationScreen extends Activity {
                     updateValues();
                 } else {
                     Log.d("Error Registration", e.toString());
-                    setInProgress(false);
-                    loginText.setText("");
-                    passwordText.setText("");
-                    confirmPasswordText.setText("");
-                    loginText.requestFocus();
                     if (e.getCode() == ParseException.USERNAME_TAKEN)
-                        loginText.setError("Login Already used");
+                        setError("Login Already used");
                     else
                         Toast.makeText(AtlasRegistrationScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }
 
+    }
 
     private boolean isValidPassword() {
         String confirmPassword = confirmPasswordText.getText().toString();
         String password = passwordText.getText().toString();
         if (password.length() < 4) {
-            passwordText.setText("");
-            confirmPasswordText.setText("");
-            passwordText.setError("Password must be at least 4 characters in length or more!");
-            passwordText.requestFocus();
+            setError("Password must be at least 4 characters in length or more!");
         } else if (!confirmPassword.equals(password)) {
-            passwordText.setText("");
-            confirmPasswordText.setText("");
-            passwordText.setError("Password and its confirm does not match!");
-            passwordText.requestFocus();
+            setError("Password and its confirm does not match!");
         } else
             return true;
         return false;
@@ -203,17 +185,32 @@ public class AtlasRegistrationScreen extends Activity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        if (dialog != null)
-            dialog.dismiss();
-        super.onDestroy();
+    private boolean isValidLogin() {
+        String login = loginText.getText().toString();
+        if (login.isEmpty()) {
+            setError("Login cannot be empty!");
+        } else if (login.matches(".*[^a-zA-Z0-9_-].*"))     //matches letters, numbers and _ or -
+            setError("Login allow only letters and numbers with \"-\" and \"_\" !");
+        else
+            return true;
+        return false;
+    }
+
+    private void setError(String error) {
+        passwordText.setText("");
+        confirmPasswordText.setText("");
+        loginText.setText("");
+        loginText.setError(error);
+        loginText.requestFocus();
     }
 
     public void setInProgress(boolean inProgress) {
         this.inProgress = inProgress;
-        if (!inProgress && this.dialog != null) {
-            dialog.dismiss();
+        if (this.dialog != null) {
+            if (inProgress)
+                dialog.show(getFragmentManager(), TAG);
+            else
+                dialog.dismiss();
         }
     }
 }

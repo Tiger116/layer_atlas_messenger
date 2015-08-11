@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by steven on 5/24/15.
@@ -41,6 +42,14 @@ public class QRIdentityProvider extends IdentityProvider {
         super(appIdCallback);
     }
 
+    private static UUID uuidFromKeyString(String s) {
+        if (s == null) return null;
+        if (s.startsWith("layer:///") && !s.endsWith("/")) {
+            return UUID.fromString(s.substring(s.lastIndexOf("/") + 1));
+        }
+        return UUID.fromString(s);
+    }
+
     @Override
     public Result getIdentityToken(String nonce, String userName, String userPassword) {
         try {
@@ -50,10 +59,14 @@ public class QRIdentityProvider extends IdentityProvider {
             StringEntity entity = new StringEntity(rootObject.toString(), "UTF-8");
             entity.setContentType("application/json");
 
-            HttpPost post = new HttpPost("https://layer-identity-provider.herokuapp.com/apps/" + mAppIdCallback.getAppId() + "/atlas_identities");
+            String appIdString = mAppIdCallback.getAppId();
+            String uuidString = UUID.fromString(appIdString.startsWith("layer:///") ? appIdString.substring(appIdString.lastIndexOf("/") + 1) : appIdString).toString();
+
+            HttpPost post = new HttpPost("https://layer-identity-provider.herokuapp.com/apps/" + uuidString + "/atlas_identities");
+
             post.setHeader("Content-Type", "application/json");
             post.setHeader("Accept", "application/json");
-            post.setHeader("X_LAYER_APP_ID", mAppIdCallback.getAppId());
+            post.setHeader("X_LAYER_APP_ID", uuidString);
             post.setEntity(entity);
             HttpResponse response = (new DefaultHttpClient()).execute(post);
             if (HttpStatus.SC_OK != response.getStatusLine().getStatusCode() && HttpStatus.SC_CREATED != response.getStatusLine().getStatusCode()) {

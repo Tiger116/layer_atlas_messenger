@@ -29,6 +29,7 @@ import android.net.Uri;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -374,42 +375,64 @@ public class AtlasMessagesList extends FrameLayout implements LayerChangeEventLi
 
         for (int partNo = 0; partNo < parts.size(); partNo++) {
             final MessagePart part = parts.get(partNo);
-            final String mimeType = part.getMimeType();
-
-            if (Atlas.MIME_TYPE_IMAGE_PNG.equals(mimeType) || Atlas.MIME_TYPE_IMAGE_JPEG.equals(mimeType)) {
-
-                // 3 parts image support
-                if ((partNo + 2 < parts.size()) && Atlas.MIME_TYPE_IMAGE_DIMENSIONS.equals(parts.get(partNo + 2).getMimeType())) {
-                    String jsonDimensions = new String(parts.get(partNo + 2).getData());
-                    try {
-                        JSONObject jo = new JSONObject(jsonDimensions);
-                        int width = jo.getInt("width");
-                        int height = jo.getInt("height");
-                        Cell imageCell = new ImageCell(part, parts.get(partNo + 1), width, height);
-                        destination.add(imageCell);
+            switch (part.getMimeType()) {
+                case Atlas.MIME_TYPE_IMAGE_PNG:
+                case Atlas.MIME_TYPE_IMAGE_JPEG:
+                    // 3 parts image support
+                    if ((partNo + 2 < parts.size()) && Atlas.MIME_TYPE_IMAGE_DIMENSIONS.equals(parts.get(partNo + 2).getMimeType())) {
+                        String jsonDimensions = new String(parts.get(partNo + 2).getData());
+                        try {
+                            JSONObject jo = new JSONObject(jsonDimensions);
+                            int width = jo.getInt("width");
+                            int height = jo.getInt("height");
+                            Cell imageCell = new ImageCell(part, parts.get(partNo + 1), width, height);
+                            destination.add(imageCell);
+                            if (debug)
+                                Log.w(TAG, "cellForMessage() 3-image part found at partNo: " + partNo);
+                            partNo++; // skip preview
+                            partNo++; // skip dimensions part
+                        } catch (JSONException e) {
+                            Log.e(TAG, "cellForMessage() cannot parse 3-part image", e);
+                        }
+                    } else {
+                        // regular image
+                        destination.add(new ImageCell(part));
                         if (debug)
-                            Log.w(TAG, "cellForMessage() 3-image part found at partNo: " + partNo);
-                        partNo++; // skip preview
-                        partNo++; // skip dimensions part
-                    } catch (JSONException e) {
-                        Log.e(TAG, "cellForMessage() cannot parse 3-part image", e);
+                            Log.w(TAG, "cellForMessage() single-image part found at partNo: " + partNo);
                     }
-                } else {
-                    // regular image
-                    destination.add(new ImageCell(part));
-                    if (debug)
-                        Log.w(TAG, "cellForMessage() single-image part found at partNo: " + partNo);
-                }
-
-            } else if (Atlas.MIME_TYPE_ATLAS_LOCATION.equals(part.getMimeType())) {
-                destination.add(new GeoCell(part));
-            } else {
-                Cell cellData = new TextCell(part);
-                if (debug) Log.w(TAG, "cellForMessage() default item: " + cellData);
-                destination.add(cellData);
+                    break;
+                case Atlas.MIME_TYPE_ATLAS_LOCATION:
+                    destination.add(new GeoCell(part));
+                    break;
+                case Atlas.MIME_TYPE_VIDEO_MP4:
+                    if ((3 >= parts.size()) && Atlas.MIME_TYPE_IMAGE_DIMENSIONS.equals(parts.get(partNo + 2).getMimeType())) {
+                        String jsonDimensions = new String(parts.get(partNo + 2).getData());
+                        try {
+                            JSONObject jo = new JSONObject(jsonDimensions);
+                            int width = jo.getInt("width");
+                            int height = jo.getInt("height");
+                            Cell videoCell = new VideoCell(part, parts.get(partNo + 1), width, height);
+                            destination.add(videoCell);
+                            if (debug)
+                                Log.w(TAG, "cellForMessage() 3-image part found at partNo: " + partNo);
+                            partNo++; // skip preview
+                            partNo++; // skip dimensions part
+                        } catch (JSONException e) {
+                            Log.e(TAG, "cellForMessage() cannot parse 3-part image", e);
+                        }
+                    } else {
+                        destination.add(new VideoCell(part));
+                        if (debug)
+                            Log.w(TAG, "cellForMessage() single-image part found at partNo: " + partNo);
+                    }
+                    break;
+                default:
+                    Cell cellData = new TextCell(part);
+                    if (debug) Log.w(TAG, "cellForMessage() default item: " + cellData);
+                    destination.add(cellData);
+                    break;
             }
         }
-
     }
 
     public synchronized void updateValues() {
@@ -644,18 +667,12 @@ public class AtlasMessagesList extends FrameLayout implements LayerChangeEventLi
             String jsonLonLat = new String(messagePart.getData());
             try {
                 JSONArray jsonArray = new JSONArray(jsonLonLat);
-                if (jsonArray.length()==1) {
+                if (jsonArray.length() == 1) {
                     double lon = jsonArray.getJSONObject(0).getDouble("lon");
                     double lat = jsonArray.getJSONObject(0).getDouble("lat");
                     text = String.format("Location:\nlon: %s\nlat:%s", lon, lat);
-                }
-                else
-                text = String.format("Locations:\n%d markers on the map", jsonArray.length());
-//                for (int i = 1; i < jsonArray.length(); i++) {
-//                    double lon = jsonArray.getJSONObject(i).getDouble("lon");
-//                    double lat = jsonArray.getJSONObject(i).getDouble("lat");
-//                    this.text += String.format("Location:\nlon: %s\nlat:%s\n\n", lon, lat);
-//                }
+                } else
+                    text = String.format("Locations:\n%d markers on the map", jsonArray.length());
             } catch (JSONException e) {
                 throw new IllegalArgumentException("Wrong geoJSON format: " + jsonLonLat, e);
             }
@@ -862,6 +879,116 @@ public class AtlasMessagesList extends FrameLayout implements LayerChangeEventLi
 
     }
 
+    private class VideoCell extends Cell {
+        MessagePart videoPart;
+        MessagePart imagePart;
+        int width;
+        int height;
+
+        private VideoCell(MessagePart videoPart, MessagePart imagePart, int width, int height) {
+            super(videoPart);
+            this.videoPart = videoPart;
+            this.imagePart = imagePart;
+            this.width = width;
+            this.height = height;
+        }
+
+        public VideoCell(MessagePart videoPart) {
+            super(videoPart);
+            this.videoPart = videoPart;
+        }
+
+        @Override
+        public View onBind(final ViewGroup cellContainer) {
+            View rootView = cellContainer.findViewById(R.id.atlas_view_messages_cell_custom);
+            ImageView imageView = (ImageView) cellContainer.findViewById(R.id.atlas_view_messages_cell_custom_image);
+            ImageView playButton = (ImageView) cellContainer.findViewById(R.id.atlas_view_messages_cell_play);
+
+            if (rootView == null) {
+                rootView = LayoutInflater.from(cellContainer.getContext()).inflate(R.layout.atlas_view_messages_cell_image, cellContainer, false);
+                imageView = (ImageView) rootView.findViewById(R.id.atlas_view_messages_cell_custom_image);
+                playButton = (ImageView) rootView.findViewById(R.id.atlas_view_messages_cell_play);
+            }
+
+            // get BitmapDrawable
+            int requiredWidth = cellContainer.getWidth() > 0 ? cellContainer.getWidth() : messagesList.getWidth();
+            int requiredHeight = cellContainer.getHeight() > 0 ? cellContainer.getHeight() : messagesList.getHeight();
+            MessagePart workingPart = /*previewPart != null ? previewPart :*/ imagePart;
+            Bitmap bmp = imageCache.get(workingPart.getId().toString());
+            if (bmp != null /*&& bmp.getWidth() >= requiredWidth / 2*/) {
+                imageView.setImageBitmap(bmp);
+                playButton.setVisibility(VISIBLE);
+
+                if (messagePart.getMessage().getSender().getUserId().equals(client.getAuthenticatedUserId())) {
+                    LayoutParams layoutParams = new ShapedFrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.END | Gravity.CENTER_VERTICAL);
+                    rootView.setLayoutParams(layoutParams);
+                }
+                if (debug)
+                    Log.i(TAG, "getBitmap() returned from cache! " + bmp.getWidth() + "x" + bmp.getHeight() + " " + bmp.getByteCount() + " bytes" + " req: " + requiredWidth + "x" + requiredHeight + " for " + messagePart.getId());
+            } else {
+                //adjust width/height
+                int stubWidth = requiredWidth;
+                int stubHeight = requiredHeight;
+                if (stubWidth > width) {
+                    stubWidth = width;
+                    stubHeight = height;
+                }
+                if (stubHeight > messagesList.getHeight()) {
+                    stubWidth = (int) (1.0 * stubWidth * stubHeight / messagesList.getHeight());
+                    stubHeight = messagesList.getHeight();
+                }
+
+                final RoundRectShape roundRectShape = new RoundRectShape(Atlas.Tools.getRoundRectRadii(new float[]{16, 16, 16, 16}, cellContainer.getResources().getDisplayMetrics()), null, null);
+                ShapeDrawable shapeDrawable = new ShapeDrawable(roundRectShape);
+                shapeDrawable.getPaint().setColor(cellContainer.getResources().getColor(R.color.atlas_background_gray));
+                //shapeDrawable.setBounds(0, 0, stubWidth, stubHeight);
+                shapeDrawable.setBounds(0, 0, 300, 300);
+                //imageView.getLayoutParams().width = stubWidth;
+                //imageView.getLayoutParams().height = stubHeight;
+                imageView.setImageDrawable(shapeDrawable); //imageView.setImageResource(R.drawable.image_stub);
+                imageView.requestLayout();
+
+                requestBitmap(workingPart, requiredWidth, requiredHeight, new BitmapLoadListener() {
+                    public void onBitmapLoaded(MessagePart part) {
+                        cellContainer.post(new Runnable() {
+                            public void run() {
+                                messagesList.invalidateViews();
+                            }
+                        });
+                    }
+                });
+            }
+
+            ShapedFrameLayout cellCustom = (ShapedFrameLayout) rootView;
+            Cell cell = this;
+            // clustering
+            cellCustom.setCornerRadiusDp(16, 16, 16, 16);
+            if (!CLUSTERED_BUBBLES) return rootView;
+            boolean myMessage = client.getAuthenticatedUserId().equals(cell.messagePart.getMessage().getSender().getUserId());
+            if (myMessage) {
+                if (cell.clusterHeadItemId == cell.clusterItemId && !cell.clusterTail) {
+                    cellCustom.setCornerRadiusDp(16, 16, 2, 16);
+                    //cellCustom.setBackgroundResource(R.drawable.atlas_shape_rounded16_blue_no_bottom_right);
+                } else if (cell.clusterTail && cell.clusterHeadItemId != cell.clusterItemId) {
+                    cellCustom.setCornerRadiusDp(16, 2, 16, 16);
+                    //cellCustom.setBackgroundResource(R.drawable.atlas_shape_rounded16_blue_no_top_right);
+                } else if (cell.clusterHeadItemId != cell.clusterItemId && !cell.clusterTail) {
+                    cellCustom.setCornerRadiusDp(16, 2, 2, 16);
+                    //cellCustom.setBackgroundResource(R.drawable.atlas_shape_rounded16_blue_no_right);
+                }
+            } else {
+                if (cell.clusterHeadItemId == cell.clusterItemId && !cell.clusterTail) {
+                    cellCustom.setCornerRadiusDp(16, 16, 16, 2);
+                } else if (cell.clusterTail && cell.clusterHeadItemId != cell.clusterItemId) {
+                    cellCustom.setCornerRadiusDp(2, 16, 16, 16);
+                } else if (cell.clusterHeadItemId != cell.clusterItemId && !cell.clusterTail) {
+                    cellCustom.setCornerRadiusDp(2, 16, 16, 2);
+                }
+            }
+            return rootView;
+        }
+    }
+
     public abstract class Cell {
         public final MessagePart messagePart;
         private int clusterHeadItemId;
@@ -888,5 +1015,4 @@ public class AtlasMessagesList extends FrameLayout implements LayerChangeEventLi
 
         public abstract View onBind(ViewGroup cellContainer);
     }
-
 }

@@ -28,45 +28,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
-                android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin"
-                android:text="Account"
-                android:textColor="@color/atlas_text_blue"
-                android:textSize="@dimen/atlas_text_size_smaller" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:orientation="vertical"
-                android:paddingLeft="@dimen/atlas_messenger_activity_horizontal_margin"
-                android:paddingRight="@dimen/atlas_messenger_activity_horizontal_margin">
-
-                <TextView
-                    android:id="@+id/atlas_settings_username_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="bottom"
-                    android:text=""
-                    android:textColor="@color/atlas_text_black"
-                    android:textSize="@dimen/atlas_text_size_general" />
-
-                <TextView
-                    android:id="@+id/atlas_settings_login_status_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="top"
-                    android:text=""
-                    android:textColor="@color/atlas_text_gray"
-                    android:textSize="@dimen/atlas_text_size_smaller" />
-
-            </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="88dp"

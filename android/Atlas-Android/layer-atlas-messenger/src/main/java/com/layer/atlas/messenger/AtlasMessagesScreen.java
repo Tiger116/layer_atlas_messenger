@@ -23,8 +23,11 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -53,6 +56,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -72,6 +76,7 @@ public class AtlasMessagesScreen extends AppCompatActivity {
     public static final int REQUEST_CODE_SETTINGS = 101;
     public static final int REQUEST_CODE_GALLERY = 111;
     public static final int REQUEST_CODE_CAMERA = 112;
+    private static final int REQUEST_CODE_PLAY_VIDEO = 113;
     private static final int REQUEST_MAP_MARKERS = 102;
     private static final String TAG = AtlasMessagesScreen.class.getSimpleName();
     private static final boolean debug = false;
@@ -125,15 +130,17 @@ public class AtlasMessagesScreen extends AppCompatActivity {
                     }
 
                     // push
-//                    Participant myParticipant = app.getParticipantProvider().get(app.getLayerClient().getAuthenticatedUserId());
-//                    String senderName = Atlas.getFullName(myParticipant);
-//                    Map<String, String> metadata = new HashMap<String, String>();
-//                    if (senderName != null && !senderName.isEmpty()) {
-//                        metadata.put(Message.ReservedMetadataKeys.PushNotificationAlertMessageKey.getKey(), senderName + ": " + text);
-//                    } else {
-//                        metadata.put(Message.ReservedMetadataKeys.PushNotificationAlertMessageKey.getKey(), text);
-//                    }
-//                    message.setMetadata(metadata);
+                    Atlas.Participant me = app.getParticipantProvider().getParticipant(app.getLayerClient().getAuthenticatedUserId());
+                    String senderName = Atlas.getFullName(me);
+                    if (!text.isEmpty()) {
+                        if (senderName != null && !senderName.isEmpty()) {
+
+                            message.getOptions().pushNotificationMessage(senderName + ": " + text);
+                        } else {
+
+                            message.getOptions().pushNotificationMessage(text);
+                        }
+                    }
                 }
                 return true;
             }
@@ -155,10 +162,19 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         messageComposer.registerMenuItem("Image", new OnClickListener() {
             public void onClick(View v) {
                 // in onCreate or any event where your want the user to select a file
-                Intent intent = new Intent();
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE_GALLERY);
+            }
+        });
+
+        messageComposer.registerMenuItem("Video", new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("video/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Video"), REQUEST_CODE_GALLERY);
             }
         });
 
@@ -181,36 +197,45 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         messagesList.setConversation(conv);
         messagesList.setItemClickListener(new ItemClickListener() {
             public void onItemClick(Cell item) {
-                String mimeType = item.messagePart.getMimeType();
-                if (Atlas.MIME_TYPE_ATLAS_LOCATION.equals(mimeType)) {
-                    String jsonLonLat = new String(item.messagePart.getData());
-                    Intent mapIntent = new Intent(AtlasMessagesScreen.this, AtlasMapScreen.class);
-                    mapIntent.putExtra(getString(R.string.locations_json_array_key), jsonLonLat);
-                    startActivity(mapIntent);
-//                    try {
-//                    JSONArray jsonArray = new JSONArray(jsonLonLat);
-//                        for (int i=0;i<jsonArray.length();i++) {
-//                            JSONObject json = new JSONObject(jsonLonLat);
-//                            double lon = json.getDouble("lon");
-//                            double lat = json.getDouble("lat");
-//                            Intent openMapIntent = new Intent(Intent.ACTION_VIEW);
-//                            String uriString = String.format(Locale.ENGLISH, "geo:%f,%f?z=%d&q=%f,%f", lat, lon, 18, lat, lon);
-//                            final Uri geoUri = Uri.parse(uriString);
-//                            openMapIntent.setData(geoUri);
-//                        }
-//                        if (openMapIntent.resolveActivity(getPackageManager()) != null) {
-//                            startActivity(openMapIntent);
-//                            if (debug) Log.w(TAG, "onItemClick() starting Map: " + uriString);
-//                        } else {
-//                            if (debug)
-//                                Log.w(TAG, "onItemClick() No Activity to start Map: " + geoUri);
-//                        }
-//                    } catch (JSONException ignored) {
-//                    }
-                } else if (mimeType.contains("image/")) {
-                    Intent intent = new Intent(AtlasMessagesScreen.this, AtlasShowPhotoScreen.class);
-                    intent.putExtra(getString(R.string.bitmap_array_key), item.messagePart.getData());
-                    startActivity(intent);
+                switch (item.messagePart.getMimeType()) {
+                    case Atlas.MIME_TYPE_ATLAS_LOCATION:
+                        String jsonLonLat = new String(item.messagePart.getData());
+                        Intent mapIntent = new Intent(AtlasMessagesScreen.this, AtlasMapScreen.class);
+                        mapIntent.putExtra(getString(R.string.locations_json_array_key), jsonLonLat);
+                        startActivity(mapIntent);
+                        break;
+                    case Atlas.MIME_TYPE_IMAGE_JPEG:
+                    case Atlas.MIME_TYPE_IMAGE_JPEG_PREVIEW:
+                    case Atlas.MIME_TYPE_IMAGE_PNG:
+                    case Atlas.MIME_TYPE_IMAGE_PNG_PREVIEW:
+                        Intent intent = new Intent(AtlasMessagesScreen.this, AtlasShowPhotoScreen.class);
+                        if (item.messagePart.isContentReady()) {
+                            intent.putExtra(getString(R.string.bitmap_array_key), item.messagePart.getData());
+                            startActivity(intent);
+                        } else
+                            Toast.makeText(AtlasMessagesScreen.this, "Content is not downloaded, please try again later", Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case Atlas.MIME_TYPE_VIDEO_MP4:
+                        String filename = "video_" + item.messagePart.getMessage().getId().getLastPathSegment() + ".mp4";
+                        File file = new File(getExternalFilesDir(Environment.DIRECTORY_MOVIES), filename);
+
+                        if (!file.exists()) {
+                            try {
+                                if (file.createNewFile()) {
+                                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+                                    bos.write(item.messagePart.getData());
+                                    bos.flush();
+                                    bos.close();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Intent videoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("file:" + file.getPath()));
+                        videoIntent.setDataAndType(Uri.parse("file:" + file.getPath()), "video/mp4");
+                        startActivityForResult(videoIntent, REQUEST_CODE_PLAY_VIDEO);
+                        break;
                 }
             }
         });
@@ -246,7 +271,6 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_MAP_MARKERS:
                 if (data != null) {
-//                    List<MessagePart> parts = new ArrayList<>();
                     double[] latitudes = data.getExtras().getDoubleArray("latitude");
                     double[] longitudes = data.getExtras().getDoubleArray("longitude");
                     JSONArray jsonArray = new JSONArray();
@@ -261,18 +285,9 @@ public class AtlasMessagesScreen extends AppCompatActivity {
                                 e.printStackTrace();
                             }
                         }
-//                            HashMap location = new HashMap<String, String>();
-//                            location.put("lat", latitudes[i]);
-//                            location.put("lon", longitudes[i]);
-
-//                        Convert the location to data
-//                            ByteArrayOutputStream locationData = new ByteArrayOutputStream();
-//                                outputStream = new ObjectOutputStream(locationData);
-//                                outputStream.writeObject(location);
                         if (jsonArray.length() > 0) {
                             String locationString = jsonArray.toString();
                             MessagePart locationPart = layerClient.newMessagePart(Atlas.MIME_TYPE_ATLAS_LOCATION, locationString.getBytes());
-//                            parts.add(locationPart);
                             Message message = layerClient.newMessage(locationPart);
                             conv.send(message);
                             if (debug) Log.w(TAG, "onSendLocation() loc:  " + locationString);
@@ -324,28 +339,35 @@ public class AtlasMessagesScreen extends AppCompatActivity {
                     Log.e(TAG, "onActivityResult() cannot insert photo" + e);
                 }
                 break;
+
             case REQUEST_CODE_GALLERY:
                 if (data == null) {
                     if (debug) Log.w(TAG, "onActivityResult() insert from gallery: no data... :( ");
                     return;
                 }
                 // first check media gallery
-                Uri selectedImageUri = data.getData();
-                // TODO: Mi4 requires READ_EXTERNAL_STORAGE permission for such operation
-                String selectedImagePath = getGalleryImagePath(selectedImageUri);
-                String resultFileName = selectedImagePath;
-                if (selectedImagePath != null) {
+                Uri selectedDataUri = data.getData();
+
+                String selectedDataPath = getGalleryDataPath(selectedDataUri);
+                String resultFileName = selectedDataPath;
+                if (selectedDataPath != null) {
                     if (debug)
-                        Log.w(TAG, "onActivityResult() image from gallery selected: " + selectedImagePath);
-                } else if (selectedImageUri.getPath() != null) {
+                        Log.w(TAG, "onActivityResult() image from gallery selected: " + selectedDataPath);
+                } else if (selectedDataUri.getPath() != null) {
                     if (debug)
-                        Log.w(TAG, "onActivityResult() image from file picker appears... " + selectedImageUri.getPath());
-                    resultFileName = selectedImageUri.getPath();
+                        Log.w(TAG, "onActivityResult() image from file picker appears... " + selectedDataUri.getPath());
+                    resultFileName = selectedDataUri.getPath();
                 }
 
                 if (resultFileName != null) {
-                    String mimeType = Atlas.MIME_TYPE_IMAGE_JPEG;
-                    if (resultFileName.endsWith(".png")) mimeType = Atlas.MIME_TYPE_IMAGE_PNG;
+                    String mimeType;
+                    if (resultFileName.endsWith(".jpg") || resultFileName.endsWith(".jpeg"))
+                        mimeType = Atlas.MIME_TYPE_IMAGE_JPEG;
+                    else if (resultFileName.endsWith(".png"))
+                        mimeType = Atlas.MIME_TYPE_IMAGE_PNG;
+                    else
+                        mimeType = Atlas.MIME_TYPE_VIDEO_MP4;
+
 
                     // test file copy locally
                     try {
@@ -364,7 +386,12 @@ public class AtlasMessagesScreen extends AppCompatActivity {
                             }
                         }
 
-                        String fileName = "galleryFile" + System.currentTimeMillis() + ".jpg";
+                        String fileName = "galleryFile_" + System.currentTimeMillis();
+                        if (!Atlas.MIME_TYPE_VIDEO_MP4.equals(mimeType)) {
+                            fileName += ".jpg";
+                        } else {
+                            fileName += ".mp4";
+                        }
                         final File originalFile = new File(getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES), fileName);
 
                         OutputStream fos = new FileOutputStream(originalFile);
@@ -411,12 +438,23 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         }
     }
 
-    private MessagePart[] buildPreviewAndSize(final LayerClient layerClient, final File imageFile) throws FileNotFoundException, IOException, JSONException {
+    private MessagePart[] buildPreviewAndSize(final LayerClient layerClient, final File file) throws FileNotFoundException, IOException, JSONException {
         // prepare preview
         BitmapFactory.Options optOriginal = new BitmapFactory.Options();
+
         optOriginal.inJustDecodeBounds = true;
-        //BitmapFactory.decodeFile(photoFile.getAbsolutePath(), optOriginal);
-        BitmapFactory.decodeStream(new FileInputStream(imageFile), null, optOriginal);
+
+        Bitmap decodedBmp = null;
+        if (file.getName().endsWith(".mp4")) {
+            decodedBmp = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+            MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+            metaRetriever.setDataSource(file.getPath());
+            optOriginal.outHeight = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+            optOriginal.outWidth = Integer.parseInt(metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        } else {
+            //BitmapFactory.decodeFile(photoFile.getAbsolutePath(), optOriginal);
+            BitmapFactory.decodeStream(new FileInputStream(file), null, optOriginal);
+        }
         if (debug)
             Log.w(TAG, "buildPreviewAndSize() original: " + optOriginal.outWidth + "x" + optOriginal.outHeight);
         int previewWidthMax = 512;
@@ -441,10 +479,13 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         BitmapFactory.Options optsPreview = new BitmapFactory.Options();
         optsPreview.inSampleSize = sampleSize;
         //Bitmap decodedBmp = BitmapFactory.decodeFile(photoFile.getAbsolutePath(), optsPreview);
-        Bitmap decodedBmp = BitmapFactory.decodeStream(new FileInputStream(imageFile), null, optsPreview);
+
+        if (decodedBmp == null)
+            decodedBmp = BitmapFactory.decodeStream(new FileInputStream(file), null, optsPreview);
+
         if (decodedBmp == null) {
             if (debug)
-                Log.w(TAG, "buildPreviewAndSize() taking photo, but photo file cannot be decoded: " + imageFile.getPath());
+                Log.w(TAG, "buildPreviewAndSize() taking photo, but photo file cannot be decoded: " + file.getPath());
             return null;
         }
         if (debug)
@@ -469,6 +510,7 @@ public class AtlasMessagesScreen extends AppCompatActivity {
         };
         final MessagePart previewPart = layerClient.newMessagePart(Atlas.MIME_TYPE_IMAGE_JPEG_PREVIEW, fisPreview, previewFile.length());
 
+
         // prepare dimensions
         JSONObject joDimensions = new JSONObject();
         joDimensions.put("width", optOriginal.outWidth);
@@ -483,7 +525,7 @@ public class AtlasMessagesScreen extends AppCompatActivity {
     /**
      * pick file name from content provider with Gallery-flavor format
      */
-    public String getGalleryImagePath(Uri uri) {
+    public String getGalleryDataPath(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = managedQuery(uri, projection, null, null, null);
         if (cursor == null) {

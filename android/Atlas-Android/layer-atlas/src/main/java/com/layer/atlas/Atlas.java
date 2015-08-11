@@ -40,12 +40,15 @@ public class Atlas {
     public static final String MIME_TYPE_IMAGE_JPEG_PREVIEW = "image/jpeg+preview";
     public static final String MIME_TYPE_IMAGE_PNG = "image/png";
     public static final String MIME_TYPE_IMAGE_PNG_PREVIEW = "image/png+preview";
+    public static final String MIME_TYPE_VIDEO_MP4 = "video/mp4";
     public static final String MIME_TYPE_IMAGE_DIMENSIONS = "application/json+imageSize";
 
     public static String getInitials(Participant p) {
         StringBuilder sb = new StringBuilder();
         sb.append(p.getFirstName() != null && p.getFirstName().trim().length() > 0 ? p.getFirstName().trim().charAt(0) : "");
         sb.append(p.getLastName() != null && p.getLastName().trim().length() > 0 ? p.getLastName().trim().charAt(0) : "");
+        if (sb.toString().isEmpty())
+            sb.append(p.getLogin() != null && p.getLogin().trim().length() > 0 ? p.getLogin().trim().toUpperCase().charAt(0) : "");
         return sb.toString();
     }
 
@@ -68,8 +71,7 @@ public class Atlas {
             if (p.getLastName() != null && p.getLastName().trim().length() > 0) {
                 sb.append(" ").append(p.getLastName().trim());
             }
-        }
-        else
+        } else
             sb.append(p.getLogin().trim());
         return sb.toString();
     }
